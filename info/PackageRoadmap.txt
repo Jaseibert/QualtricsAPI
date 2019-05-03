@@ -1,0 +1,13 @@
+Phase 1:
+- Setup the Package Structure.txt (Done)
+- Work on creating Environment Variables for Credentials.py (Done)
+- Build the primary package components (In-Progress)
+    + Get Survey Responses
+        - Add logic to open the survey responses as a dataFrame
+        - Create tests for each function
+        - Add the Sphinx Docstrings
+    + XMDirectory Functionality
+    + MailingList Functionality
+
+- Add Components to push to PyPi
+- Push version 0.1 to PyPi

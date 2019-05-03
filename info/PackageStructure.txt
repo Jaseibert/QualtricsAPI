@@ -1,0 +1,17 @@
+CURRENT PACKAGE STRUCTURE
+QualtricsAPI/                     Root Directory
+    QualtricsAPI/                 Primary package
+        __init__.py               Initialize the QualtricsAPI package
+        Credentials/              Subpackage for handling Auth Credentials
+            __init__.py
+            Credentials.py        Module for handling Auth Credentials
+             ...
+        Contacts/                    Subpackage for Orbital Calculations & TLE Parsing
+            __init__.py
+            orbit.py              Module for
+            tle.py                Module for
+            ...
+        Tests/                    Subpackage for Testing
+            __init__.py
+            test.py               Module for Testing
+            ...

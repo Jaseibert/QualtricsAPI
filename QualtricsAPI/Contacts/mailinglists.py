@@ -3,7 +3,7 @@ import io
 import json
 import requests as r
 import pandas as pd
-from QualtricsAPI.Setup.credentials import Credentials
+from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
 
 class MailingList(Credentials):
@@ -14,20 +14,24 @@ class MailingList(Credentials):
         self.directory_id = directory_id
         return
 
-    def create_list(self, list_name=None):
+    def create_list(self, name):
         '''This function creates a mailing list in the XM Directory for the specified user token.
 
         :param list_name: the name of the list to be created.
         :return: set containing the list_name and the list's new id
         '''
-        headers, url = self.header_setup(content_type=True)
-        url = url + "/mailinglists"
-        data = {"name": f"{str(list_name)}"}
-        response = r.post(url, json=data, headers=headers)
-        content = response.json()
-        list_id = self.json_parser(response=content,keys=['id'])
-        list_params = tuple([list_name, list_id])
-        return list_params
+        try:
+            headers, url = self.header_setup(content_type=True)
+            url = url + "/mailinglists"
+            data = {"name": "{0}".format(name)}
+            response = r.post(url, json=data, headers=headers)
+            content = response.json()
+            list_id = Parser().json_parser(response=content,keys=['id'], arr=False)[0][0]
+            list_params = tuple([name, list_id])
+            return list_params
+        except:
+            raise ValueError(f"ServerError:\nError Code: {content['meta']['error']['errorCode']}\nError Message: {content['meta']['error']['errorMessage']}")
+
 
     def list_lists(self, page_size=100, offset=0, to_df=True):
         '''This function lists all the mailing lists in the directory for the specified user token.
@@ -41,7 +45,7 @@ class MailingList(Credentials):
         url = base_url + f"/mailinglists?pageSize={page_size}&offset={offset}"
         response = r.get(url, headers=headers)
         lists = response.json()
-        mailing_lists = self.json_parser(response=lists, keys=['results','mailingListId', 'name', 'ownerId', 'contactCount', 'lastModifiedDate', 'creationDate'])
+        mailing_lists = self.Parser(response=lists, keys=['results','mailingListId', 'name', 'ownerId', 'contactCount', 'lastModifiedDate', 'creationDate'])
         if to_df is True:
             mailing_lists = pd.DataFrame(mailing_lists,columns=['list_ids','list_names','owner_ids','contact_count','last_modified','creation_date'])
             mailing_lists['last_modified'] = pd.to_datetime(mailing_lists['last_modified'],unit='ms')

@@ -1,8 +1,8 @@
 # __init__.py
-from Setup.credentials import *
-from SurveyResponses.responses import *
-from JSON.parser import *
-from Contacts.mailinglists import *
-from Contacts.xmdirectory import *
+from QualtricsAPI.Setup.credentials import *
+from QualtricsAPI.Survey.responses import *
+from QualtricsAPI.JSON.parser import *
+from QualtricsAPI.Contacts.mailinglists import *
+from QualtricsAPI.Contacts.xmdirectory import *
 
-__all__ = ["Setup", "JSON", "Contacts", "SurveyResponses"]
+__all__ = ["Setup", "JSON", "Contacts", "Survey"]

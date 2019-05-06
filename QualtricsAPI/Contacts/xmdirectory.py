@@ -3,7 +3,7 @@ import io
 import json
 import requests as r
 import pandas as pd
-from QualtricsAPI.Setup.credentials import Credentials
+from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
 
 class XMDirectory(Credentials):

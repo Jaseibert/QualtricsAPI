@@ -24,7 +24,10 @@ class Parser(object):
         results = extract(obj, arr, key)
         return results
 
-    def json_parser(self, response, keys=[]):
+    def json_parser(self, response=None, keys=[], arr=True):
         ''' '''
         elements  = [self.extract_values(response, item) for item in keys]
-        return np.array(elements).T
+        if arr == True:
+            return np.array(elements).T
+        else:
+            return elements

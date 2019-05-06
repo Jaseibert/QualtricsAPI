@@ -1,17 +1,26 @@
 CURRENT PACKAGE STRUCTURE
+
 QualtricsAPI/                     Root Directory
     QualtricsAPI/                 Primary package
         __init__.py               Initialize the QualtricsAPI package
-        Credentials/              Subpackage for handling Auth Credentials
-            __init__.py
-            Credentials.py        Module for handling Auth Credentials
+        Credentials/              Sub-package for handling Auth Credentials
+            __init__.py           Initialize the Credentials Sub-package
+            credentials.py        Module for handling Auth Credentials
              ...
-        Contacts/                    Subpackage for Orbital Calculations & TLE Parsing
-            __init__.py
-            orbit.py              Module for
-            tle.py                Module for
+        Contacts/                 Sub-package for working with Contact Data
+            __init__.py           Initialize the Contacts Sub-Package
+            mailingList.py        Module for working with Qualtrics Mailing Lists
+            xmdirectory.py        Module for working with Qualtrics XMDirectory
             ...
-        Tests/                    Subpackage for Testing
-            __init__.py
+        Survey/                   Sub-package for working with Survey Data
+            __init__.py           Initialize the Survey Sub-Package
+            responses.py          Module for gathering Qualtrics survey responses
+            ...
+        JSON/                     Sub-package for parsing JSON Objects
+            __init__.py           Initialize the JSON Sub-Package
+            parser.py             Module for parsing the HTTP JSON Responses
+            ...
+        Tests/                    Sub-package for Testing
+            __init__.py           Initialize the Tests Sub-Package
             test.py               Module for Testing
             ...

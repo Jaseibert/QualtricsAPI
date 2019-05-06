@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from QualtricsAPI.Exceptions import *
 
 class Credentials(object):
 
@@ -7,9 +8,12 @@ class Credentials(object):
         return
 
     def qualtrics_api_credentials(self, token=None, data_center=None, directory_id=None):
-        os.environ['token'] = token
-        os.environ['data_center'] = data_center
-        os.environ['directory_id'] = directory_id
+        try:
+            os.environ['token'] = token
+            os.environ['data_center'] = data_center
+            os.environ['directory_id'] = directory_id
+        except APITokenError:
+            
         return
 
     def header_setup(self,content_type=False,responses=True):

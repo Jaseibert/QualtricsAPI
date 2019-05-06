@@ -2,16 +2,15 @@ import requests as r
 import zipfile
 import json
 import io
-import glob
 
 class Responses(object):
 
     def __init__(self, token=None, survey_id=None, file_format=None, data_center=None, export_type='LegacyV3'):
-        self.token = str(token)
-        self.survey_id = str(survey_id)
-        self.file_format = str(file_format)
-        self.data_center = str(data_center)
-        self.export_type = str(export_type)
+        self.token = token
+        self.survey_id = survey_id
+        self.file_format = file_format
+        self.data_center = data_center
+        self.export_type = export_type
         return
 
     def setup_request(self, file_format='csv', survey_id=None):
@@ -46,8 +45,13 @@ class Responses(object):
         download_request = r.request("GET", download_url, headers=headers, stream=True)
         return download_request
 
-    def get_responses(self, file_format='csv', survey_id):
-        ''''''
+    def get_responses(self, file_format='csv', survey_id=None):
+        '''This function accepts the file format, and the survey id, and returns the responses associated with that survey.
+
+        :param file_format: the file format to be returned
+        :param survey_id: the id associated with a given survey.
+        :return: a HTML header and base url.
+        '''
         download_request = self.send_request(file_format=file_format, survey_id=survey_id)
         zipfile.ZipFile(io.BytesIO(download_request.content)).extractall("SurveyResponses")
         print('The folder "{0}" has been created with your survey responses stored inside.'.format(folder_name))

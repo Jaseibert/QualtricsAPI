@@ -2,3 +2,6 @@
 index.rst
 documentation
 __pycache__/
+Contacts/__pycache__/
+Survey/__pycache__/
+Setup/__pycache__/

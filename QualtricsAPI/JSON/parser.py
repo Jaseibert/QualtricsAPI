@@ -25,7 +25,7 @@ class Parser(object):
         return results
 
     def json_parser(self, response=None, keys=[], arr=True):
-        ''' '''
+        '''This method returns the JSON as either a NumPy Array or the element itself.'''
         elements  = [self.extract_values(response, item) for item in keys]
         if arr == True:
             return np.array(elements).T

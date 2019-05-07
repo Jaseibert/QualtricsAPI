@@ -15,7 +15,9 @@ class setup_tests(object):
     def __init__(self):
         return
 
-    # Test Case 1
+    # Test Case 1: qualtrics_api_credentials parameter lengths
+    def setup_test_credentials():
+        token
 
 
     # Test Case 2

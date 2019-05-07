@@ -2,15 +2,15 @@ import requests as r
 import zipfile
 import json
 import io
+import pandas as pd
+from QualtricsAPI.Setup import Credentials
+from QualtricsAPI.JSON import Parser
+from QualtricsAPI.Exceptions import ServerError
 
-class Responses(object):
+class Responses(Credentials):
+    '''This is a child class to the credentials class that gathers the survey responses from Qualtrics surveys'''
 
-    def __init__(self, token=None, survey_id=None, file_format=None, data_center=None, export_type='LegacyV3'):
-        self.token = token
-        self.survey_id = survey_id
-        self.file_format = file_format
-        self.data_center = data_center
-        self.export_type = export_type
+    def __init__(self):
         return
 
     def setup_request(self, file_format='csv', survey_id=None):
@@ -19,40 +19,51 @@ class Responses(object):
         :param content_type: use to return json response.
         :return: a HTML header and base url.
         '''
-        headers, url = self.header_setup(self,content_type=True,responses=True)
-        payload = '{"format":"' + str(file_format) + '","surveyId":"' + str(survey_id) + '"}'
-        response = r.request("POST", url, data=payload, headers=headers)
-        progress_id = response.json()['result']['id']
-        return progress_id, url, headers
+        try:
+            headers, url = self.header_setup(content_type=True, responses=False)
+            payload = '{"format":"' + file_format + '","surveyId":"' + survey_id + '"}'
+            request = r.request("POST", url, data=payload, headers=headers)
+            response = request.json()
+            progress_id = response['result']['id']
+            return progress_id, url, headers
+        except ServerError as s:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
+        except KeyError:
+            print(f"ServerError:\nError Message: {response['meta']['error']['errorMessage']}")
+
 
     def send_request(self, file_format='csv', survey_id=None):
         ''''''
-        file = None
-        progress_id, url, headers = self.setup_request(file_format=file_format, survey_id=survey_id)
-        check_progress = 0
-        progress_status = "in progress"
-        while check_progress < 100 and progress_status is not "complete" and file is None:
-            check_url = url + progress_id
-            check_response = r.request("GET", check_url, headers=headers)
-            file = check_response.json()["result"]["file"]
-            if file is None:
-                print ("file not ready")
-            else:
-                print ("file created:", check_response.json()["result"]["file"])
-            check_progress = check_response.json()["result"]["percentComplete"]
-            print("Download is " + str(check_progress) + " complete")
-        download_url = url + progress_id + '/file'
-        download_request = r.request("GET", download_url, headers=headers, stream=True)
+        try:
+            file = None
+            progress_id, url, headers = self.setup_request(file_format=file_format, survey_id=survey_id)
+            check_progress = 0
+            progress_status = "in progress"
+            while check_progress < 100 and progress_status is not "complete" and file is None:
+                check_url = url + progress_id
+                check_response = r.request("GET", check_url, headers=headers)
+                file = check_response.json()["result"]["file"]
+                check_progress = check_response.json()["result"]["percentComplete"]
+            download_url = url + progress_id + '/file'
+            download_request = r.get(download_url, headers=headers, stream=True).content
+        except ServerError as s:
+            print(f"ServerError:\nError Code: {content['meta']['error']['errorCode']}\nError Message: {content['meta']['error']['errorMessage']}", s.msg)
         return download_request
 
-    def get_responses(self, file_format='csv', survey_id=None):
+    def get_responses(self, file_format='csv', survey_id=None, ):
         '''This function accepts the file format, and the survey id, and returns the responses associated with that survey.
 
         :param file_format: the file format to be returned
         :param survey_id: the id associated with a given survey.
         :return: a HTML header and base url.
         '''
+
         download_request = self.send_request(file_format=file_format, survey_id=survey_id)
-        zipfile.ZipFile(io.BytesIO(download_request.content)).extractall("SurveyResponses")
-        print('The folder "{0}" has been created with your survey responses stored inside.'.format(folder_name))
-        #Add Logic to open the file as a dataFrame
+        file_stream = io.BytesIO(download_request)
+        file_stream.seek(0)
+        df = pd.read_table(file_stream, sep=',', index_col=False, encoding='utf-8')
+        return df.head()
+
+
+
+    #Method to List Surveys

@@ -1,7 +1,11 @@
 Phase 1:
 - Setup the Package Structure.txt (Done)
 - Work on creating Environment Variables for Credentials.py (Done)
-- Build Custom Error Class (In-Progress)
+- Define the Functions that need to be included in the Documentation.
+
+
+
+
 - Build the primary package components (In-Progress)
     + Get Survey Responses
         - Add logic to open the survey responses as a dataFrame
@@ -9,6 +13,8 @@ Phase 1:
         - Add the Sphinx Docstrings
     + XMDirectory Functionality
     + MailingList Functionality
+    + JSON Parser (Done)
+    + Customer Exceptions (In-Progress)
 - Build Sphinx Documentation Site
 - Add Components to push to PyPi
 - Push version 0.1 to PyPi

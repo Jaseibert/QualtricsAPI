@@ -29,7 +29,7 @@ class Responses(Credentials):
             print(f"ServerError:\nError Message: {response['meta']['error']['errorMessage']}")
 
     def send_request(self, file_format='csv', survey_id=None):
-        ''''''
+        '''This method sends the request, and sets up the download request.'''
         try:
             file = None
             progress_id, url, headers = self.setup_request(file_format=file_format, survey_id=survey_id)
@@ -52,11 +52,25 @@ class Responses(Credentials):
         :param survey_id: the id associated with a given survey.
         :return: a Pandas DataFrame with the responses
         '''
-
+        #try:
         download_request = self.send_request(file_format='csv', survey_id=survey_id)
         with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
             for s in survey_zip.infolist():
                 df = pd.read_csv(survey_zip.open(s.filename))
-                return df.head()
+                return df
+        #except AssertionError as a:
+            #assert len(survey_id) ==
+
+    def get_questions(self, survey_id=None):
+        '''This method returns a DataFrame containing the Survey questions and the QuestionIDs.
+
+        :param survey_id:
+        :return:
+        '''
+        df = self.get_responses(survey_id=survey_id)
+        q = pd.DataFrame(df[:1].T)
+        q.columns = ['Questions']
+        return q
+
 
     #Method to List Surveys

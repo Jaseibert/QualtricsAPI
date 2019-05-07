@@ -3,7 +3,15 @@ class Error(Exception):
     pass
 
 class ServerError(Error):
-    '''This Exception handles errors associated with the HTTP reponses.'''
+    '''This Exception handles errors associated with the HTTP responses.'''
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)
+
+class ServerError(Error):
+    '''This Exception handles errors associated with the SurveyId from the get_responses method.'''
     def __init__(self, msg):
         self.msg = msg
 

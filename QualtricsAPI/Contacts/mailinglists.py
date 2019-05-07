@@ -24,8 +24,8 @@ class MailingList(Credentials):
             headers, url = self.header_setup(content_type=True)
             url = url + "/mailinglists"
             data = {"name": "{0}".format(name)}
-            response = r.post(url, json=data, headers=headers)
-            content = response.json()
+            request = r.post(url, json=data, headers=headers)
+            content = request.json()
             list_id = Parser().json_parser(response=content,keys=['id'], arr=False)[0][0]
             list_params = tuple([name, list_id])
             return list_params

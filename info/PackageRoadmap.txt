@@ -1,15 +1,7 @@
 Phase 1:
 - Setup the Package Structure.txt (Done)
 - Work on creating Environment Variables for Credentials.py (Done)
-- Define the Functions that need to be included in the Documentation.
-
-
-
-
 - Build the primary package components (In-Progress)
-    + Get Survey Responses
-        - Add logic to open the survey responses as a dataFrame
-        - Create tests for each function
         - Add the Sphinx Docstrings
     + XMDirectory Functionality
     + MailingList Functionality

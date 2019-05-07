@@ -3,6 +3,7 @@ import zipfile
 import json
 import io
 import pandas as pd
+import glob
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
 from QualtricsAPI.Exceptions import ServerError
@@ -14,11 +15,7 @@ class Responses(Credentials):
         return
 
     def setup_request(self, file_format='csv', survey_id=None):
-        '''This function accepts the argument content_type and returns the correct header, and base url.
-
-        :param content_type: use to return json response.
-        :return: a HTML header and base url.
-        '''
+        '''  '''
         try:
             headers, url = self.header_setup(content_type=True, responses=False)
             payload = '{"format":"' + file_format + '","surveyId":"' + survey_id + '"}'
@@ -30,7 +27,6 @@ class Responses(Credentials):
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         except KeyError:
             print(f"ServerError:\nError Message: {response['meta']['error']['errorMessage']}")
-
 
     def send_request(self, file_format='csv', survey_id=None):
         ''''''
@@ -45,25 +41,22 @@ class Responses(Credentials):
                 file = check_response.json()["result"]["file"]
                 check_progress = check_response.json()["result"]["percentComplete"]
             download_url = url + progress_id + '/file'
-            download_request = r.get(download_url, headers=headers, stream=True).content
+            download_request = r.get(download_url, headers=headers, stream=True)
         except ServerError as s:
             print(f"ServerError:\nError Code: {content['meta']['error']['errorCode']}\nError Message: {content['meta']['error']['errorMessage']}", s.msg)
         return download_request
 
-    def get_responses(self, file_format='csv', survey_id=None, ):
+    def get_responses(self, survey_id=None):
         '''This function accepts the file format, and the survey id, and returns the responses associated with that survey.
 
-        :param file_format: the file format to be returned
         :param survey_id: the id associated with a given survey.
-        :return: a HTML header and base url.
+        :return: a Pandas DataFrame with the responses
         '''
 
-        download_request = self.send_request(file_format=file_format, survey_id=survey_id)
-        file_stream = io.BytesIO(download_request)
-        file_stream.seek(0)
-        df = pd.read_table(file_stream, sep=',', index_col=False, encoding='utf-8')
-        return df.head()
-
-
+        download_request = self.send_request(file_format='csv', survey_id=survey_id)
+        with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
+            for s in survey_zip.infolist():
+                df = pd.read_csv(survey_zip.open(s.filename))
+                return df.head()
 
     #Method to List Surveys

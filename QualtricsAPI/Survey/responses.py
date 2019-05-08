@@ -68,7 +68,7 @@ class Responses(Credentials):
         :return:
         '''
         df = self.get_responses(survey_id=survey_id)
-        q = pd.DataFrame(df[:1].T)
+        q = pd.DataFrame(df[:1].T)m
         q.columns = ['Questions']
         return q
 

@@ -24,6 +24,23 @@ class Parser(object):
         results = extract(obj, arr, key)
         return results
 
+    def extract_keys(self, obj):
+        '''Extract all of the keys from a dictionary.'''
+        keys = []
+
+        def extract(obj, keys):
+            '''Recursively identify each of the keys within a dictionary.'''
+            if isinstance(obj, dict):
+                for k,v in obj.items():
+                    if isinstance(v, (dict)):
+                        keys.append(k)
+                        extract(v, keys)
+                    else:
+                        keys.append(k)
+            return keys
+        obj_keys = extract(obj, keys)
+        return obj_keys
+
     def json_parser(self, response=None, keys=[], arr=True):
         '''This method returns the JSON as either a NumPy Array or the element itself.'''
         elements  = [self.extract_values(response, item) for item in keys]

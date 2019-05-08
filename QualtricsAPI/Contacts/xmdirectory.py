@@ -87,14 +87,8 @@ class XMDirectory(Credentials):
         url = base_url + f'/contacts/{str(contact_id)}'
         response = r.get(url, headers=headers)
         contact = response.json()
-        dynamic_keys = self.extract_keys(contact['result']['embeddedData'])
-        if embedded_data is False:
-            static_elements = self.json_parser(contact, keys)
-        #else:
-      #      dynamic_elements = self.json_parser()
-       #     df = pd.DataFrame(elements).transpose()
-       # dynamic_keys = self.extract_keys(contact['result']['embeddedData'])
-        #df.columns = keys
+
+
         return dynamic_keys
 
     def get_contact_history(self):

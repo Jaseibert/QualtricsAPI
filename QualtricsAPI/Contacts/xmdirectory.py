@@ -60,7 +60,7 @@ class XMDirectory(Credentials):
         '''This function lists the contacts in the XM Directory.
 
         :param page_size: determines the start number within the directory for the call.
-        :return
+        :return:
         '''
         headers, base_url = self.header_setup()
         url = base_url + f"/contacts?pageSize={page_size}&offset={offset}"
@@ -74,24 +74,29 @@ class XMDirectory(Credentials):
         else:
             return contact_list
 
-    def get_contact(self, contact_id=None, embedded_data=False):
-        ''''''
-        #IMprove this
-        static_keys = ['contactId', 'creationDate', 'lastModified', 'firstName', 'lastName', 'email', 'emailDomain',
-                'phone', 'language', 'writeBlanks', 'extRef', 'transactionData', 'skipped','directoryUnsubscribed',
-                'directoryUnsubscribeDate','AvgTimeToRespond', 'DataIntegrity', 'EmailCount', 'InviteCount',
-                'LastEmailDate', 'LastInviteDate', 'LastResponseDate', 'MonthEmailCount', 'MonthInviteCount',
-                'Points', 'ResponseCount', 'ResponseRate']
+    def get_contact(self, contact_id=None):
+        ''' This method returns the primary information associated with a single contact.
 
+        :param contact_id: a given Contact's ID
+        :return: a DataFrame
+        '''
         headers, base_url = self.header_setup()
         url = base_url + f'/contacts/{str(contact_id)}'
         response = r.get(url, headers=headers)
         contact = response.json()
+        primary = pd.DataFrame.from_dict(contact['result'], orient='index').transpose()
+        primary['creationDate'] = pd.to_datetime(primary['creationDate'],unit='ms')
+        primary['lastModified'] = pd.to_datetime(primary['lastModified'],unit='ms')
+        return primary
 
+    def get_contact_additional_info(self, contact_id=None, content=None):
+        ''' This method returns the additional information associated with a contact (mailinglistmembership, stats, and embeddedData)
 
-        return dynamic_keys
-
-    def get_contact_history(self):
-        ''''''
-
-        return
+        :param contact_id: a given Contact's ID
+        :param content: a string representing either 'mailingListMembership', 'stats', 'embeddedData'
+        :return: a DataFrame
+        '''
+        primary = self.get_contact(contact_id=contact_id)
+        keys = Parser().extract_keys(primary[content][0])
+        data = pd.DataFrame.from_dict(primary[content][0], orient='index').transpose()
+        return data

@@ -14,7 +14,7 @@ class MailingList(Credentials):
         self.directory_id = directory_id
         return
 
-    def create_list(self, name):
+    def create_list(self, name=None):
         '''This function creates a mailing list in the XM Directory for the specified user token.
 
         :param list_name: the name of the list to be created.
@@ -45,7 +45,7 @@ class MailingList(Credentials):
         url = base_url + f"/mailinglists?pageSize={page_size}&offset={offset}"
         response = r.get(url, headers=headers)
         lists = response.json()
-        mailing_lists = self.Parser(response=lists, keys=['results','mailingListId', 'name', 'ownerId', 'contactCount', 'lastModifiedDate', 'creationDate'])
+        mailing_lists = Parser().json_parser(response=lists, keys=['results','mailingListId', 'name', 'ownerId', 'contactCount', 'lastModifiedDate', 'creationDate'])
         if to_df is True:
             mailing_lists = pd.DataFrame(mailing_lists,columns=['list_ids','list_names','owner_ids','contact_count','last_modified','creation_date'])
             mailing_lists['last_modified'] = pd.to_datetime(mailing_lists['last_modified'],unit='ms')
@@ -78,57 +78,57 @@ class MailingList(Credentials):
             raise ValueError(f"ServerError:{content['meta']['error']['errorCode']}, {content['meta']['error']['errorMessage']}")
         return list_info
 
-    def rename_list(self, mailing_list, name=None):
+    def rename_list(self, mailing_list=None, name=None):
         '''This function takes an existing mailing list name and updates it to reflect the name defined in this function.
 
         :param mailing_list: the mailing list id.
         :param name: the new name for the mailing list.
         :return: nothing, but prints a if successful.
         '''
-        data = {"name": f"{str(name)}"}
+        data = {"name": f"{name}"}
         headers, base_url = self.header_setup(content_type=True)
-        url = base_url + f"/mailinglists/{str(mailing_list)}"
+        url = base_url + f"/mailinglists/{mailing_list}"
         response = r.put(url, json=data, headers=headers)
         content = response.json()
         assert len(mailing_list) == 18, "Check your arguement, the parameter (mailing_list) should have 17 characters."
         if content['meta']['httpStatus'] == '200 - OK':
-            print(f'Your mailing list "{str(mailing_list)}" has been deleted from the XM Directory')
+            print(f'Your mailing list "{mailing_list}" has been deleted from the XM Directory')
         else:
             raise ValueError(f"ServerError:{content['meta']['error']['errorCode']}, {content['meta']['error']['errorMessage']}")
         return
 
-    def delete_list(self,mailing_list):
+    def delete_list(self,mailing_list=None):
         '''This function deletes a mailing list from the XM Directory.
 
         :param mailing_list: the mailing list id
         :return: nothing, but prints a if successful and errors if unsuccessful.
         '''
-        data = {"name": f"{str(mailing_list)}"}
+        data = {"name": f"{mailing_list}"}
         headers, base_url = self.header_setup()
-        url = base_url + f"/mailinglists/{str(mailing_list)}"
+        url = base_url + f"/mailinglists/{mailing_list}"
         response = r.delete(url, json=data, headers=headers)
         content = response.json()
         assert len(mailing_list) == 18, "Check your arguement, the parameter (mailing_list) should have 17 characters."
         if content['meta']['httpStatus'] == '200 - OK':
-            print(f'Your mailing list "{str(mailing_list)}" has been deleted from the XM Directory')
+            print(f'Your mailing list "{mailing_list}" has been deleted from the XM Directory')
         else:
             raise ValueError(f"ServerError:{content['meta']['error']['errorCode']}, {content['meta']['error']['errorMessage']}")
         return
 
-    def list_contacts(self, mailing_list):
+    def list_contacts(self, mailing_list=None):
         '''This function lists the contacts within the defined mailing list.
 
         :param mailing_list: the mailing list id
         :return: a pandas DataFrame containing the contact information.
         '''
         headers, base_url = self.header_setup()
-        url = base_url + f"/mailinglists/{str(mailing_list)}/contacts"
+        url = base_url + f"/mailinglists/{mailing_list}/contacts"
         response = r.get(url, headers=headers)
         lists = response.json()
         contact_lists = []
         i=0
         while lists['result']['nextPage'] is not None:
-            contact_list = self.json_parse(lists,'results','contactId','firstName', 'lastName', 'email', 'phone', 'extRef', 'language', 'unsubscribed')
+            contact_list = Parser().json_parser(lists,'results','contactId','firstName', 'lastName', 'email', 'phone', 'extRef', 'language', 'unsubscribed')
             contact_list_ = pd.DataFrame(contact_list, columns=['contact_id','first_name','last_name','email','phone',
                                                                'unsbscribed','language','external_ref'])
             contact_list_['mailing_list'] = mailing_list
@@ -160,18 +160,18 @@ class MailingList(Credentials):
         :return: the contact id (contact_id) in XMDirectory, and the contact id (contact_list_id) in the mailing list.
         '''
         data = {
-            "firstName": str(first_name),
-            "lastName": str(last_name),
-            "email": str(email),
-            "phone": str(phone),
+            "firstName": first_name,
+            "lastName": last_name,
+            "email": email,
+            "phone": phone,
             "embeddedData": metadata,
-            "language": str(language),
-            "extRef": str(external_ref),
-            "unsubscribed": str(unsubscribed)
+            "language": language,
+            "extRef": external_ref,
+            "unsubscribed": unsubscribed
         }
 
         headers, base_url = self.header_setup(content_type=True)
-        url = base_url + f"/mailinglists/{str(mailing_list)}/contacts"
+        url = base_url + f"/mailinglists/{mailing_list}/contacts"
         response = r.post(url, json=data, headers=headers)
         content = response.json()
         contact_id = content['result']['id']

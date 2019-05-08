@@ -26,11 +26,11 @@ class XMDirectory(Credentials):
         :return: the contact id (contact_id) in XMDirectory.
         '''
         contact_data = {
-            "firstName": str(first_name),
-            "lastName": str(last_name),
-            "email": str(email),
-            "phone": str(phone),
-            "language": str(language),
+            "firstName": first_name,
+            "lastName": last_name,
+            "email": email,
+            "phone": phone,
+            "language": language,
             "embeddedData": metadata,
         }
         headers, base_url = self.header_setup(content_type=True)
@@ -40,23 +40,23 @@ class XMDirectory(Credentials):
         contact_id = content['result']['id']
         return contact_id
 
-    def delete_contact(self,contact_id):
+    def delete_contact(self,contact_id=None):
         '''This function will delete a user from IQDirectory.
 
         :param contact_id: The unique id associated with each contact in the XM Directory.
         :return: nothing, but prints if successful, and if there was an error.
         '''
         headers, base_url = self.header_setup()
-        url = base_url + f"/contacts/{str(contact_id)}"
+        url = base_url + f"/contacts/{contact_id}"
         response = r.delete(url, headers=headers)
         content = response.json()
         if content['meta']['httpStatus'] == '200 - OK':
-            print(f'Your XM Contact"{str(contact_id)}" has been deleted from the XM Directory.')
+            print(f'Your XM Contact"{contact_id}" has been deleted from the XM Directory.')
         else:
             raise ValueError(f"ServerError:{content['meta']['error']['errorCode']}, {content['meta']['error']['errorMessage']}")
         return
 
-    def list_contacts_in_directory(self, page_size=10, offset=0, to_df=True):
+    def list_contacts_in_directory(self, page_size=100, offset=0, to_df=True):
         '''This function lists the contacts in the XM Directory.
 
         :param page_size: determines the start number within the directory for the call.

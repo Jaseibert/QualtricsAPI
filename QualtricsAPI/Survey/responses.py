@@ -52,14 +52,16 @@ class Responses(Credentials):
         :param survey_id: the id associated with a given survey.
         :return: a Pandas DataFrame with the responses
         '''
-        #try:
-        download_request = self.send_request(file_format='csv', survey_id=survey_id)
-        with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
-            for s in survey_zip.infolist():
-                df = pd.read_csv(survey_zip.open(s.filename))
-                return df
-        #except AssertionError as a:
-            #assert len(survey_id) ==
+        try:
+            download_request = self.send_request(file_format='csv', survey_id=survey_id)
+            with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
+                for s in survey_zip.infolist():
+                    df = pd.read_csv(survey_zip.open(s.filename))
+                    return df
+        except AssertionError:
+            assert len(survey_id) == 18, 'Hey it looks like your survey ID is a the incorrect length. Try again.'
+            assert survey_id[:2] == 'SV_', 'Hey, it looks like your survey ID is incorrect. Try again.'
+
 
     def get_questions(self, survey_id=None):
         '''This method returns a DataFrame containing the Survey questions and the QuestionIDs.

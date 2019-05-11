@@ -68,9 +68,9 @@ class Responses(Credentials):
         :return:
         '''
         df = self.get_responses(survey_id=survey_id)
-        q = pd.DataFrame(df[:1].T)
-        q.columns = ['Questions']
-        return q
+        questions = pd.DataFrame(df[:1].T)
+        questions.columns = ['Questions']
+        return questions
 
 
     #Method to List Surveys

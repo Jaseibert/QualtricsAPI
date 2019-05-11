@@ -20,18 +20,20 @@ class MailingList(Credentials):
         :param list_name: the name of the list to be created.
         :return: set containing the list_name and the list's new id
         '''
-        try:
-            headers, url = self.header_setup(content_type=True)
-            url = url + "/mailinglists"
-            data = {"name": "{0}".format(name)}
-            request = r.post(url, json=data, headers=headers)
-            content = request.json()
-            list_id = Parser().json_parser(response=content,keys=['id'], arr=False)[0][0]
-            list_params = tuple([name, list_id])
-            return list_params
-        except:
-            raise ValueError(f"ServerError:\nError Code: {content['meta']['error']['errorCode']}\nError Message: {content['meta']['error']['errorMessage']}")
+        #Tests
+        ##None - Works
+        ##True - Works
+        ##Empty - Syntax Error
+        ##Random not string text - NameError
 
+        headers, url = self.header_setup(content_type=True)
+        url = url + "/mailinglists"
+        data = {"name": "{0}".format(name)}
+        request = r.post(url, json=data, headers=headers)
+        content = request.json()
+        list_id = Parser().json_parser(response=content,keys=['id'], arr=False)[0][0]
+        list_params = tuple([name, list_id])
+        return list_params
 
     def list_lists(self, page_size=100, offset=0, to_df=True):
         '''This function lists all the mailing lists in the directory for the specified user token.
@@ -41,16 +43,18 @@ class MailingList(Credentials):
         :param to_df: if True, returns the mailing lists and their member objects in a pandas DataFrame.
         :return: either a pandas DataFrame or a list of tuples, containing lists and their respective member objects.
         '''
+        #Tests
+        #DataFrame: True
+        #DataFrame: False
         headers, base_url = self.header_setup()
         url = base_url + f"/mailinglists?pageSize={page_size}&offset={offset}"
         response = r.get(url, headers=headers)
         lists = response.json()
-        mailing_lists = Parser().json_parser(response=lists, keys=['results','mailingListId', 'name', 'ownerId', 'contactCount', 'lastModifiedDate', 'creationDate'])
+        keys = Parser().extract_keys(lists)[2:-4]
+        mailing_lists = Parser().json_parser(response=lists, keys=keys)
         if to_df is True:
-            mailing_lists = pd.DataFrame(mailing_lists,columns=['list_ids','list_names','owner_ids','contact_count','last_modified','creation_date'])
-            mailing_lists['last_modified'] = pd.to_datetime(mailing_lists['last_modified'],unit='ms')
-            mailing_lists['creation_date'] = pd.to_datetime(mailing_lists['creation_date'],unit='ms')
-            return mailing_lists.head()
+            mailing_lists = pd.DataFrame(mailing_lists, columns=keys)
+            return mailing_lists
         return mailing_lists
 
     def get_list(self, mailing_list):

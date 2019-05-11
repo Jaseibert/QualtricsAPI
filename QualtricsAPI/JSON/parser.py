@@ -6,11 +6,11 @@ class Parser(object):
         return
 
     def extract_values(self, obj, key):
-        """Pull all values of specified key from nested JSON."""
+        '''Extract a values from a nested dictionary.'''
         arr = []
 
         def extract(obj, arr, key):
-            """Recursively search for values of key in JSON tree."""
+            '''Recursively search for values of key in JSON tree.'''
             if isinstance(obj, dict):
                 for k, v in obj.items():
                     if isinstance(v, (dict, list)):
@@ -32,13 +32,16 @@ class Parser(object):
             '''Recursively identify each of the keys within a dictionary.'''
             if isinstance(obj, dict):
                 for k,v in obj.items():
-                    if isinstance(v, (dict)):
+                    if isinstance(v, (dict, list)):
                         keys.append(k)
                         extract(v, keys)
                     else:
                         keys.append(k)
+            elif isinstance(obj, list):
+                for element in obj:
+                    extract(element, keys)
             return keys
-        obj_keys = extract(obj, keys)
+        obj_keys =  extract(obj, keys)
         return obj_keys
 
     def json_parser(self, response=None, keys=[], arr=True):

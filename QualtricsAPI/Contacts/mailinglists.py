@@ -55,10 +55,12 @@ class MailingList(Credentials):
         request = r.get(url, headers=headers)
         response = request.json()
         keys = Parser().extract_keys(response)[2:-4]
-        mailing_lists = Parser().json_parser(response=response, keys=keys)
+        mailing_lists = Parser().json_parser(response=response, keys=keys, arr=False)
         if to_df is True:
-            mailing_list = pd.DataFrame(mailing_lists, columns=keys)
-            #Format the Dates
+            mailing_list = pd.DataFrame(mailing_lists).transpose()
+            mailing_list.columns = keys
+            #mailing_list['creationDate'] = pd.to_datetime(mailing_list['creationDate'],unit='ms')
+            #mailing_list['lastModified'] = pd.to_datetime(mailing_list['lastModified'],unit='ms')
             return mailing_list
         return mailing_lists
 

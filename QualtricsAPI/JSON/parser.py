@@ -31,7 +31,7 @@ class Parser(object):
             elif isinstance(obj, list):
                 for j in obj:
                     extract(j, values, key)
-            return arr
+            return values
         results = extract(obj, values, key)
         return results
 

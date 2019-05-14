@@ -22,7 +22,7 @@ class Credentials(object):
         return
 
     def header_setup(self,content_type=False,responses=True):
-        '''This method accepts the argument content_type and returns the correct header, and base url.
+        '''This method accepts the argument content_type and returns the correct header, and base url. (Not a User-Facing Method)
 
         :param content_type: use to return json response.
         :return: a HTML header and base url.
@@ -33,5 +33,3 @@ class Credentials(object):
         if content_type is True:
             header["Content-Type"] = "application/json"
         return header, base_url
-
-    

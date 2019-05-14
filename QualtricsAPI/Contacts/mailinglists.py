@@ -53,33 +53,34 @@ class MailingList(Credentials):
         keys = Parser().extract_keys(lists)[2:-4]
         mailing_lists = Parser().json_parser(response=lists, keys=keys)
         if to_df is True:
-            mailing_lists = pd.DataFrame(mailing_lists, columns=keys)
-            return mailing_lists
+            mailing_list = pd.DataFrame(mailing_lists, columns=keys)
+            return mailing_list
         return mailing_lists
 
-    def get_list(self, mailing_list):
+    def get_list(self, mailing_list=None):
         '''This function gets the list specfied by the mailing list param and returns the list members.
 
         :param mailing_list: the mailing list id.
         :return: a dictionary containing the mailing list member objects.
         '''
-        headers, base_url = self.header_setup()
-        url = base_url + f"/mailinglists/{mailing_list}"
-        response = r.get(url, headers=headers)
-        content = response.json()
-        list_info = {
-                    "list_id": content['result']['mailingListId'],
-                    "list_name": content['result']['name'],
-                    "owner_id": content['result']['ownerId'],
-                    "contact_count": content['result']['contactCount'],
-                    "last_modified": t.ctime(content['result']['lastModifiedDate']*0.001),
-                    "creation_date": t.ctime(content['result']['creationDate']*0.001)
-        }
-        assert len(mailing_list) == 18, "Check your arguement, the parameter (mailing_list) should have 17 characters."
-        if content['meta']['httpStatus'] == '200 - OK':
-            pass
-        else:
-            raise ValueError(f"ServerError:{content['meta']['error']['errorCode']}, {content['meta']['error']['errorMessage']}")
+
+        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+
+        try:
+            headers, base_url = self.header_setup()
+            url = base_url + f"/mailinglists/{mailing_list}"
+            request = r.get(url, headers=headers)
+            response = request.json()
+            list_info = {
+                        "list_id": response['result']['mailingListId'],
+                        "list_name": response['result']['name'],
+                        "owner_id": response['result']['ownerId'],
+                        "contact_count": content['result']['contactCount'],
+                        "last_modified": t.ctime(response['result']['lastModifiedDate']*0.001),
+                        "creation_date": t.ctime(response['result']['creationDate']*0.001)
+            }
+        except ServerError:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         return list_info
 
     def rename_list(self, mailing_list=None, name=None):
@@ -89,16 +90,19 @@ class MailingList(Credentials):
         :param name: the new name for the mailing list.
         :return: nothing, but prints a if successful.
         '''
-        data = {"name": f"{name}"}
-        headers, base_url = self.header_setup(content_type=True)
-        url = base_url + f"/mailinglists/{mailing_list}"
-        response = r.put(url, json=data, headers=headers)
-        content = response.json()
-        assert len(mailing_list) == 18, "Check your arguement, the parameter (mailing_list) should have 17 characters."
-        if content['meta']['httpStatus'] == '200 - OK':
-            print(f'Your mailing list "{mailing_list}" has been deleted from the XM Directory')
-        else:
-            raise ValueError(f"ServerError:{content['meta']['error']['errorCode']}, {content['meta']['error']['errorMessage']}")
+
+        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+
+        try:
+            data = {"name": f"{name}"}
+            headers, base_url = self.header_setup(content_type=True)
+            url = base_url + f"/mailinglists/{mailing_list}"
+            request = r.put(url, json=data, headers=headers)
+            response = request.json()
+            if response['meta']['httpStatus'] == '200 - OK':
+                print(f'Your mailing list "{mailing_list}" has been renamed in the XM Directory')
+        except ServerError:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         return
 
     def delete_list(self,mailing_list=None):
@@ -107,16 +111,18 @@ class MailingList(Credentials):
         :param mailing_list: the mailing list id
         :return: nothing, but prints a if successful and errors if unsuccessful.
         '''
-        data = {"name": f"{mailing_list}"}
-        headers, base_url = self.header_setup()
-        url = base_url + f"/mailinglists/{mailing_list}"
-        response = r.delete(url, json=data, headers=headers)
-        content = response.json()
-        assert len(mailing_list) == 18, "Check your arguement, the parameter (mailing_list) should have 17 characters."
-        if content['meta']['httpStatus'] == '200 - OK':
-            print(f'Your mailing list "{mailing_list}" has been deleted from the XM Directory')
-        else:
-            raise ValueError(f"ServerError:{content['meta']['error']['errorCode']}, {content['meta']['error']['errorMessage']}")
+        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+
+        try:
+            data = {"name": f"{mailing_list}"}
+            headers, base_url = self.header_setup()
+            url = base_url + f"/mailinglists/{mailing_list}"
+            request = r.delete(url, json=data, headers=headers)
+            response = request.json()
+            if content['meta']['httpStatus'] == '200 - OK':
+                print(f'Your mailing list "{mailing_list}" has been deleted from the XM Directory')
+        except ServerError:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         return
 
     def list_contacts(self, mailing_list=None):
@@ -125,27 +131,26 @@ class MailingList(Credentials):
         :param mailing_list: the mailing list id
         :return: a pandas DataFrame containing the contact information.
         '''
-        headers, base_url = self.header_setup()
-        url = base_url + f"/mailinglists/{mailing_list}/contacts"
-        response = r.get(url, headers=headers)
-        lists = response.json()
-        contact_lists = []
-        i=0
-        while lists['result']['nextPage'] is not None:
-            contact_list = Parser().json_parser(lists,'results','contactId','firstName', 'lastName', 'email', 'phone', 'extRef', 'language', 'unsubscribed')
-            contact_list_ = pd.DataFrame(contact_list, columns=['contact_id','first_name','last_name','email','phone',
-                                                               'unsbscribed','language','external_ref'])
-            contact_list_['mailing_list'] = mailing_list
-            contact_lists.append(contact_list_)
-            url = lists['result']['nextPage']
+        try:
+            headers, base_url = self.header_setup()
+            url = base_url + f"/mailinglists/{mailing_list}/contacts"
             response = r.get(url, headers=headers)
             lists = response.json()
-            if lists['result']['nextPage'] is not None:
-                pass
-            else:
-                print('finished')
-            i+=1
-        contact_list = pd.concat(contact_lists).reset_index(drop=True)
+            contact_lists = []
+            i=0
+            while lists['result']['nextPage'] is not None:
+                contact_list = Parser().json_parser(lists,'results','contactId','firstName', 'lastName', 'email', 'phone', 'extRef', 'language', 'unsubscribed')
+                contact_list_ = pd.DataFrame(contact_list, columns=['contact_id','first_name','last_name','email','phone',
+                                                                   'unsbscribed','language','external_ref'])
+                contact_list_['mailing_list'] = mailing_list
+                contact_lists.append(contact_list_)
+                url = lists['result']['nextPage']
+                response = r.get(url, headers=headers)
+                lists = response.json()
+                i+=1
+            contact_list = pd.concat(contact_lists).reset_index(drop=True)
+        except ServerError:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         return contact_list
 
     def create_contact_in_list(self,mailing_list, first_name=None, last_name=None, email=None, phone=None, external_ref=None, unsubscribed=False,language="en",metadata={}):

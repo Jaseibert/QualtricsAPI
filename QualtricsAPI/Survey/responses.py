@@ -15,7 +15,13 @@ class Responses(Credentials):
         return
 
     def setup_request(self, file_format='csv', survey_id=None):
-        '''  '''
+        ''' This method sets up the request and handles the '''
+        #Test that the length Assert Works
+        #Test that the survey_id Assert Works
+        
+        assert len(survey_id) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
+        assert survey_id[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
+
         try:
             headers, url = self.header_setup(content_type=True, responses=False)
             payload = '{"format":"' + file_format + '","surveyId":"' + survey_id + '"}'
@@ -23,7 +29,7 @@ class Responses(Credentials):
             response = request.json()
             progress_id = response['result']['id']
             return progress_id, url, headers
-        except ServerError as s:
+        except ServerError:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         except KeyError:
             print(f"ServerError:\nError Message: {response['meta']['error']['errorMessage']}")
@@ -52,15 +58,12 @@ class Responses(Credentials):
         :param survey_id: the id associated with a given survey.
         :return: a Pandas DataFrame with the responses
         '''
-        try:
-            download_request = self.send_request(file_format='csv', survey_id=survey_id)
-            with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
-                for s in survey_zip.infolist():
-                    df = pd.read_csv(survey_zip.open(s.filename))
-                    return df
-        except AssertionError:
-            assert len(survey_id) == 18, 'Hey it looks like your survey ID is a the incorrect length. Try again.'
-            assert survey_id[:2] == 'SV_', 'Hey, it looks like your survey ID is incorrect. Try again.'
+
+        download_request = self.send_request(file_format='csv', survey_id=survey_id)
+        with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
+            for s in survey_zip.infolist():
+                df = pd.read_csv(survey_zip.open(s.filename))
+                return df
 
 
     def get_questions(self, survey_id=None):
@@ -69,6 +72,7 @@ class Responses(Credentials):
         :param survey_id:
         :return:
         '''
+
         df = self.get_responses(survey_id=survey_id)
         questions = pd.DataFrame(df[:1].T)
         questions.columns = ['Questions']

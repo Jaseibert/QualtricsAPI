@@ -18,7 +18,7 @@ class Responses(Credentials):
         ''' This method sets up the request and handles the '''
         #Test that the length Assert Works
         #Test that the survey_id Assert Works
-        
+
         assert len(survey_id) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
         assert survey_id[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
 
@@ -31,8 +31,6 @@ class Responses(Credentials):
             return progress_id, url, headers
         except ServerError:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
-        except KeyError:
-            print(f"ServerError:\nError Message: {response['meta']['error']['errorMessage']}")
 
     def send_request(self, file_format='csv', survey_id=None):
         '''This method sends the request, and sets up the download request.'''
@@ -70,7 +68,7 @@ class Responses(Credentials):
         '''This method returns a DataFrame containing the Survey questions and the QuestionIDs.
 
         :param survey_id:
-        :return:
+        :return: a DataFrame with the Surveys questions
         '''
 
         df = self.get_responses(survey_id=survey_id)

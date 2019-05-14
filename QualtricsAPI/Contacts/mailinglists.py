@@ -25,14 +25,16 @@ class MailingList(Credentials):
         ##True - Works
         ##Empty - Syntax Error
         ##Random not string text - NameError
-
-        headers, url = self.header_setup(content_type=True)
-        url = url + "/mailinglists"
-        data = {"name": "{0}".format(name)}
-        request = r.post(url, json=data, headers=headers)
-        content = request.json()
-        list_id = Parser().json_parser(response=content,keys=['id'], arr=False)[0][0]
-        list_params = tuple([name, list_id])
+        try:
+            headers, url = self.header_setup(content_type=True)
+            url = url + "/mailinglists"
+            data = {"name": "{0}".format(name)}
+            request = r.post(url, json=data, headers=headers)
+            response = request.json()
+            list_id = Parser().json_parser(response=response,keys=['id'], arr=False)[0][0]
+            list_params = tuple([name, list_id])
+        except ServerError:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         return list_params
 
     def list_lists(self, page_size=100, offset=0, to_df=True):
@@ -48,10 +50,10 @@ class MailingList(Credentials):
         #DataFrame: False
         headers, base_url = self.header_setup()
         url = base_url + f"/mailinglists?pageSize={page_size}&offset={offset}"
-        response = r.get(url, headers=headers)
-        lists = response.json()
-        keys = Parser().extract_keys(lists)[2:-4]
-        mailing_lists = Parser().json_parser(response=lists, keys=keys)
+        request = r.get(url, headers=headers)
+        response = request.json()
+        keys = Parser().extract_keys(response)[2:-4]
+        mailing_lists = Parser().json_parser(response=response, keys=keys)
         if to_df is True:
             mailing_list = pd.DataFrame(mailing_lists, columns=keys)
             return mailing_list
@@ -75,7 +77,7 @@ class MailingList(Credentials):
                         "list_id": response['result']['mailingListId'],
                         "list_name": response['result']['name'],
                         "owner_id": response['result']['ownerId'],
-                        "contact_count": content['result']['contactCount'],
+                        "contact_count": response['result']['contactCount'],
                         "last_modified": t.ctime(response['result']['lastModifiedDate']*0.001),
                         "creation_date": t.ctime(response['result']['creationDate']*0.001)
             }
@@ -131,6 +133,8 @@ class MailingList(Credentials):
         :param mailing_list: the mailing list id
         :return: a pandas DataFrame containing the contact information.
         '''
+        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+
         try:
             headers, base_url = self.header_setup()
             url = base_url + f"/mailinglists/{mailing_list}/contacts"
@@ -153,7 +157,7 @@ class MailingList(Credentials):
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         return contact_list
 
-    def create_contact_in_list(self,mailing_list, first_name=None, last_name=None, email=None, phone=None, external_ref=None, unsubscribed=False,language="en",metadata={}):
+    def create_contact_in_list(self, mailing_list=None, first_name=None, last_name=None, email=None, phone=None, external_ref=None, unsubscribed=False,language="en",metadata={}):
         '''This function creates contacts in a specified mailing list.
 
         :param mailing_list: the mailing list id.
@@ -168,6 +172,8 @@ class MailingList(Credentials):
         :type metadata: dict
         :return: the contact id (contact_id) in XMDirectory, and the contact id (contact_list_id) in the mailing list.
         '''
+        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+
         data = {
             "firstName": first_name,
             "lastName": last_name,
@@ -181,8 +187,8 @@ class MailingList(Credentials):
 
         headers, base_url = self.header_setup(content_type=True)
         url = base_url + f"/mailinglists/{mailing_list}/contacts"
-        response = r.post(url, json=data, headers=headers)
-        content = response.json()
-        contact_id = content['result']['id']
-        contact_list_id = content['result']['contactLookupId']
+        request = r.post(url, json=data, headers=headers)
+        response = request.json()
+        contact_id = response['result']['id']
+        contact_list_id = response['result']['contactLookupId']
         return contact_id, contact_list_id

@@ -23,15 +23,16 @@ class MailingList(Credentials):
         #Tests
         ##None - Works
         ##True - Works
-        ##Empty - Syntax Error
-        ##Random not string text - NameError
+        ##Empty - Syntax Error (Cannot Catch)
+        ##Random not string text - NameError (Cannot Catch)
+
         try:
             headers, url = self.header_setup(content_type=True)
             url = url + "/mailinglists"
             data = {"name": "{0}".format(name)}
             request = r.post(url, json=data, headers=headers)
             response = request.json()
-            list_id = Parser().json_parser(response=response,keys=['id'], arr=False)[0][0]
+            list_id = Parser().json_parser(response=response, keys=['id'], arr=False)[0][0]
             list_params = tuple([name, list_id])
         except ServerError:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
@@ -48,6 +49,7 @@ class MailingList(Credentials):
         #Tests
         #DataFrame: True
         #DataFrame: False
+
         headers, base_url = self.header_setup()
         url = base_url + f"/mailinglists?pageSize={page_size}&offset={offset}"
         request = r.get(url, headers=headers)
@@ -56,6 +58,7 @@ class MailingList(Credentials):
         mailing_lists = Parser().json_parser(response=response, keys=keys)
         if to_df is True:
             mailing_list = pd.DataFrame(mailing_lists, columns=keys)
+            #Format the Dates
             return mailing_list
         return mailing_lists
 
@@ -66,7 +69,12 @@ class MailingList(Credentials):
         :return: a dictionary containing the mailing list member objects.
         '''
 
+        #Tests
+        #Length Works
+        #ID Class Works
+
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
         try:
             headers, base_url = self.header_setup()
@@ -81,6 +89,7 @@ class MailingList(Credentials):
                         "last_modified": t.ctime(response['result']['lastModifiedDate']*0.001),
                         "creation_date": t.ctime(response['result']['creationDate']*0.001)
             }
+            #Return a DataFrame?
         except ServerError:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         return list_info
@@ -93,7 +102,8 @@ class MailingList(Credentials):
         :return: nothing, but prints a if successful.
         '''
 
-        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert len(mailing_list) == 18, 'Hey there! The parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
         try:
             data = {"name": f"{name}"}
@@ -113,7 +123,8 @@ class MailingList(Credentials):
         :param mailing_list: the mailing list id
         :return: nothing, but prints a if successful and errors if unsuccessful.
         '''
-        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert len(mailing_list) == 18, 'Hey there! The parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
         try:
             data = {"name": f"{mailing_list}"}
@@ -134,6 +145,7 @@ class MailingList(Credentials):
         :return: a pandas DataFrame containing the contact information.
         '''
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
         try:
             headers, base_url = self.header_setup()
@@ -144,8 +156,7 @@ class MailingList(Credentials):
             i=0
             while lists['result']['nextPage'] is not None:
                 contact_list = Parser().json_parser(lists,'results','contactId','firstName', 'lastName', 'email', 'phone', 'extRef', 'language', 'unsubscribed')
-                contact_list_ = pd.DataFrame(contact_list, columns=['contact_id','first_name','last_name','email','phone',
-                                                                   'unsbscribed','language','external_ref'])
+                contact_list_ = pd.DataFrame(contact_list, columns=['contact_id','first_name','last_name','email','phone','unsbscribed','language','external_ref'])
                 contact_list_['mailing_list'] = mailing_list
                 contact_lists.append(contact_list_)
                 url = lists['result']['nextPage']
@@ -172,23 +183,27 @@ class MailingList(Credentials):
         :type metadata: dict
         :return: the contact id (contact_id) in XMDirectory, and the contact id (contact_list_id) in the mailing list.
         '''
-        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert len(mailing_list) == 18, 'Hey there! The parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
-        data = {
-            "firstName": first_name,
-            "lastName": last_name,
-            "email": email,
-            "phone": phone,
-            "embeddedData": metadata,
-            "language": language,
-            "extRef": external_ref,
-            "unsubscribed": unsubscribed
-        }
+        try:
+            data = {
+                "firstName": first_name,
+                "lastName": last_name,
+                "email": email,
+                "phone": phone,
+                "embeddedData": metadata,
+                "language": language,
+                "extRef": external_ref,
+                "unsubscribed": unsubscribed
+            }
 
-        headers, base_url = self.header_setup(content_type=True)
-        url = base_url + f"/mailinglists/{mailing_list}/contacts"
-        request = r.post(url, json=data, headers=headers)
-        response = request.json()
-        contact_id = response['result']['id']
-        contact_list_id = response['result']['contactLookupId']
+            headers, base_url = self.header_setup(content_type=True)
+            url = base_url + f"/mailinglists/{mailing_list}/contacts"
+            request = r.post(url, json=data, headers=headers)
+            response = request.json()
+            contact_id = response['result']['id']
+            contact_list_id = response['result']['contactLookupId']
+        except ServerError:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
         return contact_id, contact_list_id

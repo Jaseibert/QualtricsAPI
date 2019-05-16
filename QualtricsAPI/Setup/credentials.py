@@ -15,7 +15,7 @@ class Credentials(object):
         :param directory_id: your Qualtrics directory id
         :return: Nothing, but you've create enviornment variables for each parameter.
         '''
-
+        #Add Length Logic for Token and Directory Id
         os.environ['token'] = token
         os.environ['data_center'] = data_center
         os.environ['directory_id'] = directory_id

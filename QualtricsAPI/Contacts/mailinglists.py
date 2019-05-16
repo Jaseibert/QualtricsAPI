@@ -20,11 +20,6 @@ class MailingList(Credentials):
         :param list_name: the name of the list to be created.
         :return: set containing the list_name and the list's new id
         '''
-        #Tests
-        ##None - Works
-        ##True - Works
-        ##Empty - Syntax Error (Cannot Catch)
-        ##Random not string text - NameError (Cannot Catch)
 
         try:
             headers, url = self.header_setup(content_type=True)
@@ -46,9 +41,6 @@ class MailingList(Credentials):
         :param to_df: if True, returns the mailing lists and their member objects in a pandas DataFrame.
         :return: either a pandas DataFrame or a list of tuples, containing lists and their respective member objects.
         '''
-        #Tests
-        #DataFrame: True
-        #DataFrame: False
 
         headers, base_url = self.header_setup()
         url = base_url + f"/mailinglists?pageSize={page_size}&offset={offset}"
@@ -70,10 +62,6 @@ class MailingList(Credentials):
         :param mailing_list: the mailing list id.
         :return: a dictionary containing the mailing list member objects.
         '''
-
-        #Tests
-        #Length Works
-        #ID Class Works
 
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'

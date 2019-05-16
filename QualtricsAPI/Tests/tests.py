@@ -1,8 +1,5 @@
 #Imports
 import unittest
-import requests as r
-import json
-import time as t
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
@@ -15,54 +12,61 @@ class setup_tests(object):
     def __init__(self):
         return
 
-    # Test Case 1: qualtrics_api_credentials parameter lengths
+    ## I know ternary statements arent pythonic but they are succinct and I want to use them.
     def setup_test_token(self, short=False):
-        '''Setup for Test Case 1: qualtrics_api_credentials token parameter lengths'''
+        '''Setup for Test Case 1: qualtrics_api_credentials token parameter lengths.(40)'''
+
         token = 'ThisIsaFakeAPITokenAndIsTooShortToWork!' if short else 'ThisIsaFakeAPITokenAndIsTooShortToWork!!!'
-        return token
+        correct_token = 'ThisIsaFakeAPITokenAndIsTooShortToWork!!'
+        return token, correct_token
 
     def setup_test_dictionary_id(self, short=False, false_id=False):
-        '''Setup for Test Case 2: qualtrics_api_credentials dictionary id parameter lengths, and the incorrect id. '''
-        #len(20) Start(POOL_)
-        #Setup a short Dictionary id
-        #Setup a Long Dictonary id
-        #Setup false id
-        return
+        '''Setup for Test Case 2: qualtrics_api_credentials dictionary id parameter lengths (20), and the incorrect id (POOL_). '''
+
+        dictonary_id = 'POOL_ThisIsaFakeID!' if short else 'POOL_ThisIsaFakeDictionaryID!'
+        bad_id = 'ThisIsaFakeIDwo/POOL' if false_id else 'POOL_ThisIsaFakeID!'
+        return dictonary_id, bad_id
 
     def setup_test_mailing_list_id(self, short=False, false_id=False):
-        '''Setup for Test Case 3: Mailing List Sub-Module method's exception handling.'''
-        #len(18) start(CG_)
-        #Setup a short MailingList id
-        #Setup a Long MailingList id
-        #Setup False id
-        return
+        '''Setup for Test Case 3: Mailing List Sub-Module method's exception handling of the mailing list's length (18), and
+        the incorrect id (CG_).'''
+
+        mailing_list_id = 'CG_ThisIsaFakeID!' if short else 'CG_ThisIsaFakeMailingID!'
+        bad_id = 'ThisIsaFakeIDwo/CG' if false_id else None
+        return mailing_list_id, bad_id
 
     def setup_test_contact_id(self, short=False, false_id=False):
-        '''Setup for Test Case 4: XMDirectory Sub-Module method's exception handling.'''
-        #Len(19) Start(CID_)
-        #Setup a short Contact id
-        #Setup a Long Contact id
-        #Setup False id
-        return
+        '''Setup for Test Case 4: XMDirectory Sub-Module method's exception handling of the contact_id's length (18), and
+        the incorrect id (CG_).'''
+
+        contact_id = 'CID_ThisIsaFakeID!' if short else 'CID_ThisIsaFakeMailingID!'
+        bad_id = 'ThisIsaFakeIDwo/CID' if false_id else None
+        return contact_id, bad_id
 
     def setup_test_survey_id(self, short=False, false_id=False):
-        '''Setup for Test Case 5: Responses Sub-Module method's exception handling.'''
-        #len(18) and Start (SV_)
-        #Setup a short Survey id
-        #Setup a Long Survey id
-        #Setup False id
-        return
+        '''Setup for Test Case 5: Responses Sub-Module method's exception handling of the survey_id's length (18), and
+        the incorrect id (SV_).'''
+
+        survey_id = 'SV_ThisIsaFakeID!' if short else 'SV_ThisIsaFakeMailingID!'
+        bad_id = 'ThisIsaFakeIDwo/SV' if false_id else None
+        return survey_id, bad_id
 
     def setup_methods(self, module=None):
-        #if 'mailing'
-            #return an object that will hold all of the methods that are needing to be tested.
-        #elif 'xm'
-            #return an object that will hold all of the methods that are needing to be tested.
-        #elif 'responses'
-            #return an object that will hold all of the methods that are needing to be tested.
-        return
+        if module is 'credentials':
+            c = Credentials()
+            methods = [c.qualtrics_api_credentials()]
+        elif module is 'mailing':
+            m = MailingList()
+            methods = [m.get_list(), m.rename_list(), m.delete_list(), m.list_contacts(), m.create_contacts_in_list()]
+        elif module is 'xm':
+            x = XMDirectory()
+            methods = [x.get_contact(), x.delete_contact(), x.get_contact_additional_info()]
+        elif module is 'responses':
+            r = responses
+            methods = [r.setup_request()]
+        return methods
 
-    def setup_itterator():
+    def setup_itterator(module=None, function=None):
         #for method in setup_methods
         #test a given set of exceptions
         return

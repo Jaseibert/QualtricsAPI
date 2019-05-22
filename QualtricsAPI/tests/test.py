@@ -2,9 +2,10 @@
 import unittest
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
-from QualtricsAPI.JSON import Parser
-from QualtricsAPI.Contacts import XMDirectory, MailingList
 from QualtricsAPI.Survey import Responses
+from QualtricsAPI.JSON import Parser
+from QualtricsAPI.Contacts import MailingList
+from QualtricsAPI.Contacts import XMDirectory
 
 # Setup Tests Class
 class setup_tests(object):
@@ -66,8 +67,10 @@ class setup_tests(object):
             methods = [r.setup_request()]
         return methods
 
-    def setup_itterator(module=None, function=None):
+    def setup_itterator(self, module=None, param=None):
         #for method in setup_methods
+        for method in self.setup_methods(module=module):
+            method(param)
         #test a given set of exceptions
         return
 
@@ -76,6 +79,15 @@ class TestQualtricsAPI(unittest.TestCase):
 
     ## API Credentials: Token ##
     #Test Assertion Error is handled: Short Token
+    def test_credentials_one(self):
+        s = setup_tests()
+        token, correct_token = s.setup_test_token(short=False)
+        with self.assertRaises(AssertionError):
+            s.setup_itterator(module='credentials', param=token)
+
+
+
+
     #Test Assertion Error is handled: Long Token
 
     ## API Credentials: Dictorary ID ##

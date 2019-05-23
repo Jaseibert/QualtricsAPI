@@ -5,6 +5,7 @@ import requests as r
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
+from QualtricsAPI.Exceptions import ContactIDError
 
 class XMDirectory(Credentials):
 
@@ -115,6 +116,7 @@ class XMDirectory(Credentials):
 
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
+        assert content is not None, 'Hey there, you need to pass an argument ("embeddedData", or "mailingListMembership") to the "content" parameter.'
 
         try:
             primary = self.get_contact(contact_id=contact_id)

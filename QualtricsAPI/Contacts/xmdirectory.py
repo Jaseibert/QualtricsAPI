@@ -8,6 +8,8 @@ from QualtricsAPI.JSON import Parser
 from QualtricsAPI.Exceptions import ContactIDError
 
 class XMDirectory(Credentials):
+    ''' This class contains methods that give users the ability to work with their contact data within the
+    XMDirectory.'''
 
     def __init__(self, token=None, directory_id=None, data_center=None):
         self.token = token
@@ -15,17 +17,25 @@ class XMDirectory(Credentials):
         self.directory_id = directory_id
 
     def create_contact_in_XM(self, first_name=None, last_name=None, email=None, phone=None, language="en", metadata={}):
-        '''This function creates a contact in the XM Directory.
+        '''This function gives you the ability to create a contact in your XM Directory. This method does not every item
+        in that you just created, but it does return the XMDirectory contact id associated with the newly created contact.
 
-        :param first_name: the contacts first name.
-        :param last_name: the contacts last name.
+        :param first_name: The contacts first name.
+        :type first_name: str
+        :param last_name: The contacts last name.
+        :type last_name: str
         :param email: the contacts email.
+        :type email: str
         :param phone: the contacts phone number.
+        :type phone: str
         :param language: the native language of the contact. (Default: English)
+        :type language: str
         :param metadata: any relevant contact metadata.
         :type metadata: dict
-        :return: the contact id (contact_id) in XMDirectory.
+        :return: The newly created contact id (contact_id) in XMDirectory.
+        :type return: str
         '''
+
         try:
             contact_data = {
                 "firstName": first_name,
@@ -45,10 +55,12 @@ class XMDirectory(Credentials):
         return contact_id
 
     def delete_contact(self, contact_id=None):
-        '''This function will delete a user from XMDirectory.
+        '''This method will delete a contact from your XMDirectory. (Caution this cannot be reversed once deleted!)
 
         :param contact_id: The unique id associated with each contact in the XM Directory.
-        :return: nothing, but prints if successful, and if there was an error.
+        :type contact_id: str
+        :return: Nothing, but prints if successful, and if there was an error.
+
         '''
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
@@ -65,10 +77,21 @@ class XMDirectory(Credentials):
         return
 
     def list_contacts_in_directory(self, page_size=100, offset=0, to_df=True):
-        '''This function lists the contacts in the XM Directory.
+        '''This method will list the top-level information about the contacts in your XM Directory. Depending
+        on the argument that you pass to the parameter 'to_df', the method will either return a Pandas DataFrame
+        or a dictionary containing the contact data. Use the parameters 'page_size' and 'offset' to dictate the
+        size and position of the slice that you are requesting from the XMDirectory. As an additional point, when
+        itteratively calling this function you may experience some latency, so as a courtesy to Qualtrics and their
+        Dev team I recommend calling time.sleep(3) between each request.
 
-        :param page_size: determines the start number within the directory for the call.
-        :return:
+        :param page_size: This parameter sets chunk size of the number of contacts requested.
+        :type page_size: int
+        :param offset: This parameter specifies the where start index value of the call. (i.e offset = 300 means start the request at the 300th contact in the directory.)
+        :type offset: int
+        :param to_df: If True, the contacts will be returned in a Pandas DataFrame. If False, a Dictionary is returned.
+        :type to_df: Boolean
+        :return: A Pandas DataFrame, or Dictionary containing the top-level information regarding a contact in the XMDirectory.
+        :type return: DataFrame, Dict
         '''
         try:
             headers, base_url = self.header_setup()
@@ -86,10 +109,13 @@ class XMDirectory(Credentials):
         return contact_list
 
     def get_contact(self, contact_id=None):
-        ''' This method returns the primary information associated with a single contact.
+        ''' This method is similar to the 'list_contacts_in_directory' method, in that it will return a single contact's
+        information.
 
-        :param contact_id: a given Contact's ID
-        :return: a DataFrame
+        :param contact_id: The unique id associated with each contact in the XM Directory.
+        :type contact_id: str
+        :return: A Pandas DataFrame containing the contact's informaion
+        :type return: DataFrame
         '''
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
@@ -107,11 +133,19 @@ class XMDirectory(Credentials):
         return primary
 
     def get_contact_additional_info(self, contact_id=None, content=None):
-        ''' This method returns the additional information associated with a contact (mailinglistmembership, stats, and embeddedData)
+        ''' This method will return the additional "nested" information associated with a contact in the XMDirectory.
+        To get these different nested pieces of infomation you can pass one of three arguements to the 'content' parameter. If you
+        pass 'mailinglistmembership', you will return the different Mailing Lists that the contact is associated with in the form of a
+        pandas DataFrame. If you pass 'stats', you will return the response statistics associated with the contact, again in the form
+        of a Pandas DataFrame. Finally, if you pass the 'embeddedData' argument, you will return any emmbedded data associated with
+        the given contact, and as you guessed it, in the form of a Pandas DataFrame.
 
-        :param contact_id: a given Contact's ID
-        :param content: a string representing either 'mailingListMembership', 'stats', 'embeddedData'
-        :return: a DataFrame
+        :param contact_id: The unique id associated with each contact in the XM Directory.
+        :type contact_id: str
+        :param content: A string representing either 'mailingListMembership', 'stats', 'embeddedData'
+        :type content: str
+        :return: A Pandas DataFrame
+        :type return: DataFrame
         '''
 
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'

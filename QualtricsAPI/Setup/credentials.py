@@ -2,20 +2,25 @@ import numpy as np
 import os
 
 class Credentials(object):
-    ''' This class handles the setup of credentials needed to setup the Qualtrics API Authorization.'''
+    ''' This class handles the setup of credentials needed to setup the Qualtrics API Authorization. Use the
+    qualtrics_api_credentials method to create enviornment variables that will automatically populate the correct
+    HTTP headers for the request that you are making. '''
 
     def __init__(self):
         return
 
-    def qualtrics_api_credentials(self, token=None, data_center=None, directory_id=None):
+    def qualtrics_api_credentials(self, token, data_center, directory_id=None):
         '''This method creates enviornment variables for the users Qualtrics API token, data center, and their directory id.
 
-        :param token: your Qualtrics API Token
-        :param data_center: your Qualtrics data center
-        :param directory_id: your Qualtrics directory id
-        :return: Nothing, but you've create enviornment variables for each parameter.
+        :param token: Your Qualtrics API Token
+        :type token: str
+        :param data_center: Your Qualtrics data center
+        :type data_center: str
+        :param directory_id: Your Qualtrics directory id
+        :type directory_id: str
+        :return: Nothing explicitly, However you just create enviornment variables that will populate you HTTP Headers.
         '''
-        #Add Length Logic for Token and Directory Id
+
         os.environ['token'] = token
         os.environ['data_center'] = data_center
         os.environ['directory_id'] = directory_id

@@ -5,14 +5,16 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='QualtricsAPI',
-    version='0.0.5',
+    version='0.0.6',
     author='Jeremy A. Seibert',
     author_email='Jaskzc@mail.missouri.edu',
-    description="This is a Python wrapper is a convenient way for python users to ingest, or upload their data from Qualtrics to their development environment.",
+    description="This is wrapper is a convenient way for python users to ingest, or upload their data from Qualtrics to their development environment.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Jaseibert/QualtricsAPI",
+    license='MIT',
     packages=setuptools.find_packages(),
+    keywords='qualtrics api python',
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",

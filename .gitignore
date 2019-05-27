@@ -1,11 +1,11 @@
 .DS_Store
-index.rst
+build/
 __pycache__/
 Contacts/__pycache__/
 Survey/__pycache__/
 Setup/__pycache__/
-build/
 dist/
 QualtricsAPI.egg-info
 setup.py
 pipfile.lock
+/documentation

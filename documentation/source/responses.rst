@@ -1,6 +1,5 @@
 Survey Responses
 ==================
 
-
-.. autoclass:: QualtricsAPI.Survey.responses.Responses
-    :members: get_responses, get_questions
+.. automethod:: QualtricsAPI.Survey.responses.Responses.get_responses
+.. automethod:: QualtricsAPI.Survey.responses.Responses.get_questions

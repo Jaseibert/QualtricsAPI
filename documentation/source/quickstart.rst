@@ -20,7 +20,7 @@ find one of these IDs check out `Qualtrics - Finding Your Qualtrics IDs Guide <h
     :members: qualtrics_api_credentials
 
 Example Implementation
-###########################
+----------------------
 
 Here is an example on how to implement the qualtrics_api_credentials() method.
 ::

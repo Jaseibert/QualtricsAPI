@@ -37,8 +37,8 @@ This will generate environment variables that will be used to  populate the HTTP
 Now the generation of the necessary HTTP headers will be handled automatically, so we don't have to worry about it. We have 2 modules available to work with Contact Data. The first is `XMDirectory()`, and `MailingList()`. We import each as follows below.
 
 ```python
-from QualtricsAPI.Contacts import XMDirectory
-from QualtricsAPI.Contacts import MailingList
+from QualtricsAPI.XM import XMDirectory
+from QualtricsAPI.XM import MailingList
 
 #Create instances of each
 x = XMDirectory()

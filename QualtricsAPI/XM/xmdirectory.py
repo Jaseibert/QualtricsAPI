@@ -32,7 +32,7 @@ class XMDirectory(Credentials):
         :type language: str
         :param metadata: any relevant contact metadata.
         :type metadata: dict
-        :return: The newly created contact id (contact_id) in XMDirectory.
+        :return: The newly created contact id (CID) in XMDirectory.
         :type return: str
         '''
 
@@ -98,11 +98,10 @@ class XMDirectory(Credentials):
             url = base_url + f"/contacts?pageSize={page_size}&offset={offset}"
             request = r.get(url, headers=headers)
             response = request.json()
-            #extract_keys
-            contact_list = Parser().json_parser(response=response,keys=['contactId','firstName', 'lastName', 'email', 'phone', 'unsubscribed', 'language', 'extRef'])
-            col_names = ['contact_id','first_name','last_name','email','phone','unsubscribed','language','external_ref']
+            keys = ['contactId','firstName', 'lastName', 'email', 'phone','unsubscribed', 'language', 'extRef']
+            contact_list = Parser().json_parser(response=response,keys=keys)
             if to_df is True:
-                contact_list = pd.DataFrame(contact_list, columns=col_names)
+                contact_list = pd.DataFrame(contact_list, columns=keys)
                 return contact_list
         except ServerError:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)

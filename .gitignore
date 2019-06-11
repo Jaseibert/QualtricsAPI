@@ -1,5 +1,5 @@
 .DS_Store
-build/
+
 __pycache__/
 Contacts/__pycache__/
 Survey/__pycache__/
@@ -8,4 +8,3 @@ dist/
 QualtricsAPI.egg-info
 setup.py
 pipfile.lock
-/documentation

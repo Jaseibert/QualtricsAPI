@@ -76,6 +76,50 @@ class XMDirectory(Credentials):
             'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
         return
 
+    def update_contact(self, contact_id=None, first_name=None, last_name=None, email=None, phone=None, language=None, extRef=None, unsubscribed=None, metadata={}):
+        '''This method will update a contact from your XMDirectory.
+
+        :param contact_id: The unique id associated with each contact in the XM Directory.
+        :type contact_id: str
+        :param first_name: The contacts first name.
+        :type first_name: str
+        :param last_name: The contacts last name.
+        :type last_name: str
+        :param email: the contacts email.
+        :type email: str
+        :param phone: the contacts phone number.
+        :type phone: str
+        :param language: the native language of the contact. (Default: English)
+        :type language: str
+        :param metadata: any relevant contact metadata.
+        :type metadata: dict
+        :return: Nothing, but prints if successful, and if there was an error.
+        '''
+        assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
+        assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
+
+        try:
+            headers, base_url = self.header_setup()
+            url = base_url + f"/contacts/{contact_id}"
+            contact_data = {
+                "firstName": first_name,
+                "lastName": last_name,
+                "email": email,
+                "phone": phone,
+                "language": language,
+                "embeddedData": metadata,
+                "language": language,
+	            "extRef": extRef,
+	            "unsubscribed": unsubscribed
+            }
+            request = r.put(url, json=contact_data, headers=headers)
+            response = request.json()
+            if content['meta']['httpStatus'] == '200 - OK':
+                print(f'Your XM Contact"{contact_id}" has been updated in your XM Directory.')
+        except ContactIDError:
+            'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
+        return
+
     def list_contacts_in_directory(self, page_size=100, offset=0, to_df=True):
         '''This method will list the top-level information about the contacts in your XM Directory. Depending
         on the argument that you pass to the parameter 'to_df', the method will either return a Pandas DataFrame

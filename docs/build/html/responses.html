@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Survey Responses &mdash; QualtricsAPI 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="XM Directory (XM Subscribers)" href="xmdirectory(XM Subscribers).html" />
+    <link rel="prev" title="Quick Start" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #06D6A0" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> QualtricsAPI
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Library Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Survey Responses</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#get-responses-from-survey">Get Responses from Survey</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-implementation">Example Implementation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#get-questions-from-survey">Get Questions from Survey</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Example Implementation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="xmdirectory(XM Subscribers).html">XM Directory (XM Subscribers)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mailinglist(XM Subscribers).html">Mailing Lists (XM Subscribers)</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QualtricsAPI</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Survey Responses</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/responses.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="survey-responses">
+<h1>Survey Responses<a class="headerlink" href="#survey-responses" title="Permalink to this headline">¶</a></h1>
+<p>The methods in the Responses module give you the ability pull in survey responses from a specified survey, and to get the specific
+questions within the survey.</p>
+<div class="section" id="get-responses-from-survey">
+<h2>Get Responses from Survey<a class="headerlink" href="#get-responses-from-survey" title="Permalink to this headline">¶</a></h2>
+<dl class="method">
+<dt id="QualtricsAPI.Survey.responses.Responses.get_responses">
+<code class="descclassname">Responses.</code><code class="descname">get_responses</code><span class="sig-paren">(</span><em>survey_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#QualtricsAPI.Survey.responses.Responses.get_responses" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function accepts the survey id, and returns the responses associated with that survey.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>survey_id</strong> (<em>str</em>) – The Survey ID.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a Pandas DataFrame with the Survey’s responses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="example-implementation">
+<h3>Example Implementation<a class="headerlink" href="#example-implementation" title="Permalink to this headline">¶</a></h3>
+<p>In this example say that we want to collect the responses from a survey that we previously conducted. We only need the survey ID,
+in this case ‘SV_AFakeSurveyID’, and pass it as an argument to the survey_id parameter in the get_responses() method.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#Setup your Credentials, if not already done.</span>
+<span class="c1">#You only have to do this once.</span>
+
+<span class="c1">#Import the module</span>
+<span class="kn">from</span> <span class="nn">QualtricsAPI.Survey</span> <span class="k">import</span> <span class="n">Responses</span>
+
+<span class="c1">#Create an instance</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">Responses</span><span class="p">()</span>
+
+<span class="c1">#Call the method</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">get_responses</span><span class="p">(</span><span class="n">survey_id</span><span class="o">=</span><span class="s1">&#39;SV_AFakeSurveyID&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will return a pandas DataFrame containing the responses from the survey with the ID, ‘SV_AFakeSurveyID’.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>           <span class="n">contact_id</span>   <span class="n">first_name</span> <span class="n">last_name</span>                       <span class="n">email</span> <span class="n">phone</span> <span class="n">unsubscribed</span>  <span class="n">language</span> <span class="n">external_ref</span>
+<span class="mi">0</span>  <span class="n">CID_FakeContactID1</span>         <span class="n">John</span>      <span class="n">Snow</span>     <span class="s1">&#39;therealking@email.com&#39;</span>  <span class="kc">None</span>        <span class="kc">False</span>      <span class="s1">&#39;en&#39;</span>         <span class="kc">None</span>
+<span class="mi">1</span>  <span class="n">CID_FakeContactID2</span>         <span class="n">Bran</span>     <span class="n">Stark</span>          <span class="s1">&#39;b.stark@fake.net&#39;</span>  <span class="kc">None</span>        <span class="kc">False</span>      <span class="kc">None</span>         <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="get-questions-from-survey">
+<h2>Get Questions from Survey<a class="headerlink" href="#get-questions-from-survey" title="Permalink to this headline">¶</a></h2>
+<dl class="method">
+<dt id="QualtricsAPI.Survey.responses.Responses.get_questions">
+<code class="descclassname">Responses.</code><code class="descname">get_questions</code><span class="sig-paren">(</span><em>survey_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#QualtricsAPI.Survey.responses.Responses.get_questions" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a DataFrame containing the Survey questions and the QuestionIDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>survey_id</strong> (<em>str</em>) – The Survey ID.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a Pandas DataFrame with the survey’s questions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="id1">
+<h3>Example Implementation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The real benefit of the get_questions() method comes after having called the get_responses() method. Qualtrics uses an ID system
+to map the actual questions asked in a survey to a set of IDs (typically dictated by chronological order). This becomes kind of a
+hassle whenever you are trying to locate a specific question. Here we use the get_questions() method to get the questions associated
+the survey_id, ‘SV_AFakeSurveyID’.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#Setup your Credentials, if not already done.</span>
+<span class="c1">#You only have to do this once.</span>
+
+<span class="c1">#Import the module</span>
+<span class="kn">from</span> <span class="nn">QualtricsAPI.Survey</span> <span class="k">import</span> <span class="n">Responses</span>
+
+<span class="c1">#Create an instance</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">Responses</span><span class="p">()</span>
+
+<span class="c1">#Call the method</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">get_questions</span><span class="p">(</span><span class="n">survey_id</span><span class="o">=</span><span class="s1">&#39;SV_AFakeSurveyID&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will return a pandas DataFrame containing the questions associated with the given survey.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>           <span class="n">contact_id</span>   <span class="n">first_name</span> <span class="n">last_name</span>                       <span class="n">email</span> <span class="n">phone</span> <span class="n">unsubscribed</span>  <span class="n">language</span> <span class="n">external_ref</span>
+<span class="mi">0</span>  <span class="n">CID_FakeContactID1</span>         <span class="n">John</span>      <span class="n">Snow</span>     <span class="s1">&#39;therealking@email.com&#39;</span>  <span class="kc">None</span>        <span class="kc">False</span>      <span class="s1">&#39;en&#39;</span>         <span class="kc">None</span>
+<span class="mi">1</span>  <span class="n">CID_FakeContactID2</span>         <span class="n">Bran</span>     <span class="n">Stark</span>          <span class="s1">&#39;b.stark@fake.net&#39;</span>  <span class="kc">None</span>        <span class="kc">False</span>      <span class="kc">None</span>         <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="xmdirectory(XM Subscribers).html" class="btn btn-neutral float-right" title="XM Directory (XM Subscribers)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quick Start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Jeremy A. Seibert
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

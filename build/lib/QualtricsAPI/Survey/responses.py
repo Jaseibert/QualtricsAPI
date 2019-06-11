@@ -9,13 +9,15 @@ from QualtricsAPI.JSON import Parser
 from QualtricsAPI.Exceptions import ServerError
 
 class Responses(Credentials):
-    '''This is a inherits from the credentials class that gathers the survey responses from Qualtrics surveys'''
+    '''This is a child class to the credentials class that gathers the survey responses from Qualtrics surveys'''
 
     def __init__(self):
         return
 
     def setup_request(self, file_format='csv', survey_id=None):
         ''' This method sets up the request and handles the '''
+        #Test that the length Assert Works
+        #Test that the survey_id Assert Works
 
         assert len(survey_id) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
         assert survey_id[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
@@ -49,11 +51,10 @@ class Responses(Credentials):
         return download_request
 
     def get_responses(self, survey_id=None):
-        '''This function accepts the survey id, and returns the responses associated with that survey.
+        '''This function accepts the file format, and the survey id, and returns the responses associated with that survey.
 
-        :param survey_id: The Survey ID.
-        :type survey_id: str
-        :return: a Pandas DataFrame with the Survey's responses.
+        :param survey_id: the id associated with a given survey.
+        :return: a Pandas DataFrame with the responses
         '''
 
         download_request = self.send_request(file_format='csv', survey_id=survey_id)
@@ -66,9 +67,8 @@ class Responses(Credentials):
     def get_questions(self, survey_id=None):
         '''This method returns a DataFrame containing the Survey questions and the QuestionIDs.
 
-        :param survey_id: The Survey ID.
-        :type survey_id: str
-        :return: a Pandas DataFrame with the survey's questions.
+        :param survey_id:
+        :return: a DataFrame with the Surveys questions
         '''
 
         df = self.get_responses(survey_id=survey_id)

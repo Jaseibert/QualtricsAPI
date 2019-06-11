@@ -1,7 +1,7 @@
 Survey Responses
 ==================
 The methods in the Responses module give you the ability pull in survey responses from a specified survey, and to get the specific
-questions within the survey.
+questions within a given survey.
 
 Get Responses from Survey
 ##########################

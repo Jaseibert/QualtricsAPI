@@ -70,8 +70,32 @@ class XMDirectory(Credentials):
             url = base_url + f"/contacts/{contact_id}"
             request = r.delete(url, headers=headers)
             response = request.json()
-            if content['meta']['httpStatus'] == '200 - OK':
+            if response['meta']['httpStatus'] == '200 - OK':
                 print(f'Your XM Contact"{contact_id}" has been deleted from the XM Directory.')
+        except ContactIDError:
+            'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
+        return
+
+    def update_contact(self, contact_id=None, **kwargs):
+        '''This method will update a contact from your XMDirectory.
+
+        :param contact_id: The unique id associated with each contact in the XM Directory.
+        :type contact_id: str
+        :return: Nothing, but prints if successful, and if there was an error.
+        '''
+        assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
+        assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
+
+        try:
+            headers, base_url = self.header_setup()
+            url = base_url + f"/contacts/{contact_id}"
+            contact_data = {}
+            for key, value in kwargs.items():
+                contact_data.update({key: str(value)})
+            request = r.put(url, json=contact_data, headers=headers)
+            response = request.json()
+            if response['meta']['httpStatus'] == '200 - OK':
+                print(f'Your XM Contact"{contact_id}" has been updated in your XM Directory.')
         except ContactIDError:
             'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
         return

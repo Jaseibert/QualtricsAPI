@@ -3,7 +3,6 @@ import zipfile
 import json
 import io
 import pandas as pd
-import glob
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
 from QualtricsAPI.Exceptions import ServerError

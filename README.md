@@ -1,12 +1,23 @@
 # QualtricsAPI
 
-[Qualtrics](https://www.qualtrics.com) is an awesome company that builds software which gives users the ability to collect online data through online surveys. This python package, exists as a wrapper on top of the Qualtrics API. This package's primary goal is to be a super convenient way for python users to ingest, or upload their data from Qualtrics to their development environment, and vice versa. I do want to make point to say this package is not affiliated with Qualtrics, and is an open-source project.
+**Author:** [Jeremy Seibert](https://www.jeremyseibert.com)<br/>
+**License:** [MIT](https://opensource.org/licenses/MIT)<br/>
+**Package Documentation:** [Documentation](https://www.qualtricsapi-pydocs.com)<br/>
 
-### Project Status
-This project is under active development and does have reduced functionality. I am working on setting up Sphinx Docs to better clarify each method's parameters.
+
+[Qualtrics](https://www.qualtrics.com) is an awesome company that builds software which gives users the ability to collect online data through online surveys. This python package, exists as a wrapper on top of the Qualtrics API. This package's primary goal is to be a super convenient way for python users to ingest, or upload their data from Qualtrics to their development environment, and vice versa.
+
+Before we continue, I want to mention two things:
+
+First, you must have Qualtrics API access in order to use this package. Contact whomever your Qualtrics Account Manager is for further clarification on your account's access credentials.
+
+Secondly, this package is not affiliated with Qualtrics. Thus, I the author of this package, Jeremy Seibert, is not affiliated with Qualtrics, and Qualtrics does not offer support for this package. For specific information about the Qualtrics API, you can refer to their official documentation.
 
 # R Users
-For any R users there is an equally awesome package called ["qualtRics"](https://github.com/ropensci/qualtRics) which functions in very similar ways to this package. However, I don't believe that it supports functionality to work within the Contact Data (i.e. the XMDirectory, or Mailing Lists). [CRAN]('https://cran.r-project.org/web/packages/qualtRics/index.html')
+For any R users there is an equally awesome package called ["qualtRics"](https://github.com/ropensci/qualtRics) which functions in very similar ways to this package. I have tried to keep consistent with some of the methods that are used in the qualtRics package and this one, so that there is a cohesion  between the two. However, I don't believe that it supports functionality to work within the XM Contacts Data (i.e. the XMDirectory, or Mailing Lists). [CRAN]('https://cran.r-project.org/web/packages/qualtRics/index.html')
+
+**Authors:** [Julia Silge](https://juliasilge.com/), [Jasper Ginn](http://www.jasperginn.io)<br/>
+**License:** [MIT](https://opensource.org/licenses/MIT)
 
 # Functionality
 
@@ -18,7 +29,7 @@ There are currently two primary uses of this package.
 
 # Basic Usage
 
-##Credentials Code Flow
+## Credentials Code Flow
 We first create environment variables that will hold your API credentials, so you don't have to continually declare them. To do this we import the Credentials module, create and call the `qualtrics_api_credentials()`method.
 
 ```python
@@ -45,7 +56,6 @@ x = XMDirectory()
 m = MailingList()
 ```
 Once imported, there are 10 methods that are available between both modules.
-
 
 1. XMDirectory() Class Methods
 
@@ -101,3 +111,7 @@ r.get_responses()
 # Wrap-up
 
 Again this is currently under development so there may be reduced functionality, but I hope this helps fellow Qualtrics users to expedite their current workflow!
+
+### Want to Contribute?
+
+This project abides by the [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms. Feedback, bug reports (and fixes!), and feature requests are welcome!

@@ -24,3 +24,8 @@ QualtricsAPI/                     Root Directory
             __init__.py           Initialize the Tests Sub-Package
             test.py               Module for Testing
             ...
+
+Dependancies:
+pandas = ">=0.23.4"
+numpy = ">=1.16"
+requests = ">=2.21.0"

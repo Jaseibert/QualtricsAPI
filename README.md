@@ -1,8 +1,10 @@
 # QualtricsAPI
 
-**Author:** [Jeremy Seibert](https://www.jeremyseibert.com)
-**License:** [MIT](https://opensource.org/licenses/MIT)
-**Documentation:** [Documentation]('https://www.qualtricsapi-pydocs.com')
+**Author:** [Jeremy Seibert](https://www.jeremyseibert.com)  
+
+**License:** [MIT](https://opensource.org/licenses/MIT)  
+
+**Documentation:** [Documentation]('https://www.qualtricsapi-pydocs.com')  
 
 [Qualtrics](https://www.qualtrics.com) is an awesome company that builds software which gives users the ability to collect online data through online surveys. This python package, exists as a wrapper on top of the Qualtrics API. This package's primary goal is to be a super convenient way for python users to ingest, or upload their data from Qualtrics to their development environment, and vice versa.
 

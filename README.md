@@ -1,14 +1,13 @@
 # QualtricsAPI
 
-**Author:** [Jeremy Seibert](https://www.jeremyseibert.com)  
+**Author:** [Jeremy Seibert](https://www.jeremyseibert.com)<br/>
+**License:** [MIT](https://opensource.org/licenses/MIT)<br/>
+**Package Documentation:** [Documentation](https://www.qualtricsapi-pydocs.com)<br/>
 
-**License:** [MIT](https://opensource.org/licenses/MIT)  
-
-**Documentation:** [Documentation]('https://www.qualtricsapi-pydocs.com')  
 
 [Qualtrics](https://www.qualtrics.com) is an awesome company that builds software which gives users the ability to collect online data through online surveys. This python package, exists as a wrapper on top of the Qualtrics API. This package's primary goal is to be a super convenient way for python users to ingest, or upload their data from Qualtrics to their development environment, and vice versa.
 
-Before we jump into the documentation, I want to mention two things.
+Before we continue, I want to mention two things:
 
 First, you must have Qualtrics API access in order to use this package. Contact whomever your Qualtrics Account Manager is for further clarification on your account's access credentials.
 
@@ -30,7 +29,7 @@ There are currently two primary uses of this package.
 
 # Basic Usage
 
-##Credentials Code Flow
+## Credentials Code Flow
 We first create environment variables that will hold your API credentials, so you don't have to continually declare them. To do this we import the Credentials module, create and call the `qualtrics_api_credentials()`method.
 
 ```python

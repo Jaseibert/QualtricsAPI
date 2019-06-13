@@ -81,7 +81,7 @@ class XMDirectory(Credentials):
 
         :param contact_id: The unique id associated with each contact in the XM Directory.
         :type contact_id: str
-        :return: Nothing, but prints if successful, and if there was an error.
+        :return: Nothing
         '''
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
@@ -94,8 +94,6 @@ class XMDirectory(Credentials):
                 contact_data.update({key: str(value)})
             request = r.put(url, json=contact_data, headers=headers)
             response = request.json()
-            if response['meta']['httpStatus'] == '200 - OK':
-                print(f'Your XM Contact"{contact_id}" has been updated in your XM Directory.')
         except ContactIDError:
             'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
         return

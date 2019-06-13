@@ -1,5 +1,11 @@
 # QualtricsAPI
 
+[![Version](https://img.shields.io/pypi/v/qualtricsapi.svg)](https://pypi.python.org/pypi/qualtricsapi)
+[![License](https://img.shields.io/pypi/l/qualtricsapi.svg)](https://pypi.python.org/pypi/qualtricsapi)
+[![Python](https://img.shields.io/pypi/pyversions/qualtricsapi.svg)](https://pypi.python.org/pypi/qualtricsapi)
+[![Documenation Site](https://img.shields.io/website/https/www.qualtricsapi-pydocs.com.svg?down_color=red&down_message=offline&style=plastic&up_color=green&up_message=online)](https://img.shields.io/website/https/www.qualtricsapi-pydocs.com.svg?down_color=red&down_message=offline&style=plastic&up_color=green&up_message=online)
+[![Downloads](https://img.shields.io/pypi/dm/qualtricsapi.svg?style=plastic)](https://img.shields.io/pypi/dm/qualtricsapi.svg?style=plastic)
+
 **Author:** [Jeremy Seibert](https://www.jeremyseibert.com)<br/>
 **License:** [MIT](https://opensource.org/licenses/MIT)<br/>
 **Package Documentation:** [Documentation](https://www.qualtricsapi-pydocs.com)<br/>

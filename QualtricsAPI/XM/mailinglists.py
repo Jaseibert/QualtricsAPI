@@ -119,7 +119,7 @@ class MailingList(Credentials):
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
         return
 
-    def delete_list(self,mailing_list=None):
+    def delete_list(self, mailing_list=None):
         '''This method will delete the specified mailing list from the given users XM Directory.
 
         :param mailing_list: Your mailing list id that you are interested in deleting.

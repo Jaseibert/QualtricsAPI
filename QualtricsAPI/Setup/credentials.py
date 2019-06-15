@@ -20,6 +20,9 @@ class Credentials(object):
         :type directory_id: str
         :return: Nothing explicitly, However you just create enviornment variables that will populate you HTTP Headers.
         '''
+        assert len(token) == 40, 'Hey there! It looks like your api token is a the incorrect length. It needs to be 40 characters long. Please try again.'
+        assert len(directory_id) == 20, 'Hey there! It looks like your api directory ID is a the incorrect length. It needs to be 20 characters long. Please try again.'
+        assert directory_id[:5] == 'POOL_', 'Hey there! It looks like your directory ID is incorrect. You can find the directory ID on the Qualtrics site under your account settings. Please try again.'
 
         os.environ['token'] = token
         os.environ['data_center'] = data_center

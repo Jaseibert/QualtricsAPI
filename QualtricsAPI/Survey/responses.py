@@ -14,9 +14,7 @@ class Responses(Credentials):
         return
 
     def setup_request(self, file_format='csv', survey_id=None):
-        ''' This method sets up the request and handles the '''
-        #Test that the length Assert Works
-        #Test that the survey_id Assert Works
+        ''' This method sets up the request and handles the setup of the request for the survey.'''
 
         assert len(survey_id) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
         assert survey_id[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'

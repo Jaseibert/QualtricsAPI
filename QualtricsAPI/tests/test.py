@@ -97,6 +97,12 @@ class TestQualtricsAPI(unittest.TestCase):
         with self.assertRaises(AssertionError):
             Credentials().qualtrics_api_credentials(token=TestQualtricsAPI.correct_token, data_center='FAKE', directory_id=bad_id)
 
+    ## MailingList: Mailing List IDs (list_lists)
+    def test_ml_short_pg_sz_list_lists(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a page_size of 0.'''
+        with self.assertRaises(AssertionError):
+            MailingList().list_lists(page_size=0)
+
     ## MailingList: Mailing List IDs (rename_list)
     #Test Assertion Error is handled: Short Mailing List ID
     def test_ml_short_ml_id_rename(self):

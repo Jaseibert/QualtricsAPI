@@ -150,7 +150,7 @@ class MailingList(Credentials):
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
         return
 
-    def list_contacts(self, mailing_list=None, page_size=100, url=None):
+    def list_contacts(self, mailing_list=None, page_size=500, url=None):
         '''This method creates a pandas DataFrame of all the contacts information within the defined mailing list.
 
         :param mailing_list: the mailing list id
@@ -161,6 +161,7 @@ class MailingList(Credentials):
         '''
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
+        assert page_size != 0, 'Hey there! You need to have a page size greater than 1'
 
         try:
             contact_list = pd.DataFrame()
@@ -171,9 +172,9 @@ class MailingList(Credentials):
                 request = r.get(url, headers=headers)
                 response = request.json()
                 keys = ['contactId','firstName', 'lastName', 'email', 'phone', 'extRef', 'language', 'unsubscribed', 'nextPage']
-                contact_list = Parser().json_parser(response=response, keys=keys, arr=False)
-                next_page = contact_list[-1][0] if len(contact_list[0]) == page_size else None
-                single_contact_list = pd.DataFrame(contact_list[:-1]).transpose()
+                contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
+                next_page = contact_lists[-1][0] if len(contact_lists[0]) == page_size else None
+                single_contact_list = pd.DataFrame(contact_lists[:-1]).transpose()
                 single_contact_list.columns = keys[:-1]
                 single_contact_list['mailing_list'] = mailing_list
                 contact_list = pd.concat([contact_list, single_contact_list]).reset_index(drop=True)

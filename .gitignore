@@ -9,3 +9,6 @@ Pipfile
 Pipfile.lock
 /dist
 /build
+tests/__inti__.pyc
+tests/test.pyc
+Setup/__init__.pyc

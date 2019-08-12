@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Mailing Lists (XM Subscribers) &mdash; QualtricsAPI 0.1.1 documentation</title>
+  <title>Mailing Lists (XM Subscribers) &mdash; QualtricsAPI 0.1.3 documentation</title>
   
 
   
@@ -227,16 +227,14 @@ will be available to your specific user’s account.</p>
 <h2>List the Mailing Lists Available to your Account<a class="headerlink" href="#list-the-mailing-lists-available-to-your-account" title="Permalink to this headline">¶</a></h2>
 <dl class="method">
 <dt id="QualtricsAPI.XM.mailinglists.MailingList.list_lists">
-<code class="descclassname">MailingList.</code><code class="descname">list_lists</code><span class="sig-paren">(</span><em>page_size=100</em>, <em>offset=0</em>, <em>to_df=True</em><span class="sig-paren">)</span><a class="headerlink" href="#QualtricsAPI.XM.mailinglists.MailingList.list_lists" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method lists all the mailing lists in the directory for the specified user token. Use the page_size and offset
-parameters to dictate the size and position of the list that is returned. Page_size is defaulted at 100, and offset is
-defaulted to start at the beginning (i.e. offset=0).</p>
+<code class="descclassname">MailingList.</code><code class="descname">list_lists</code><span class="sig-paren">(</span><em>page_size=100</em>, <em>url=None</em><span class="sig-paren">)</span><a class="headerlink" href="#QualtricsAPI.XM.mailinglists.MailingList.list_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method lists all the mailing lists in the directory for the specified user token. You won’t typically need to adjust
+the pre-defined parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>page_size</strong> (<em>int</em>) – The number of mailing lists to return per call.</p></li>
-<li><p><strong>offset</strong> (<em>int</em>) – The index offset that you would like to apply in you call.</p></li>
-<li><p><strong>to_df</strong> – if True, returns the mailing lists and their member objects in a pandas DataFrame.</p></li>
+<li><p><strong>url</strong> (<em>string</em>) – The url parameter is used to hold the next page url when itterating.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -399,19 +397,15 @@ m.delete_list(mailing_list=’CG_FakeMailingListID’)</p>
 <h2>List the Contacts in a Mailing List<a class="headerlink" href="#list-the-contacts-in-a-mailing-list" title="Permalink to this headline">¶</a></h2>
 <dl class="method">
 <dt id="QualtricsAPI.XM.mailinglists.MailingList.list_contacts">
-<code class="descclassname">MailingList.</code><code class="descname">list_contacts</code><span class="sig-paren">(</span><em>mailing_list=None</em>, <em>page_size=100</em>, <em>offset=0</em>, <em>to_df=True</em><span class="sig-paren">)</span><a class="headerlink" href="#QualtricsAPI.XM.mailinglists.MailingList.list_contacts" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">MailingList.</code><code class="descname">list_contacts</code><span class="sig-paren">(</span><em>mailing_list=None</em>, <em>page_size=500</em>, <em>url=None</em><span class="sig-paren">)</span><a class="headerlink" href="#QualtricsAPI.XM.mailinglists.MailingList.list_contacts" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method creates a pandas DataFrame of all the contacts information within the defined mailing list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mailing_list</strong> (<em>str</em>) – the mailing list id</p></li>
+<li><p><strong>url</strong> – the url for a single contact page (typically this doesn’t not need to be changed.)</p></li>
 <li><p><strong>page_size</strong> (<em>int</em>) – The number of contacts in the mailing list to return per call.</p></li>
-<li><p><strong>offset</strong> (<em>int</em>) – The index offset that you would like to apply in you call.</p></li>
-<li><p><strong>to_df</strong> – if True, returns the contacts in the mailing list and their member objects in a pandas DataFrame.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a pandas DataFrame, or a dictionary containing the contacts information.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -451,7 +445,7 @@ page of the Qualtrics Documentation.</p>
 </div>
 <dl class="method">
 <dt id="QualtricsAPI.XM.mailinglists.MailingList.create_contact_in_list">
-<code class="descclassname">MailingList.</code><code class="descname">create_contact_in_list</code><span class="sig-paren">(</span><em>mailing_list=None</em>, <em>first_name=None</em>, <em>last_name=None</em>, <em>email=None</em>, <em>phone=None</em>, <em>external_ref=None</em>, <em>unsubscribed=False</em>, <em>language='en'</em>, <em>metadata={}</em><span class="sig-paren">)</span><a class="headerlink" href="#QualtricsAPI.XM.mailinglists.MailingList.create_contact_in_list" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">MailingList.</code><code class="descname">create_contact_in_list</code><span class="sig-paren">(</span><em>mailing_list=None</em>, <em>first_name=''</em>, <em>last_name=''</em>, <em>email=''</em>, <em>phone=''</em>, <em>external_ref=''</em>, <em>unsubscribed=False</em>, <em>language='en'</em>, <em>metadata={}</em><span class="sig-paren">)</span><a class="headerlink" href="#QualtricsAPI.XM.mailinglists.MailingList.create_contact_in_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method creates contacts in the specified mailing list. It is important to remember here that whenever you create a contact in
 a mailing list, you are also creating that contact in the XMDirectory. Once created 2 seperate IDs are created for the contact. The ContactID
 is the reference for the contact in the XMDirectory, and the Contact Lookup ID is the reference of the contact in the Mailing List.</p>

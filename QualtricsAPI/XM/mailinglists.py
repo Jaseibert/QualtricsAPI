@@ -31,36 +31,46 @@ class MailingList(Credentials):
             request = r.post(url, json=data, headers=headers)
             response = request.json()
             list_id = Parser().json_parser(response=response, keys=['id'], arr=False)[0][0]
+            list_params = tuple([name, list_id])
         except ServerError:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
-        return tuple([name, list_id])
+        return list_params
 
-    def list_lists(self, page_size=100, offset=0, to_df=True):
-        '''This method lists all the mailing lists in the directory for the specified user token. Use the page_size and offset
-        parameters to dictate the size and position of the list that is returned. Page_size is defaulted at 100, and offset is
-        defaulted to start at the beginning (i.e. offset=0).
+    def list_lists(self, page_size=100, url=None):
+        '''This method lists all the mailing lists in the directory for the specified user token. You won't typically need to adjust
+        the pre-defined parameters.
 
         :param page_size: The number of mailing lists to return per call.
         :type page_size: int
-        :param offset: The index offset that you would like to apply in you call.
-        :type offset: int
-        :param to_df: if True, returns the mailing lists and their member objects in a pandas DataFrame.
+        :param url: The url parameter is used to hold the next page url when itterating.
+        :type url: string
         :return: Either a pandas DataFrame or a list of tuples, containing lists and their respective member objects.
         '''
+        assert page_size != 0, 'Hey there! You need to have a page size greater than 1'
+        try:
+            mailing_list = pd.DataFrame()
+            def extract_page(page_size=page_size, url=url, mailing_list=mailing_list):
+                ''' This method is a nested method that extracts a single page of mailing lists. '''
+                headers, base_url = self.header_setup()
+                url = base_url + f"/mailinglists?pageSize={page_size}" if url == None else url
+                request = r.get(url, headers=headers)
+                response = request.json()
+                keys = ['mailingListId', 'name', 'ownerId', 'lastModifiedDate', 'creationDate','contactCount', 'nextPage']
+                mailing_lists = Parser().json_parser(response=response, keys=keys, arr=False)
+                next_page = mailing_lists[-1][0] if len(mailing_lists[0]) == page_size else None
+                single_mailing_list = pd.DataFrame(mailing_lists[:-1]).transpose()
+                single_mailing_list.columns = keys[:-1]
+                single_mailing_list['creationDate'] = pd.to_datetime(single_mailing_list['creationDate'], unit='ms')
+                single_mailing_list['lastModifiedDate'] = pd.to_datetime(single_mailing_list['lastModifiedDate'], unit='ms')
+                mailing_list = pd.concat([mailing_list, single_mailing_list]).reset_index(drop=True)
+                return mailing_list, next_page
+            mailing_list, next_page = extract_page()
+            while next_page != None:
+                mailing_list, next_page = extract_page(url=next_page,mailing_list=mailing_list)
+        except:
+            print('Hey there! It looks like something went wrong. Check to see that you have Mailing Lists, and Please try again.')
+        return mailing_list
 
-        headers, base_url = self.header_setup()
-        url = base_url + f"/mailinglists?pageSize={page_size}&offset={offset}"
-        request = r.get(url, headers=headers)
-        response = request.json()
-        keys = ['mailingListId', 'name', 'ownerId', 'lastModifiedDate', 'creationDate','contactCount']
-        mailing_lists = Parser().json_parser(response=response, keys=keys, arr=False)
-        if to_df is True:
-            mailing_list = pd.DataFrame(mailing_lists).transpose()
-            mailing_list.columns = keys
-            mailing_list['creationDate'] = pd.to_datetime(mailing_list['creationDate'], unit='ms')
-            mailing_list['lastModifiedDate'] = pd.to_datetime(mailing_list['lastModifiedDate'], unit='ms')
-            return mailing_list
-        return mailing_lists
 
     def get_list(self, mailing_list=None):
         '''This function gets the list specfied by the mailing list param and returns the list members.
@@ -116,9 +126,11 @@ class MailingList(Credentials):
                 print(f'Your mailing list "{mailing_list}" has been renamed to {name} in the XM Directory.')
         except MailingListIDError:
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
+        except:
+            return response
         return
 
-    def delete_list(self,mailing_list=None):
+    def delete_list(self, mailing_list=None):
         '''This method will delete the specified mailing list from the given users XM Directory.
 
         :param mailing_list: Your mailing list id that you are interested in deleting.
@@ -140,50 +152,43 @@ class MailingList(Credentials):
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
         return
 
-    def list_contacts(self, mailing_list=None, page_size=100, offset=0, to_df=True):
+    def list_contacts(self, mailing_list=None, page_size=500, url=None):
         '''This method creates a pandas DataFrame of all the contacts information within the defined mailing list.
 
         :param mailing_list: the mailing list id
         :type mailing_list: str
+        :param url: the url for a single contact page (typically this doesn't not need to be changed.)
         :param page_size: The number of contacts in the mailing list to return per call.
         :type page_size: int
-        :param offset: The index offset that you would like to apply in you call.
-        :type offset: int
-        :param to_df: if True, returns the contacts in the mailing list and their member objects in a pandas DataFrame.
-        :return: a pandas DataFrame, or a dictionary containing the contacts information.
         '''
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
+        assert page_size != 0, 'Hey there! You need to have a page size greater than 1'
 
         try:
-            headers, base_url = self.header_setup()
-            url = base_url + f"/mailinglists/{mailing_list}/contacts?pageSize={page_size}&offset={offset}"
-            request = r.get(url, headers=headers)
-            response = request.json()
-            keys = ['contactId','firstName', 'lastName', 'email', 'phone', 'extRef', 'language', 'unsubscribed']
-            contact_list = Parser().json_parser(response=response, keys=keys, arr=False)
-            if to_df is True:
-                contact_list = pd.DataFrame(contact_list).transpose()
-                contact_list.columns = keys
-                contact_list['mailing_list'] = mailing_list
-
-            #contact_list = []
-            #while lists['result']['nextPage'] is not None:
-                #contact_list = Parser().json_parser(lists, keys=keys arr=False)
-                #contact_df = pd.DataFrame(contact_list).transpose()
-                #contact_df.columns = keys
-                #contact_df['mailing_list'] = mailing_list
-                #contact_lists.append(contact_df)
-                #url = lists['result']['nextPage']
-                #response = r.get(url, headers=headers)
-                #lists = response.json()
-            #contact_df = pd.concat(contact_lists).reset_index(drop=True)
-
+            contact_list = pd.DataFrame()
+            def extract_page(mailing_list=mailing_list, url=url, contact_list=contact_list, page_size=page_size):
+                ''' This is a method that extracts a single page of contacts in a mailing list.'''
+                headers, base_url = self.header_setup()
+                url = base_url + f"/mailinglists/{mailing_list}/contacts?pageSize={page_size}" if url == None else url
+                request = r.get(url, headers=headers)
+                response = request.json()
+                keys = ['contactId','firstName', 'lastName', 'email', 'phone', 'extRef', 'language', 'unsubscribed', 'nextPage']
+                contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
+                next_page = contact_lists[-1][0] if len(contact_lists[0]) == page_size else None
+                single_contact_list = pd.DataFrame(contact_lists[:-1]).transpose()
+                single_contact_list.columns = keys[:-1]
+                single_contact_list['mailing_list'] = mailing_list
+                contact_list = pd.concat([contact_list, single_contact_list]).reset_index(drop=True)
+                return contact_list, next_page
+            contact_list, next_page = extract_page()
+            while next_page != None:
+                contact_list, next_page = extract_page(url=next_page, contact_list=contact_list)
         except MailingListIDError:
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
         return contact_list
 
-    def create_contact_in_list(self, mailing_list=None, first_name=None, last_name=None, email=None, phone=None, external_ref=None, unsubscribed=False,language="en",metadata={}):
+    def create_contact_in_list(self, mailing_list=None, first_name='', last_name='', email='', phone='', external_ref='', unsubscribed=False,language="en",metadata={}):
         '''This method creates contacts in the specified mailing list. It is important to remember here that whenever you create a contact in
         a mailing list, you are also creating that contact in the XMDirectory. Once created 2 seperate IDs are created for the contact. The ContactID
         is the reference for the contact in the XMDirectory, and the Contact Lookup ID is the reference of the contact in the Mailing List.
@@ -231,4 +236,6 @@ class MailingList(Credentials):
             contact_list_id = response['result']['contactLookupId']
         except MailingListIDError:
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
-        return tuple([contact_id, contact_list_id])
+        except:
+            return response
+        return contact_id, contact_list_id

@@ -126,6 +126,8 @@ class MailingList(Credentials):
                 print(f'Your mailing list "{mailing_list}" has been renamed to {name} in the XM Directory.')
         except MailingListIDError:
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
+        except:
+            return response
         return
 
     def delete_list(self, mailing_list=None):
@@ -186,7 +188,7 @@ class MailingList(Credentials):
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
         return contact_list
 
-    def create_contact_in_list(self, mailing_list=None, first_name=None, last_name=None, email=None, phone=None, external_ref=None, unsubscribed=False,language="en",metadata={}):
+    def create_contact_in_list(self, mailing_list=None, first_name='', last_name='', email='', phone='', external_ref='', unsubscribed=False,language="en",metadata={}):
         '''This method creates contacts in the specified mailing list. It is important to remember here that whenever you create a contact in
         a mailing list, you are also creating that contact in the XMDirectory. Once created 2 seperate IDs are created for the contact. The ContactID
         is the reference for the contact in the XMDirectory, and the Contact Lookup ID is the reference of the contact in the Mailing List.
@@ -234,4 +236,6 @@ class MailingList(Credentials):
             contact_list_id = response['result']['contactLookupId']
         except MailingListIDError:
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
+        except:
+            return response
         return contact_id, contact_list_id

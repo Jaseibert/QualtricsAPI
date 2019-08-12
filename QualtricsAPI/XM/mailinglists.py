@@ -188,7 +188,7 @@ class MailingList(Credentials):
             print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
         return contact_list
 
-    def create_contact_in_list(self, mailing_list=None, first_name='', last_name='', email='', phone='', external_ref='', unsubscribed=False,language="en",metadata={}):
+    def create_contact_in_list(self, mailing_list=None, first_name='', email='', unsubscribed=False, language="en",metadata={}, phone, external_ref, last_name):
         '''This method creates contacts in the specified mailing list. It is important to remember here that whenever you create a contact in
         a mailing list, you are also creating that contact in the XMDirectory. Once created 2 seperate IDs are created for the contact. The ContactID
         is the reference for the contact in the XMDirectory, and the Contact Lookup ID is the reference of the contact in the Mailing List.

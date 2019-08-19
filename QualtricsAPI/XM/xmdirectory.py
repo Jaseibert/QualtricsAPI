@@ -45,7 +45,7 @@ class XMDirectory(Credentials):
                 "language": language,
                 "embeddedData": metadata,
             }
-            headers, base_url = self.header_setup(content_type=True)
+            headers, base_url = self.header_setup(content_type=True, xm=True)
             url = base_url + "/contacts"
             request = r.post(url, json=contact_data, headers=headers)
             response = request.json()
@@ -66,7 +66,7 @@ class XMDirectory(Credentials):
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
 
         try:
-            headers, base_url = self.header_setup()
+            headers, base_url = self.header_setup(xm=True)
             url = base_url + f"/contacts/{contact_id}"
             request = r.delete(url, headers=headers)
             response = request.json()
@@ -87,7 +87,7 @@ class XMDirectory(Credentials):
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
 
         try:
-            headers, base_url = self.header_setup()
+            headers, base_url = self.header_setup(xm=True)
             url = base_url + f"/contacts/{contact_id}"
             contact_data = {}
             for key, value in kwargs.items():
@@ -119,7 +119,7 @@ class XMDirectory(Credentials):
             contact_list = pd.DataFrame()
             def extract_page(url=url, contact_list=contact_list, offset=offset, page_size=page_size):
                 ''' This is a method that extracts a single page of contacts in a mailing list.'''
-                headers, base_url = self.header_setup()
+                headers, base_url = self.header_setup(xm=True)
                 url = base_url + f"/contacts?pageSize={page_size}" if url == None else url
                 request = r.get(url, headers=headers)
                 response = request.json()
@@ -150,7 +150,7 @@ class XMDirectory(Credentials):
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
 
         try:
-            headers, base_url = self.header_setup()
+            headers, base_url = self.header_setup(xm=True)
             url = base_url + f'/contacts/{str(contact_id)}'
             request = r.get(url, headers=headers)
             response = request.json()

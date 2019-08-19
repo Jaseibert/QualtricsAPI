@@ -21,20 +21,19 @@ class MailingList(Credentials):
         '''This method will create a mailing list in the XM Directory for the your specified user's account.
 
         :param list_name: the name of the list to be created.
-        :return: set containing the list_name and the list's new id
+        :return: tuple containing the list_name and the list's new id
         '''
 
         try:
-            headers, url = self.header_setup(content_type=True)
+            headers, url = self.header_setup(content_type=True, xm=True)
             url = url + "/mailinglists"
             data = {"name": "{0}".format(name)}
             request = r.post(url, json=data, headers=headers)
             response = request.json()
             list_id = Parser().json_parser(response=response, keys=['id'], arr=False)[0][0]
-            list_params = tuple([name, list_id])
         except ServerError:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
-        return list_params
+        return name, list_id
 
     def list_lists(self, page_size=100, url=None):
         '''This method lists all the mailing lists in the directory for the specified user token. You won't typically need to adjust
@@ -44,14 +43,14 @@ class MailingList(Credentials):
         :type page_size: int
         :param url: The url parameter is used to hold the next page url when itterating.
         :type url: string
-        :return: Either a pandas DataFrame or a list of tuples, containing lists and their respective member objects.
+        :return: A Pandas DataFrame
         '''
         assert page_size != 0, 'Hey there! You need to have a page size greater than 1'
         try:
             mailing_list = pd.DataFrame()
             def extract_page(page_size=page_size, url=url, mailing_list=mailing_list):
                 ''' This method is a nested method that extracts a single page of mailing lists. '''
-                headers, base_url = self.header_setup()
+                headers, base_url = self.header_setup(xm=True)
                 url = base_url + f"/mailinglists?pageSize={page_size}" if url == None else url
                 request = r.get(url, headers=headers)
                 response = request.json()
@@ -77,14 +76,14 @@ class MailingList(Credentials):
 
         :param mailing_list: Your mailing list id that you are interested in getting information on.
         :type mailing_list: str
-        :return: a dictionary containing the mailing list member objects.
+        :return: A Pandas DataFrame
         '''
 
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.'
 
         try:
-            headers, base_url = self.header_setup()
+            headers, base_url = self.header_setup(xm=True)
             url = base_url + f"/mailinglists/{mailing_list}"
             request = r.get(url, headers=headers)
             response = request.json()
@@ -118,7 +117,7 @@ class MailingList(Credentials):
 
         try:
             data = {"name": f"{name}"}
-            headers, base_url = self.header_setup(content_type=True)
+            headers, base_url = self.header_setup(content_type=True, xm=True)
             url = base_url + f"/mailinglists/{mailing_list}"
             request = r.put(url, json=data, headers=headers)
             response = request.json()
@@ -142,7 +141,7 @@ class MailingList(Credentials):
 
         try:
             data = {"name": f"{mailing_list}"}
-            headers, base_url = self.header_setup()
+            headers, base_url = self.header_setup(xm=True)
             url = base_url + f"/mailinglists/{mailing_list}"
             request = r.delete(url, json=data, headers=headers)
             response = request.json()
@@ -160,6 +159,7 @@ class MailingList(Credentials):
         :param url: the url for a single contact page (typically this doesn't not need to be changed.)
         :param page_size: The number of contacts in the mailing list to return per call.
         :type page_size: int
+        :return: A Pandas DataFrame
         '''
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
@@ -169,7 +169,7 @@ class MailingList(Credentials):
             contact_list = pd.DataFrame()
             def extract_page(mailing_list=mailing_list, url=url, contact_list=contact_list, page_size=page_size):
                 ''' This is a method that extracts a single page of contacts in a mailing list.'''
-                headers, base_url = self.header_setup()
+                headers, base_url = self.header_setup(xm=True)
                 url = base_url + f"/mailinglists/{mailing_list}/contacts?pageSize={page_size}" if url == None else url
                 request = r.get(url, headers=headers)
                 response = request.json()
@@ -228,7 +228,7 @@ class MailingList(Credentials):
                 "unsubscribed": unsubscribed
             }
 
-            headers, base_url = self.header_setup(content_type=True)
+            headers, base_url = self.header_setup(content_type=True, xm=True)
             url = base_url + f"/mailinglists/{mailing_list}/contacts"
             request = r.post(url, json=data, headers=headers)
             response = request.json()

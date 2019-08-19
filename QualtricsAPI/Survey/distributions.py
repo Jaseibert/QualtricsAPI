@@ -11,7 +11,7 @@ from QualtricsAPI.JSON import Parser
 from QualtricsAPI.Exceptions import ServerError
 
 class Distributions(Credentials):
-    '''This is a child class to the credentials class that gathers information about from Qualtrics Distributions.'''
+    '''This is a child class to the credentials class and gathers information about  Qualtric's Distributions.'''
 
     def __init__(self, token=None, directory_id=None, data_center=None):
         self.token = token
@@ -202,10 +202,14 @@ class Distributions(Credentials):
         return thanks_id
 
     def list_distributions(self, survey):
-        ''' This method will list all of the distributions corresponding with a given survey.
+        ''' This method will list all of the distributions corresponding with a given survey. Given that distributions are
+        specific to individual surveys, we must pass the SurveyID as an arguement into the survey parameter for this method
+        to work appropriately. This method will return a Pandas DataFrame filled with a list of the distributions associated
+        with the specific SurveyID passed to the survey parameter.
 
         :param survey: The Survey ID corresponding with the Survey that the distribution is to be sent to.
         :type survey: str
+        :return: A Pandas DataFrame
         '''
 
         assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'
@@ -232,12 +236,16 @@ class Distributions(Credentials):
         return dist_df
 
     def get_distribution(self, survey, distribution):
-        ''' This method gives users the ability to get a specific distribution corresponding with a given survey.
+        ''' This method gives users the ability to get a specific distribution corresponding with a given survey. Given that
+        distributions are specific to individual surveys, we must pass the SurveyID as an arguement into the survey parameter for
+        this method to work appropriately. This method will return a Pandas DataFrame consisting of multiple variables associated
+        with the specified distirbution.
 
         :param survey: The Survey ID corresponding with the Survey that the distribution is to be sent to.
         :type survey: str
         :param distribution: A specific Distribution ID associated with the given survey.
         :type distribution: str
+        :return: A Pandas DataFrame
         '''
 
         assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'

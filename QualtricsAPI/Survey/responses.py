@@ -20,7 +20,7 @@ class Responses(Credentials):
         assert survey_id[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
 
         try:
-            headers, url = self.header_setup(content_type=True, responses=False)
+            headers, url = self.header_setup(content_type=True, xm=False, path='responseexports/')
             payload = '{"format":"' + file_format + '","surveyId":"' + survey_id + '"}'
             request = r.request("POST", url, data=payload, headers=headers)
             response = request.json()
@@ -72,6 +72,3 @@ class Responses(Credentials):
         questions = pd.DataFrame(df[:1].T)
         questions.columns = ['Questions']
         return questions
-
-
-    #Method to List Surveys

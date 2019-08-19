@@ -8,6 +8,7 @@ from QualtricsAPI.Survey import Responses
 from QualtricsAPI.JSON import Parser
 from QualtricsAPI.XM import MailingList
 from QualtricsAPI.XM import XMDirectory
+from QualtricsAPI.Library import Messages
 
 # Setup Tests Class
 class setup_tests(object):
@@ -51,6 +52,38 @@ class setup_tests(object):
         survey_id = 'SV_ThisIsaFakeID!' if short else 'SV_ThisIsaFakeMailingID!'
         bad_id = 'ThisIsaFakeIDwo/SV' if false_id else None
         return survey_id, bad_id
+
+    def setup_test_library_id_ur(self, short=False, false_id=False):
+        '''Setup for Test Case 6: Responses Sub-Module method's exception handling of the library_id's length (18), and
+        the incorrect id (UR_).'''
+
+        lib_id = 'UR_ThisIsaFakeID!' if short else 'UR_ThisIsaFakeMailingID!'
+        bad_id = 'ThisIsaFakeIDwo/UR' if false_id else None
+        return lib_id, bad_id
+
+    def setup_test_library_id_gr(self, short=False, false_id=False):
+        '''Setup for Test Case 7: Responses Sub-Module method's exception handling of the library_id's length (18), and
+        the incorrect id (GR_).'''
+
+        lib_id = 'GR_ThisIsaFakeID!' if short else 'GR_ThisIsaFakeMailingID!'
+        bad_id = 'ThisIsaFakeIDwo/GR' if false_id else None
+        return lib_id, bad_id
+
+    def setup_test_dist_id(self, short=False, false_id=False):
+        '''Setup for Test Case 8: Responses Sub-Module method's exception handling of the distribution_id's length (19), and
+        the incorrect id (UMD_).'''
+
+        dist_id = 'UMD_ThisIsaFakeID!' if short else 'UMD_ThisIsaFakeMailingID!'
+        bad_id = 'ThisIsaFakeIDwo/UMD' if false_id else None
+        return dist_id, bad_id
+
+    def setup_test_message_id(self, short=False, false_id=False):
+        '''Setup for Test Case 9: Responses Sub-Module method's exception handling of the message_id's length (18), and
+        the incorrect id (MS_).'''
+
+        msg_id = 'MS_ThisIsaFakeID!' if short else 'MS_ThisIsaFakeMailingID!'
+        bad_id = 'ThisIsaFakeIDwo/MS' if false_id else None
+        return msg_id, bad_id
 
 #UnitTest Class
 class TestQualtricsAPI(unittest.TestCase):
@@ -300,6 +333,133 @@ class TestQualtricsAPI(unittest.TestCase):
         survey_id, bad_id = setup_tests().setup_test_survey_id(short=False, false_id=True)
         with self.assertRaises(AssertionError):
             Responses().setup_request(file_format='csv', survey_id=bad_id)
+
+    ## Messages.list_messages: Library IDs ##
+    #Test Assertion Error is handled: Short Library id (UR)
+    def test_responses_short_library_id_list_msgs_ur(self):
+        '''This method tests that an assertion is raised in the Messages Module's list_messages method when the user enters a
+        library_id (UR: User-Defined Resource) that is too long. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().list_messages(library=lib_id)
+
+    #Test Assertion Error is handled: Long Library id (UR)
+    def test_responses_long_library_id_lst_msgs_ur(self):
+        '''This method tests that an assertion is raised in the Messages Module's list_messages method when the user enters a
+         library_id (UR: User-Defined Resource) that is too short. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_ur(short=True, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().list_messages(library=lib_id)
+
+    #Test Assertion Error is handled: Incorrect Library id (UR)
+    def test_responses_bad_libary_id_lst_msgs_ur(self):
+        '''This method tests that an assertion is raised in the Messages Module's list_messages method when the user enters
+         a library_id (UR: User-Defined Resource) that is incorrect. '''
+
+        lib_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=True)
+        with self.assertRaises(AssertionError):
+            Messages().list_messages(library=bad_id)
+
+    #Test Assertion Error is handled: Short Library id (GR)
+    def test_responses_short_library_id_list_msgs_gr(self):
+        '''This method tests that an assertion is raised in the Messages Module's list_messages method when the user enters
+         a library_id (GR: Global Resource) that is too long. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().list_messages(library=lib_id)
+
+    #Test Assertion Error is handled: Long Library id (GR)
+    def test_responses_long_library_id_lst_msgs_gr(self):
+        '''This method tests that an assertion is raised in the Messages Module's list_messages method when the user enters
+         a library_id (GR: Global Resource) that is too short. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_gr(short=True, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().list_messages(library=lib_id)
+
+    #Test Assertion Error is handled: Incorrect Library id (GR)
+    def test_responses_bad_libary_id_lst_msgs_gr(self):
+        '''This method tests that an assertion is raised in the Messages Module's list_messages method when the user enters
+         a library_id (GR: Global Resource) that is incorrect. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=True)
+        with self.assertRaises(AssertionError):
+            Messages().list_messages(library=bad_id)
+
+    ## Messages.get_messages: Library IDs ##
+    #Test Assertion Error is handled: Short Library id (UR)
+    def test_responses_short_library_id_get_msg_ur(self):
+        '''This method tests that an assertion is raised in the Messages Module's get_message method when the user enters a
+        library_id (UR: User-Defined Resource) that is too long. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().get_message(library=lib_id, message="MS_ThisIsaFakeMsg!")
+
+    #Test Assertion Error is handled: Long Library id (UR)
+    def test_responses_long_library_id_get_msg_ur(self):
+        '''This method tests that an assertion is raised in the Messages Module's get_message method when the user enters a
+         library_id (UR: User-Defined Resource) that is too short. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_ur(short=True, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().get_message(library=lib_id, message="MS_ThisIsaFakeMsg!")
+
+    #Test Assertion Error is handled: Incorrect Library id (UR)
+    def test_responses_bad_libary_id_get_msg_ur(self):
+        '''This method tests that an assertion is raised in the Messages Module's get_message method when the user enters
+         a library_id (UR: User-Defined Resource) that is incorrect. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=True)
+        with self.assertRaises(AssertionError):
+            Messages().get_message(library=bad_id, message="MS_ThisIsaFakeMsg!")
+
+    #Test Assertion Error is handled: Short Library id (GR)
+    def test_responses_short_library_id_get_msg_gr(self):
+        '''This method tests that an assertion is raised in the Messages Module's get_message method when the user enters
+         a library_id (GR: Global Resource) that is too long. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().get_message(library=lib_id, message="MS_ThisIsaFakeMsg!")
+
+    #Test Assertion Error is handled: Long Library id (GR)
+    def test_responses_long_library_id_get_msg_gr(self):
+        '''This method tests that an assertion is raised in the Messages Module's get_message method when the user enters
+         a library_id (GR: Global Resource) that is too short. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_gr(short=True, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().get_message(library=lib_id, message="MS_ThisIsaFakeMsg!")
+
+    #Test Assertion Error is handled: Incorrect Library id (GR)
+    def test_responses_bad_libary_id_get_msg_gr(self):
+        '''This method tests that an assertion is raised in the Messages Module's get_message method when the user enters
+         a library_id (GR: Global Resource) that is incorrect. '''
+        lib_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=True)
+        with self.assertRaises(AssertionError):
+            Messages().get_message(library=bad_id, message="MS_ThisIsaFakeMsg!")
+
+    ## Messages.get_messages: Message IDs ##
+    #Test Assertion Error is handled: Short Message ID
+    def test_responses_short_msg_id_get_msgs(self):
+        '''This method tests that an assertion is raised in the Messages Module's get_message method when the user enters a
+        message_id that is too long. '''
+        msg_id, bad_id = setup_tests().setup_test_message_id(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().get_message(library=msg_id, message="MS_ThisIsaFakeMsg!")
+
+    #Test Assertion Error is handled: Long Message ID
+    def test_responses_long_msg_id_get_msgs(self):
+        '''This method tests that an assertion is raised in the Messages Module's get_message method when the user enters a
+         message_id that is too short. '''
+        msg_id, bad_id = setup_tests().setup_test_message_id(short=True, false_id=False)
+        with self.assertRaises(AssertionError):
+            Messages().get_message(library=msg_id, message="MS_ThisIsaFakeMsg!")
+
+    #Test Assertion Error is handled: Incorrect Message ID
+    def test_responses_bad_msg_id_get_msgs(self):
+        '''This method tests that an assertion is raised in the Messages Module's get_message method when the user enters
+         a message_id that is incorrect. '''
+        msg_id, bad_id = setup_tests().setup_test_message_id(short=False, false_id=True)
+        with self.assertRaises(AssertionError):
+            Messages().get_message(library=bad_id, message="MS_ThisIsaFakeMsg!")
+
+
+
 
 if __name__ == "__main__":
     unittest.main()

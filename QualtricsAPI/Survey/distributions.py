@@ -1,10 +1,6 @@
 import requests as r
-import zipfile
-import json
-import io
 import pandas as pd
-from datetime import date
-import datetime
+from datetime import date, datetime, timedelta
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
 
@@ -35,7 +31,7 @@ class Distributions(Credentials):
         :param seconds: The second offset for the send_date. [Default = 0]
         :type seconds: int
         '''
-        send_date = datetime.now() + timedelta(weeks=weeks, days=days, hour=hours, minute=minutes, second=seconds)
+        send_date = datetime.now() + timedelta(weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds)
         return date.strftime(send_date, '%Y-%m-%dT%H:%M:%SZ')
 
     def create_distribution(self, subject, reply_email, from_email, from_name, mailing_list, library, survey, message, send_date, link_type='Individual'):

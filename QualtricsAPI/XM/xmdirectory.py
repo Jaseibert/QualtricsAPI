@@ -50,9 +50,10 @@ class XMDirectory(Credentials):
             request = r.post(url, json=contact_data, headers=headers)
             response = request.json()
             contact_id = response['result']['id']
-        except ServerError:
-            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
-        return contact_id
+            return contact_id
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+
 
     def delete_contact(self, contact_id=None):
         '''This method will delete a contact from your XMDirectory. (Caution this cannot be reversed once deleted!)
@@ -72,9 +73,9 @@ class XMDirectory(Credentials):
             response = request.json()
             if response['meta']['httpStatus'] == '200 - OK':
                 print(f'Your XM Contact"{contact_id}" has been deleted from the XM Directory.')
-        except ContactIDError:
-            'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
-        return
+            return
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def update_contact(self, contact_id=None, **kwargs):
         '''This method will update a contact from your XMDirectory.
@@ -94,9 +95,12 @@ class XMDirectory(Credentials):
                 contact_data.update({key: str(value)})
             request = r.put(url, json=contact_data, headers=headers)
             response = request.json()
-        except ContactIDError:
-            'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
-        return
+            if response['meta']['httpStatus'] == '200 - OK':
+                print(f'Your XM Contact"{contact_id}" has been updated in the XM Directory.')
+            return
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+
 
     def list_contacts_in_directory(self, page_size=1000, offset=0, url=None):
         '''This method will list the top-level information about the contacts in your XM Directory. Depending
@@ -133,9 +137,10 @@ class XMDirectory(Credentials):
             contact_list, next_page = extract_page()
             while next_page != None:
                 contact_list, next_page = extract_page(url=next_page, contact_list=contact_list)
-        except ServerError:
-            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
-        return response
+            #return contact_list
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+
 
     def get_contact(self, contact_id=None):
         ''' This method is similar to the 'list_contacts_in_directory' method, in that it will return a single contact's
@@ -157,9 +162,10 @@ class XMDirectory(Credentials):
             primary = pd.DataFrame.from_dict(response['result'], orient='index').transpose()
             primary['creationDate'] = pd.to_datetime(primary['creationDate'],unit='ms')
             primary['lastModified'] = pd.to_datetime(primary['lastModified'],unit='ms')
-        except ContactIDError:
-            'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
-        return primary
+            return primary
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+
 
     def get_contact_additional_info(self, contact_id=None, content=None):
         ''' This method will return the additional "nested" information associated with a contact in the XMDirectory.
@@ -185,6 +191,6 @@ class XMDirectory(Credentials):
             primary = self.get_contact(contact_id=contact_id)
             keys = Parser().extract_keys(primary[content][0])
             data = pd.DataFrame.from_dict(primary[content][0], orient='index').transpose()
-        except ContactIDError:
-            'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
-        return data
+            return data
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")

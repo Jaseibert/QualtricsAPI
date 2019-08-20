@@ -1,6 +1,4 @@
 import time as t
-import io
-import json
 import requests as r
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
@@ -31,9 +29,10 @@ class MailingList(Credentials):
             request = r.post(url, json=data, headers=headers)
             response = request.json()
             list_id = Parser().json_parser(response=response, keys=['id'], arr=False)[0][0]
-        except ServerError:
-            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
-        return name, list_id
+            return name, list_id
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+
 
     def list_lists(self, page_size=100, url=None):
         '''This method lists all the mailing lists in the directory for the specified user token. You won't typically need to adjust
@@ -66,9 +65,9 @@ class MailingList(Credentials):
             mailing_list, next_page = extract_page()
             while next_page != None:
                 mailing_list, next_page = extract_page(url=next_page,mailing_list=mailing_list)
+            return
         except:
-            print('Hey there! It looks like something went wrong. Check to see that you have Mailing Lists, and Please try again.')
-        return mailing_list
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
 
     def get_list(self, mailing_list=None):
@@ -81,7 +80,6 @@ class MailingList(Credentials):
 
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.'
-
         try:
             headers, base_url = self.header_setup(xm=True)
             url = base_url + f"/mailinglists/{mailing_list}"
@@ -98,9 +96,9 @@ class MailingList(Credentials):
             df = pd.DataFrame.from_dict(list_info, orient='index').transpose()
             df['creationDate'] = pd.to_datetime(df['creationDate'], unit='ms')
             df['lastModifiedDate'] = pd.to_datetime(df['lastModifiedDate'], unit='ms')
-        except MailingListIDError:
-            print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
-        return df
+            return df
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def rename_list(self, mailing_list=None, name=None):
         '''This method takes an existing mailing list name and updates it to reflect the name defined in the name method.
@@ -123,11 +121,10 @@ class MailingList(Credentials):
             response = request.json()
             if response['meta']['httpStatus'] == '200 - OK':
                 print(f'Your mailing list "{mailing_list}" has been renamed to {name} in the XM Directory.')
-        except MailingListIDError:
-            print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
+            return
         except:
-            return response
-        return
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+
 
     def delete_list(self, mailing_list=None):
         '''This method will delete the specified mailing list from the given users XM Directory.
@@ -147,9 +144,10 @@ class MailingList(Credentials):
             response = request.json()
             if content['meta']['httpStatus'] == '200 - OK':
                 print(f'Your mailing list "{mailing_list}" has been deleted from the XM Directory.')
-        except MailingListIDError:
-            print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
-        return
+            return
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+
 
     def list_contacts(self, mailing_list=None, page_size=500, url=None):
         '''This method creates a pandas DataFrame of all the contacts information within the defined mailing list.
@@ -184,9 +182,10 @@ class MailingList(Credentials):
             contact_list, next_page = extract_page()
             while next_page != None:
                 contact_list, next_page = extract_page(url=next_page, contact_list=contact_list)
-        except MailingListIDError:
-            print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
-        return contact_list
+            return contact_list
+        except:
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+
 
     def create_contact_in_list(self, mailing_list=None, first_name='', email='', unsubscribed=False, language="en", external_ref='null', phone='null', last_name='null', metadata={}):
         '''This method creates contacts in the specified mailing list. It is important to remember here that whenever you create a contact in
@@ -234,8 +233,6 @@ class MailingList(Credentials):
             response = request.json()
             contact_id = response['result']['id']
             contact_list_id = response['result']['contactLookupId']
-        except MailingListIDError:
-            print('Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.')
+            return contact_id, contact_list_id
         except:
-            return response
-        return contact_id, contact_list_id
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")

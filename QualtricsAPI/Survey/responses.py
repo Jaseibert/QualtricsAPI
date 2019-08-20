@@ -24,7 +24,7 @@ class Responses(Credentials):
             progress_id = response['result']['id']
             return progress_id, url, headers
         except:
-            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}", s.msg)
+            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def send_request(self, file_format='csv', survey_id=None):
         '''This method sends the request, and sets up the download request.'''
@@ -42,8 +42,7 @@ class Responses(Credentials):
             download_request = r.get(download_url, headers=headers, stream=True)
             return download_request
         except:
-            print(f"ServerError:\nError Code: {content['meta']['error']['errorCode']}\nError Message: {content['meta']['error']['errorMessage']}", s.msg)
-        return
+            print(f"ServerError:\nError Code: {content['meta']['error']['errorCode']}\nError Message: {content['meta']['error']['errorMessage']}")
 
     def get_responses(self, survey_id=None):
         '''This function accepts the file format, and the survey id, and returns the responses associated with that survey.

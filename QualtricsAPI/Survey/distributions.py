@@ -8,7 +8,6 @@ from datetime import date
 import datetime
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
-from QualtricsAPI.Exceptions import ServerError
 
 class Distributions(Credentials):
     '''This is a child class to the credentials class and gathers information about  Qualtric's Distributions.'''
@@ -142,9 +141,10 @@ class Distributions(Credentials):
             response = request.json()
             reminder_id = response['result']
             #Maybe return a success message not the result
+            return reminder_id
         except:
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
-        return reminder_id
+        return
 
     def create_thank_you(self, subject, reply_email, from_email, from_name, library, message, distribution, send_date=gmtime()):
         '''This method gives users the ability to create a thank you for a given distribution. In order to create thank you distributions,
@@ -197,9 +197,10 @@ class Distributions(Credentials):
             request = r.post(url, json=data, headers=headers)
             response = request.json()
             thanks_id = response['result']
+            return thanks_id
         except:
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
-        return thanks_id
+        return
 
     def list_distributions(self, survey):
         ''' This method will list all of the distributions corresponding with a given survey. Given that distributions are
@@ -269,6 +270,7 @@ class Distributions(Credentials):
             library_ids = Parser().json_parser(response=response, keys=['libraryId'], arr=False)
             lib = pd.DataFrame(library_ids[0], index=['mailing_list_library_id', 'message_library_id'])
             dist_df = dist_df.append(lib)
+            return dist_df
         except:
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
-        return dist_df
+        return

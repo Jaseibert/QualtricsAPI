@@ -3,7 +3,6 @@ import zipfile
 import json
 import io
 import pandas as pd
-from time import gmtime, strftime
 from datetime import date
 import datetime
 from QualtricsAPI.Setup import Credentials
@@ -18,27 +17,26 @@ class Distributions(Credentials):
         self.directory_id = directory_id
         return
 
-    def set_send_date(self, year, month, day, hour='00', minute='00', second='00'):
+    def set_send_date(self, weeks=0, days=0, hours=0, minutes=0, seconds=0):
         '''This method is a helper function to format the send date arguements for several methods in the Distribution Module.
         The send_date parameter must be in the format ""%Y-%m-%dT%H:%M:%SZ" in order for the API to properly parse the send date.
+        Thus, this method defines the offset for the send_date, and formats it properly. An example would be if you wanted to send
+        a reminder one week from now, simply pass "1" as an argument in to the "weeks" parameter. The default behaviour is for the
+        send_date to be now, thus all params are set to zero offset.
 
-        :param year: The Year for the send_date (e.g. 2000).
-        :type year: str
-        :param month: The Month for the send_date (e.g. 01, 02, 03, etc.).
-        :type month: str
-        :param day: The Day for the send_date (e.g. 01, 02, 03, etc.).
-        :type day: str
-        :param hour: The Hour for the send_date 24-hour clock ['00','23'] (e.g. 01, 02, 03, etc.) Defaulted to '00'.
-        :type hour: str
-        :param minute: The Minute for the send_date (e.g. 01, 02, 03, etc.) Defaulted to '00'.
-        :type minute: str
-        :param second: The Second for the send_date (e.g. 01, 02, 03, etc.) Defaulted to '00'.
-        :type second: str
+        :param weeks: The week offset for the send_date. [Default = 0]
+        :type weeks: int
+        :param days: The day offset for the send_date. [Default = 0]
+        :type days: int
+        :param hours: The hour offset for the send_date. [Default = 0]
+        :type hours: int
+        :param minutes: The minute offset for the send_date. [Default = 0]
+        :type minutes: int
+        :param seconds: The second offset for the send_date. [Default = 0]
+        :type seconds: int
         '''
-
-        return f'{year}-{month}-{day}T{hour}:{minute}:{second}Z'
-
-
+        send_date = datetime.now() + timedelta(weeks=weeks, days=days, hour=hours, minute=minutes, second=seconds)
+        return date.strftime(send_date, '%Y-%m-%dT%H:%M:%SZ')
 
     def create_distribution(self, subject, reply_email, from_email, from_name, mailing_list, library, survey, message, send_date, link_type='Individual'):
         '''This method gives users the ability to create a distribution for a given mailing list and survey. In order to use this method you
@@ -94,7 +92,7 @@ class Distributions(Credentials):
                 'recipients': {
                     'mailingListId': mailing_list
                 },
-                'sendDate': strftime('%Y-%m-%dT%H:%M:%SZ', send_date),
+                'sendDate': send_date,
                 'message': {
                         'libraryId': library,
                         'messageId': message
@@ -151,7 +149,7 @@ class Distributions(Credentials):
                     'replyToEmail': reply_email,
                     'subject': subject
                 },
-                'sendDate': strftime('%Y-%m-%dT%H:%M:%SZ', send_date),
+                'sendDate': send_date,
                 'message': {
                         'libraryId': library,
                         'messageId': message
@@ -209,7 +207,7 @@ class Distributions(Credentials):
                     'replyToEmail': reply_email,
                     'subject': subject
                 },
-                'sendDate': strftime('%Y-%m-%dT%H:%M:%SZ', send_date),
+                'sendDate': send_date,
                 'message': {
                         'libraryId': library,
                         'messageId': message

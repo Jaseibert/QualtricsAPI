@@ -18,13 +18,34 @@ class Distributions(Credentials):
         self.directory_id = directory_id
         return
 
-    def create_distribution(self, subject, reply_email, from_email, from_name, mailing_list, library, survey, message, send_date=gmtime(), link_type='Individual'):
+    def set_send_date(self, year, month, day, hour='00', minute='00', second='00'):
+        '''This method is a helper function to format the send date arguements for several methods in the Distribution Module.
+        The send_date parameter must be in the format ""%Y-%m-%dT%H:%M:%SZ" in order for the API to properly parse the send date.
+
+        :param year: The Year for the send_date (e.g. 2000).
+        :type year: str
+        :param month: The Month for the send_date (e.g. 01, 02, 03, etc.).
+        :type month: str
+        :param day: The Day for the send_date (e.g. 01, 02, 03, etc.).
+        :type day: str
+        :param hour: The Hour for the send_date 24-hour clock ['00','23'] (e.g. 01, 02, 03, etc.) Defaulted to '00'.
+        :type hour: str
+        :param minute: The Minute for the send_date (e.g. 01, 02, 03, etc.) Defaulted to '00'.
+        :type minute: str
+        :param second: The Second for the send_date (e.g. 01, 02, 03, etc.) Defaulted to '00'.
+        :type second: str
+        '''
+
+        return f'{year}-{month}-{day}T{hour}:{minute}:{second}Z'
+
+
+
+    def create_distribution(self, subject, reply_email, from_email, from_name, mailing_list, library, survey, message, send_date, link_type='Individual'):
         '''This method gives users the ability to create a distribution for a given mailing list and survey. In order to use this method you
         must already have access to pre-defined Messages and their MessageID's existing within a User-Defined (starts with UR_)
         or Global (starts with GR_) Library. You can list the messages and their MessageID's(starts with MS_)  that are available to your user
         account by using the "QualtricsAPI.Library.Messages.list_messages()" method. As a final note, this method gives users the ability to
-        define the different types of
-
+        define the different types of messages.
 
         :param subject: The subject for the reminder email.
         :type subject: str
@@ -42,8 +63,8 @@ class Distributions(Credentials):
         :type mailing_list: str
         :param survey: The Survey ID corresponding with the Survey that the distribution is to be sent to.
         :type survey: str
-        :param send_date: The date that the distribution is supposed to be sent on. Default Behavior is the current time.
-        :type send_date:
+        :param send_date: The date that the distribution is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
+        :type send_date: str
         :param link_type: This parameter refers to the type of link that is to be sent within the distribution.
         :type link_type: str
         '''
@@ -88,7 +109,7 @@ class Distributions(Credentials):
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
 
-    def create_reminder(self, subject, reply_email, from_email, from_name, library, message, distribution, send_date=gmtime()):
+    def create_reminder(self, subject, reply_email, from_email, from_name, library, message, distribution, send_date):
         '''This method gives users the ability to create a reminder for a given distribution. In order to create a reminders you must have
         already created a distribution for a given mailing list and survey. Once created, you will pass the Distribution ID corresponding to
         the correct distribution to the distribution parameter and the reminder will be set to that specific distribution. Unlike the
@@ -109,8 +130,8 @@ class Distributions(Credentials):
         :type message: str
         :param distribution: The Distribution ID corresponding with the distribution that the reminder is to be attached to.
         :type distribution: str
-        :param send_date: The date that the reminder is supposed to be sent on. Default Behavior is the current time.
-        :type send_date:
+        :param send_date: The date that the reminder is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
+        :type send_date: str
         '''
 
         assert len(distribution) == 19, 'Hey, the parameter for "distribution" that was passed is the wrong length. It should have 19 characters.'
@@ -146,7 +167,7 @@ class Distributions(Credentials):
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
 
-    def create_thank_you(self, subject, reply_email, from_email, from_name, library, message, distribution, send_date=gmtime()):
+    def create_thank_you(self, subject, reply_email, from_email, from_name, library, message, distribution, send_date):
         '''This method gives users the ability to create a thank you for a given distribution. In order to create thank you distributions,
          you must have already created a distribution for a given mailing list and survey. Once created, you will pass the Distribution ID
          corresponding to the correct distribution to the distribution parameter and the reminder will be set to that specific distribution.
@@ -167,8 +188,8 @@ class Distributions(Credentials):
         :type message: str
         :param distribution: The Distribution ID corresponding with the distribution that the reminder is to be attached to.
         :type distribution: str
-        :param send_date: The date that the reminder is supposed to be sent on. Default Behavior is the current time.
-        :type send_date:
+        :param send_date: The date that the reminder is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
+        :type send_date: str
         '''
 
         assert len(distribution) == 19, 'Hey, the parameter for "distribution" that was passed is the wrong length. It should have 19 characters.'

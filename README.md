@@ -53,10 +53,6 @@ c.qualtrics_api_credentials(token='Your API Token',data_center='Your Data Center
 ```
 This will generate environment variables that will be used to  populate the HTTP headers which are necessary to make your API calls.  
 
-# Wrap-up
-
-Again this is currently under development so there may be reduced functionality, but I hope this helps fellow Qualtrics users to expedite their current workflow!
-
 # R Users
 For any R users there is an equally awesome package called ["qualtRics"](https://github.com/ropensci/qualtRics) which functions in very similar ways to this package. I have tried to keep consistent with some of the methods that are used in the qualtRics package and this one, so that there is a cohesion  between the two. However, I don't believe that it supports functionality to work within the XM Contacts Data (i.e. the XMDirectory, or Mailing Lists). [CRAN]('https://cran.r-project.org/web/packages/qualtRics/index.html')
 

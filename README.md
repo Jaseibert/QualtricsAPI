@@ -5,6 +5,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/qualtricsapi.svg)](https://pypi.python.org/pypi/qualtricsapi)
 [![Documenation Site](https://img.shields.io/website/https/www.qualtricsapi-pydocs.com.svg?down_color=red&down_message=offline&style=plastic&up_color=green&up_message=online)](https://img.shields.io/website/https/www.qualtricsapi-pydocs.com.svg?down_color=red&down_message=offline&style=plastic&up_color=green&up_message=online)
 [![Downloads](https://img.shields.io/pypi/dm/qualtricsapi.svg?style=plastic)](https://img.shields.io/pypi/dm/qualtricsapi.svg?style=plastic)
+[![Build Status](https://travis-ci.org/Jaseibert/QualtricsAPI.svg?branch=master)](https://travis-ci.org/Jaseibert/QualtricsAPI)
 
 **Author:** [Jeremy Seibert](https://www.jeremyseibert.com)<br/>
 **License:** [MIT](https://opensource.org/licenses/MIT)<br/>

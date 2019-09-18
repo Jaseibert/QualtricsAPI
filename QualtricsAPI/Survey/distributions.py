@@ -72,31 +72,31 @@ class Distributions(Credentials):
         assert message[:3] == 'MS_', 'Hey there! It looks like your MessageID is incorrect. You can find the MessageID by using the list messages method available in the Messages module of this Package. It will begin with "MS_". Please try again.'
         assert library[:3] == 'UR_' or library[:3] == 'GR_', 'Hey there! It looks like your Library ID is incorrect. You can find the Library ID on the Qualtrics site under your account settings. It will begin with "UR_" or "GR_". Please try again.'
 
-        try:
-            headers, url = self.header_setup(content_type=True, xm=False, path='distributions')
-            data = {
-                'header': {
-                    'fromEmail': from_email,
-                    'fromName': from_name,
-                    'replyToEmail': reply_email,
-                    'subject': subject
-                },
-                'surveyLink': {
-                    'surveyId': survey,
-                    'type': 'Individual'
-                },
-                'recipients': {
-                    'mailingListId': mailing_list
-                },
-                'sendDate': send_date,
-                'message': {
-                        'libraryId': library,
-                        'messageId': message
-                }
+        headers, url = self.header_setup(content_type=True, xm=False, path='distributions')
+        data = {
+            'header': {
+                'fromEmail': from_email,
+                'fromName': from_name,
+                'replyToEmail': reply_email,
+                'subject': subject
+            },
+            'surveyLink': {
+                'surveyId': survey,
+                'type': 'Individual'
+            },
+            'recipients': {
+                'mailingListId': mailing_list
+            },
+            'sendDate': send_date,
+            'message': {
+                    'libraryId': library,
+                    'messageId': message
             }
+        }
 
-            request = r.post(url, json=data, headers=headers)
-            response = request.json()
+        request = r.post(url, json=data, headers=headers)
+        response = request.json()
+        try:
             distribution_id = response['result']['id']
             return distribution_id
         except:
@@ -135,25 +135,26 @@ class Distributions(Credentials):
         assert message[:3] == 'MS_', 'Hey there! It looks like your MessageID is incorrect. You can find the MessageID by using the list messages method available in the Messages module of this Package. It will begin with "MS_". Please try again.'
         assert library[:3] == 'UR_' or library[:3] == 'GR_', 'Hey there! It looks like your Library ID is incorrect. You can find the Library ID on the Qualtrics site under your account settings. It will begin with "UR_" or "GR_". Please try again.'
 
-        try:
-            headers, base_url = self.header_setup(content_type=True, xm=False, path='distributions')
-            url = base_url + f'/{distribution}/reminders'
-            data = {
-                'header': {
-                    'fromEmail': from_email,
-                    'fromName': from_name,
-                    'replyToEmail': reply_email,
-                    'subject': subject
-                },
-                'sendDate': send_date,
-                'message': {
-                        'libraryId': library,
-                        'messageId': message
-                }
-            }
 
-            request = r.post(url, json=data, headers=headers)
-            response = request.json()
+        headers, base_url = self.header_setup(content_type=True, xm=False, path='distributions')
+        url = base_url + f'/{distribution}/reminders'
+        data = {
+            'header': {
+                'fromEmail': from_email,
+                'fromName': from_name,
+                'replyToEmail': reply_email,
+                'subject': subject
+            },
+            'sendDate': send_date,
+            'message': {
+                    'libraryId': library,
+                    'messageId': message
+            }
+        }
+
+        request = r.post(url, json=data, headers=headers)
+        response = request.json()
+        try:
             reminder_id = response['result']
             #Maybe return a success message not the result
             return reminder_id
@@ -193,24 +194,25 @@ class Distributions(Credentials):
         assert message[:3] == 'MS_', 'Hey there! It looks like your MessageID is incorrect. You can find the MessageID by using the list messages method available in the Messages module of this Package. It will begin with "MS_". Please try again.'
         assert library[:3] == 'UR_' or library[:3] == 'GR_', 'Hey there! It looks like your Library ID is incorrect. You can find the Library ID on the Qualtrics site under your account settings. It will begin with "UR_" or "GR_". Please try again.'
 
-        try:
-            headers, base_url = self.header_setup(content_type=True, xm=False, path='distributions')
-            url = base_url + f'/{distribution}/thankyous'
-            data = {
-                'header': {
-                    'fromEmail': from_email,
-                    'fromName': from_name,
-                    'replyToEmail': reply_email,
-                    'subject': subject
-                },
-                'sendDate': send_date,
-                'message': {
-                        'libraryId': library,
-                        'messageId': message
-                }
+
+        headers, base_url = self.header_setup(content_type=True, xm=False, path='distributions')
+        url = base_url + f'/{distribution}/thankyous'
+        data = {
+            'header': {
+                'fromEmail': from_email,
+                'fromName': from_name,
+                'replyToEmail': reply_email,
+                'subject': subject
+            },
+            'sendDate': send_date,
+            'message': {
+                    'libraryId': library,
+                    'messageId': message
             }
-            request = r.post(url, json=data, headers=headers)
-            response = request.json()
+        }
+        request = r.post(url, json=data, headers=headers)
+        response = request.json()
+        try:
             thanks_id = response['result']
             return thanks_id
         except:
@@ -231,10 +233,11 @@ class Distributions(Credentials):
         assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'
         assert len(survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
 
+
+        headers, base_url = self.header_setup(xm=False, path='distributions')
+        url = base_url + f'?surveyId={survey}'
+        request = r.get(url, headers=headers)
         try:
-            headers, base_url = self.header_setup(xm=False, path='distributions')
-            url = base_url + f'?surveyId={survey}'
-            request = r.get(url, headers=headers)
             response = request.json()
             keys = ['id', 'parentDistributionId', 'ownerId', 'organizationId', 'requestStatus', 'requestType',
                     'sendDate', 'createdDate', 'modifiedDate', 'headers', 'fromEmail', 'replyToEmail', 'fromName',
@@ -269,10 +272,11 @@ class Distributions(Credentials):
         assert len(distribution) == 19, 'Hey, the parameter for "distribution" that was passed is the wrong length. It should have 19 characters.'
         assert distribution[:4] == 'EMD_', 'Hey there! It looks like your distributionID is incorrect. You can find the distributionID by using the list_distributions method in this module. It will begin with "UMD_". Please try again.'
 
+
+        headers, base_url = self.header_setup(xm=False, path='distributions')
+        url = base_url + f'/{distribution}?surveyId={survey}'
+        request = r.get(url, headers=headers)
         try:
-            headers, base_url = self.header_setup(xm=False, path='distributions')
-            url = base_url + f'/{distribution}?surveyId={survey}'
-            request = r.get(url, headers=headers)
             response = request.json()
             keys = ['id', 'parentDistributionId', 'ownerId', 'organizationId', 'requestStatus', 'requestType',
                     'sendDate', 'createdDate', 'modifiedDate', 'headers', 'fromEmail', 'replyToEmail', 'fromName',

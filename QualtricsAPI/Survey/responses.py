@@ -16,11 +16,11 @@ class Responses(Credentials):
         assert len(survey_id) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
         assert survey_id[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
 
+        headers, url = self.header_setup(content_type=True, xm=False, path='responseexports/')
+        payload = '{"format":"' + file_format + '","surveyId":"' + survey_id + '"}'
+        request = r.request("POST", url, data=payload, headers=headers)
+        response = request.json()
         try:
-            headers, url = self.header_setup(content_type=True, xm=False, path='responseexports/')
-            payload = '{"format":"' + file_format + '","surveyId":"' + survey_id + '"}'
-            request = r.request("POST", url, data=payload, headers=headers)
-            response = request.json()
             progress_id = response['result']['id']
             return progress_id, url, headers
         except:

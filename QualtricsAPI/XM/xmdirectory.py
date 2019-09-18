@@ -36,19 +36,20 @@ class XMDirectory(Credentials):
         :type return: str
         '''
 
+
+        contact_data = {
+            "firstName": first_name,
+            "lastName": last_name,
+            "email": email,
+            "phone": phone,
+            "language": language,
+            "embeddedData": metadata,
+        }
+        headers, base_url = self.header_setup(content_type=True, xm=True)
+        url = base_url + "/contacts"
+        request = r.post(url, json=contact_data, headers=headers)
+        response = request.json()
         try:
-            contact_data = {
-                "firstName": first_name,
-                "lastName": last_name,
-                "email": email,
-                "phone": phone,
-                "language": language,
-                "embeddedData": metadata,
-            }
-            headers, base_url = self.header_setup(content_type=True, xm=True)
-            url = base_url + "/contacts"
-            request = r.post(url, json=contact_data, headers=headers)
-            response = request.json()
             contact_id = response['result']['id']
             return contact_id
         except:
@@ -66,11 +67,12 @@ class XMDirectory(Credentials):
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
 
+
+        headers, base_url = self.header_setup(xm=True)
+        url = base_url + f"/contacts/{contact_id}"
+        request = r.delete(url, headers=headers)
+        response = request.json()
         try:
-            headers, base_url = self.header_setup(xm=True)
-            url = base_url + f"/contacts/{contact_id}"
-            request = r.delete(url, headers=headers)
-            response = request.json()
             if response['meta']['httpStatus'] == '200 - OK':
                 print(f'Your XM Contact"{contact_id}" has been deleted from the XM Directory.')
             return
@@ -87,14 +89,14 @@ class XMDirectory(Credentials):
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
 
+        headers, base_url = self.header_setup(xm=True)
+        url = base_url + f"/contacts/{contact_id}"
+        contact_data = {}
+        for key, value in kwargs.items():
+            contact_data.update({key: str(value)})
+        request = r.put(url, json=contact_data, headers=headers)
+        response = request.json()
         try:
-            headers, base_url = self.header_setup(xm=True)
-            url = base_url + f"/contacts/{contact_id}"
-            contact_data = {}
-            for key, value in kwargs.items():
-                contact_data.update({key: str(value)})
-            request = r.put(url, json=contact_data, headers=headers)
-            response = request.json()
             if response['meta']['httpStatus'] == '200 - OK':
                 print(f'Your XM Contact"{contact_id}" has been updated in the XM Directory.')
             return
@@ -127,13 +129,16 @@ class XMDirectory(Credentials):
                 url = base_url + f"/contacts?pageSize={page_size}" if url == None else url
                 request = r.get(url, headers=headers)
                 response = request.json()
-                keys = ['contactId','firstName', 'lastName', 'email', 'phone','unsubscribed', 'language', 'extRef', 'nextPage']
-                contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
-                next_page = contact_lists[-1][0] if len(contact_lists[0]) == page_size else None
-                single_contact_list = pd.DataFrame(contact_lists[:-1]).transpose()
-                single_contact_list.columns = keys[:-1]
-                contact_list = pd.concat([contact_list, single_contact_list]).reset_index(drop=True)
-                return contact_list, next_page
+                try:
+                    keys = ['contactId','firstName', 'lastName', 'email', 'phone','unsubscribed', 'language', 'extRef', 'nextPage']
+                    contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
+                    next_page = contact_lists[-1][0] if len(contact_lists[0]) == page_size else None
+                    single_contact_list = pd.DataFrame(contact_lists[:-1]).transpose()
+                    single_contact_list.columns = keys[:-1]
+                    contact_list = pd.concat([contact_list, single_contact_list]).reset_index(drop=True)
+                    return contact_list, next_page
+                except:
+                    print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
             contact_list, next_page = extract_page()
             while next_page != None:
                 contact_list, next_page = extract_page(url=next_page, contact_list=contact_list)
@@ -154,11 +159,12 @@ class XMDirectory(Credentials):
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
 
+
+        headers, base_url = self.header_setup(xm=True)
+        url = base_url + f'/contacts/{str(contact_id)}'
+        request = r.get(url, headers=headers)
+        response = request.json()
         try:
-            headers, base_url = self.header_setup(xm=True)
-            url = base_url + f'/contacts/{str(contact_id)}'
-            request = r.get(url, headers=headers)
-            response = request.json()
             primary = pd.DataFrame.from_dict(response['result'], orient='index').transpose()
             primary['creationDate'] = pd.to_datetime(primary['creationDate'],unit='ms')
             primary['lastModified'] = pd.to_datetime(primary['lastModified'],unit='ms')
@@ -193,4 +199,4 @@ class XMDirectory(Credentials):
             data = pd.DataFrame.from_dict(primary[content][0], orient='index').transpose()
             return data
         except:
-            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+            'Hey there! Something went wrong please try again.'

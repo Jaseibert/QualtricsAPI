@@ -6,7 +6,6 @@ Setup/__pycache__/
 QualtricsAPI.egg-info
 /documentation
 Pipfile
-Pipfile.lock
 /build
 /dist
 tests/__inti__.pyc

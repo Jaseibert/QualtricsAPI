@@ -7,8 +7,8 @@ QualtricsAPI.egg-info
 /documentation
 Pipfile
 Pipfile.lock
-/dist
 /build
+/dist
 tests/__inti__.pyc
 tests/test.pyc
 Setup/__init__.pyc

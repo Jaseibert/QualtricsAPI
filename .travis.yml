@@ -4,7 +4,7 @@ python:
   - "3.6"
   - "3.7"
 install:
- - 'pip install pipenv'
- - 'pipenv sync'
+ - pip install pipenv
+ - pipenv install
 script:
  - python3 -m unittest QualtricsAPI.tests.test

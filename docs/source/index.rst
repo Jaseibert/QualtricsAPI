@@ -19,6 +19,19 @@ this package, Jeremy Seibert, is not affiliated with Qualtrics, and Qualtrics
 does not offer support for this package. For specific information about the
 Qualtrics API, you can refer to their official `documentation`_.
 
+Functionality
+-------------
+
+There are currently two primary uses of this package.
+
+There are currently three primary uses of this package.
+
+Contact Data - to manage survey contacts within the XMDirectory and any associated Mailing Lists.
+
+Survey Data - to manage surveys and the data collected from each of your surveys.
+
+Distribution Data - to manage the distributions (i.e. emails) which are sent to contacts as invites, reminders to complete surveys.
+
 R Users
 -------
 
@@ -29,23 +42,13 @@ qualtRics package and this one, so that there is a cohesion  between the two.
 However, I don’t believe that it supports functionality to work within
 the Contact Data (i.e. the XMDirectory, or Mailing Lists). `CRAN`_
 
-Functionality
--------------
-
-There are currently two primary uses of this package.
-
-1. Contact Data - to manage survey contacts within the XMDirectory and
-any associated Mailing Lists.
-
-2. Survey Data - to manage surveys and the data collected from each of
-your surveys.
-
 .. toctree::
    :maxdepth: 2
 
    installation
    quickstart
    responses
+   distributions
    xmdirectory(XM Subscribers)
    mailinglist(XM Subscribers)
 

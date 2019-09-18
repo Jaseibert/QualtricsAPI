@@ -29,14 +29,17 @@ class Credentials(object):
         os.environ['directory_id'] = directory_id
         return
 
-    def header_setup(self,content_type=False,responses=True):
+    def header_setup(self, content_type=False, xm=True, path=None):
         '''This method accepts the argument content_type and returns the correct header, and base url. (Not a User-Facing Method)
+
+        response => path = 'responseexports/'
+        distributions => path = 'distributions'
 
         :param content_type: use to return json response.
         :return: a HTML header and base url.
         '''
         header = {"x-api-token": os.environ['token']}
-        path = 'directories/{0}/'.format(os.environ['directory_id']) if responses else 'responseexports/'
+        path = 'directories/{0}/'.format(os.environ['directory_id']) if xm else path
         base_url = f"https://{os.environ['data_center']}.qualtrics.com/API/v3/{path}"
         if content_type is True:
             header["Content-Type"] = "application/json"

@@ -16,7 +16,6 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     keywords='qualtrics api python research survey',
     classifiers=[
-        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",
@@ -26,5 +25,5 @@ setuptools.setup(
           'pandas',
           'numpy',
           'requests'
-      ]
+      ],
 )

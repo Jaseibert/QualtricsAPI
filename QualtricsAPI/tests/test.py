@@ -10,6 +10,8 @@ from QualtricsAPI.XM import MailingList
 from QualtricsAPI.XM import XMDirectory
 from QualtricsAPI.Library import Messages
 from QualtricsAPI.Survey import Distributions
+from datetime import date, datetime, timedelta
+from time import gmtime
 
 # Setup Tests Class
 class setup_tests(object):
@@ -460,7 +462,7 @@ class TestQualtricsAPI(unittest.TestCase):
         mailing_list_id that is too long. '''
         mailing_list_id, bad_id = setup_tests().setup_test_mailing_list_id(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(mailing_list=mailing_list_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake", survey="SV_ThisIsaFakeID!!")
+            Distributions().create_distribution(mailing_list=mailing_list_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", send_date=gmtime(), reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake", survey="SV_ThisIsaFakeID!!")
 
     #Test Assertion Error is handled: Short MailiingList ID (create_distribution)
     def test_responses_long_ml_id_create_dist(self):
@@ -468,7 +470,7 @@ class TestQualtricsAPI(unittest.TestCase):
          mailing_list_id that is too short.'''
         mailing_list_id, bad_id = setup_tests().setup_test_mailing_list_id(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(mailing_list=mailing_list_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake", survey="SV_ThisIsaFakeID!!")
+            Distributions().create_distribution(mailing_list=mailing_list_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", send_date=gmtime(), reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake", survey="SV_ThisIsaFakeID!!")
 
     #Test Assertion Error is handled: Incorrect MailiingList ID (create_distribution)
     def test_responses_bad_ml_id_create_dist(self):
@@ -476,7 +478,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a mailing_list_id that is incorrect. '''
         mailing_list_id, bad_id = setup_tests().setup_test_mailing_list_id(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(mailing_list=bad_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake", survey="SV_ThisIsaFakeID!!")
+            Distributions().create_distribution(mailing_list=bad_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", send_date=gmtime(), reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake", survey="SV_ThisIsaFakeID!!")
 
     ## Distribution: Survey IDs ##
     #Test Assertion Error is handled: Long Survey ID (create_distribution)
@@ -485,7 +487,7 @@ class TestQualtricsAPI(unittest.TestCase):
         survey_id that is too long. '''
         survey_id, bad_id = setup_tests().setup_test_survey_id(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(survey=survey_id, mailing_list="CG_ThisIsaFakeMail", library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(survey=survey_id, mailing_list="CG_ThisIsaFakeMail", library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", send_date=gmtime(), subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Survey ID (create_distribution)
     def test_responses_long_sv_id_create_dist(self):
@@ -493,7 +495,7 @@ class TestQualtricsAPI(unittest.TestCase):
          survey_id that is too short.'''
         survey_id, bad_id = setup_tests().setup_test_survey_id(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(survey=survey_id, mailing_list="CG_ThisIsaFakeMail", library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(survey=survey_id, mailing_list="CG_ThisIsaFakeMail", library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", send_date=gmtime(), subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Survey ID (create_distribution)
     def test_responses_bad_sv_id_create_dist(self):
@@ -501,7 +503,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a survey_id that is incorrect. '''
         survey_id, bad_id = setup_tests().setup_test_survey_id(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(survey=bad_id, mailing_list="CG_ThisIsaFakeMail", library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(survey=bad_id, mailing_list="CG_ThisIsaFakeMail", library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", send_date=gmtime(), subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Survey IDs ##
     #Test Assertion Error is handled: Long Survey ID (list_distributions)
@@ -560,7 +562,7 @@ class TestQualtricsAPI(unittest.TestCase):
         library_id (UR: User-Defined Resource) that is too long. '''
         library_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(library=library_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(library=library_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", send_date=gmtime(), subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Library ID (create_distribution: UR)
     def test_responses_long_lib_id_create_dist_ur(self):
@@ -568,7 +570,7 @@ class TestQualtricsAPI(unittest.TestCase):
          library_id (UR: User-Defined Resource) that is too short.'''
         library_id, bad_id = setup_tests().setup_test_library_id_ur(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(library=library_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(library=library_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", send_date=gmtime(), subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Library ID (create_distribution: UR)
     def test_responses_bad_lib_id_create_dist_ur(self):
@@ -576,7 +578,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a library_id (UR: User-Defined Resource) that is incorrect. '''
         library_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(library=bad_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(library=bad_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", send_date=gmtime(), subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Library IDs (GR) ##
     #Test Assertion Error is handled: Long Library ID (create_distribution: GR)
@@ -585,7 +587,7 @@ class TestQualtricsAPI(unittest.TestCase):
         library_id (GR: Global Resource) that is too long. '''
         library_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(library=library_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(library=library_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", send_date=gmtime(), subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Library ID (create_distribution: GR)
     def test_responses_long_lib_id_create_dist_gr(self):
@@ -593,7 +595,7 @@ class TestQualtricsAPI(unittest.TestCase):
          library_id (GR: Global Resource) that is too short.'''
         library_id, bad_id = setup_tests().setup_test_library_id_gr(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(library=library_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(library=library_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", send_date=gmtime(), subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Library ID (create_distribution: GR)
     def test_responses_bad_lib_id_create_dist_gr(self):
@@ -601,7 +603,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a library_id (GR: Global Resource) that is incorrect. '''
         library_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(library=bad_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(library=bad_id, survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", message="MS_ThisIsaFakeMsg!", send_date=gmtime(), subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Library IDs (UR) ##
     #Test Assertion Error is handled: Long Library ID (create_reminder: UR)
@@ -610,7 +612,7 @@ class TestQualtricsAPI(unittest.TestCase):
         library_id (UR: User-Defined Resource) that is too long. '''
         library_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Library ID (create_reminder: UR)
     def test_responses_long_lib_id_create_remind_ur(self):
@@ -618,7 +620,7 @@ class TestQualtricsAPI(unittest.TestCase):
          library_id (UR: User-Defined Resource) that is too short.'''
         library_id, bad_id = setup_tests().setup_test_library_id_ur(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Library ID (create_reminder: UR)
     def test_responses_bad_lib_id_create_remind_ur(self):
@@ -626,7 +628,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a library_id (UR: User-Defined Resource) that is incorrect. '''
         library_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(library=bad_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(library=bad_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Library IDs (GR) ##
     #Test Assertion Error is handled: Long Library ID (create_reminder: GR)
@@ -635,7 +637,7 @@ class TestQualtricsAPI(unittest.TestCase):
         library_id (GR: Global Resource) that is too long. '''
         library_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Library ID (create_reminder: GR)
     def test_responses_long_lib_id_create_remind_gr(self):
@@ -643,7 +645,7 @@ class TestQualtricsAPI(unittest.TestCase):
          library_id (GR: Global Resource) that is too short.'''
         library_id, bad_id = setup_tests().setup_test_library_id_gr(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Library ID (create_reminder: GR)
     def test_responses_bad_lib_id_create_remind_gr(self):
@@ -651,7 +653,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a library_id (GR: Global Resource) that is incorrect. '''
         library_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(library=bad_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(library=bad_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Library IDs ##
     #Test Assertion Error is handled: Long Library ID (create_thank_you: UR)
@@ -660,7 +662,7 @@ class TestQualtricsAPI(unittest.TestCase):
         library_id (UR: User-Defined Resource) that is too long. '''
         library_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Library ID (create_thank_you: UR)
     def test_responses_long_lib_id_create_ty_ur(self):
@@ -668,7 +670,7 @@ class TestQualtricsAPI(unittest.TestCase):
          library_id (UR: User-Defined Resource) that is too short.'''
         library_id, bad_id = setup_tests().setup_test_library_id_ur(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Library ID (create_thank_you: UR)
     def test_responses_bad_lib_id_create_ty_ur(self):
@@ -676,7 +678,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a library_id (UR: User-Defined Resource) that is incorrect. '''
         library_id, bad_id = setup_tests().setup_test_library_id_ur(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(library=bad_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(library=bad_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Library IDs (GR) ##
     #Test Assertion Error is handled: Long Library ID (create_reminder: GR)
@@ -685,7 +687,7 @@ class TestQualtricsAPI(unittest.TestCase):
         library_id (GR: Global Resource) that is too long. '''
         library_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Library ID (create_reminder: GR)
     def test_responses_long_lib_id_create_ty_gr(self):
@@ -693,7 +695,7 @@ class TestQualtricsAPI(unittest.TestCase):
          library_id (GR: Global Resource) that is too short.'''
         library_id, bad_id = setup_tests().setup_test_library_id_gr(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(library=library_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Library ID (create_reminder: GR)
     def test_responses_bad_lib_id_create_ty_gr(self):
@@ -701,7 +703,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a library_id (GR: Global Resource) that is incorrect. '''
         library_id, bad_id = setup_tests().setup_test_library_id_gr(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(library=bad_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(library=bad_id, distribution="EMD_ThisIsaFakeID!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Distribution IDs ##
     #Test Assertion Error is handled: Long Distribution ID (get_distribution)
@@ -735,7 +737,7 @@ class TestQualtricsAPI(unittest.TestCase):
         distrubution_id that is too long. '''
         distribution_id, bad_id = setup_tests().setup_test_dist_id(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(distribution=distribution_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(distribution=distribution_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Distribution ID (create_reminder)
     def test_responses_long_dist_id_create_remind(self):
@@ -743,7 +745,7 @@ class TestQualtricsAPI(unittest.TestCase):
          distrubution_id that is too short.'''
         distribution_id, bad_id = setup_tests().setup_test_dist_id(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(distribution=distribution_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(distribution=distribution_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Distribution ID (create_reminder)
     def test_responses_bad_dist_id_create_remind(self):
@@ -751,7 +753,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a distrubution_id that is incorrect. '''
         distribution_id, bad_id = setup_tests().setup_test_dist_id(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(distribution=bad_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(distribution=bad_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Distribution IDs ##
     #Test Assertion Error is handled: Long Distribution ID (create_thank_you)
@@ -760,7 +762,7 @@ class TestQualtricsAPI(unittest.TestCase):
         distrubution_id that is too long. '''
         distribution_id, bad_id = setup_tests().setup_test_dist_id(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(distribution=distribution_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(distribution=distribution_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Distribution ID (create_thank_you)
     def test_responses_long_dist_id_create_ty(self):
@@ -768,7 +770,7 @@ class TestQualtricsAPI(unittest.TestCase):
          distrubution_id that is too short.'''
         distribution_id, bad_id = setup_tests().setup_test_dist_id(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(distribution=distribution_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(distribution=distribution_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Distribution ID (create_thank_you)
     def test_responses_bad_dist_id_create_ty(self):
@@ -776,7 +778,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a distrubution_id that is incorrect. '''
         distribution_id, bad_id = setup_tests().setup_test_dist_id(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(distribution=bad_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(distribution=bad_id, library="GR_ThisIsaFakeLib!", message="MS_ThisIsaFakeMsg!", subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Message IDs ##
     #Test Assertion Error is handled: Long Message ID (create_distribution)
@@ -785,7 +787,7 @@ class TestQualtricsAPI(unittest.TestCase):
         message_id that is too long. '''
         msg_id, bad_id = setup_tests().setup_test_message_id(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(message=msg_id, library="GR_ThisIsaFakeLib!", survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(message=msg_id, library="GR_ThisIsaFakeLib!", survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", subject="Fake", send_date=gmtime(), reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Message ID (create_distribution)
     def test_responses_long_msg_id_create_dist(self):
@@ -793,7 +795,7 @@ class TestQualtricsAPI(unittest.TestCase):
          message_id that is too short.'''
         msg_id, bad_id = setup_tests().setup_test_message_id(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(message=msg_id ,library="GR_ThisIsaFakeLib!", survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(message=msg_id ,library="GR_ThisIsaFakeLib!", survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", subject="Fake", send_date=gmtime(), reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Message ID (create_distribution)
     def test_responses_bad_msg_id_create_dist(self):
@@ -801,7 +803,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a message_id that is incorrect. '''
         msg_id, bad_id = setup_tests().setup_test_message_id(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_distribution(message=bad_id, library="GR_ThisIsaFakeLib!", survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_distribution(message=bad_id, library="GR_ThisIsaFakeLib!", survey="SV_ThisIsaFakeID!!", mailing_list="CG_ThisIsaFakeMail", subject="Fake", send_date=gmtime(), reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution: Message IDs ##
     #Test Assertion Error is handled: Long Message ID (create_reminder)
@@ -810,7 +812,7 @@ class TestQualtricsAPI(unittest.TestCase):
         message_id that is too long. '''
         msg_id, bad_id = setup_tests().setup_test_message_id(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=msg_id, subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=msg_id, subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Message ID (create_reminder)
     def test_responses_long_msg_id_create_remind(self):
@@ -818,7 +820,7 @@ class TestQualtricsAPI(unittest.TestCase):
          message_id that is too short.'''
         msg_id, bad_id = setup_tests().setup_test_message_id(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=msg_id, subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=msg_id, subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Message ID (create_reminder)
     def test_responses_bad_msg_id_create_remind(self):
@@ -826,7 +828,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a message_id that is incorrect. '''
         msg_id, bad_id = setup_tests().setup_test_message_id(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_reminder(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=bad_id, subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_reminder(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=bad_id, subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     ## Distribution Message IDs ##
     #Test Assertion Error is handled: Long Message ID (create_thank_you)
@@ -835,7 +837,7 @@ class TestQualtricsAPI(unittest.TestCase):
         message_id that is too long. '''
         msg_id, bad_id = setup_tests().setup_test_message_id(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=msg_id, subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=msg_id, subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Short Message ID (create_thank_you)
     def test_responses_long_msg_id_create_ty(self):
@@ -843,7 +845,7 @@ class TestQualtricsAPI(unittest.TestCase):
          message_id that is too short.'''
         msg_id, bad_id = setup_tests().setup_test_message_id(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=msg_id, subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=msg_id, subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
     #Test Assertion Error is handled: Incorrect Message ID (create_thank_you)
     def test_responses_bad_msg_id_create_ty(self):
@@ -851,7 +853,7 @@ class TestQualtricsAPI(unittest.TestCase):
          a message_id that is incorrect. '''
         msg_id, bad_id = setup_tests().setup_test_message_id(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Distributions().create_thank_you(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=bad_id, subject="Fake", reply_email="Fake@Fake.com", from_email="Fake@Fake.com", from_name="Fake")
+            Distributions().create_thank_you(distribution="EMD_ThisIsaFakeID!", library="GR_ThisIsaFakeLib!", message=bad_id, subject="Fake", reply_email="Fake@Fake.com", send_date=gmtime(), from_email="Fake@Fake.com", from_name="Fake")
 
 if __name__ == "__main__":
     unittest.main()

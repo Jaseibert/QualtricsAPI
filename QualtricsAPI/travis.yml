@@ -3,7 +3,8 @@ python:
   - "3.5"
   - "3.6"
   - "3.7"
-
-# command to run tests
-#script:
- # - unittest
+install:
+ - 'pip install pipenv'
+ - 'pipenv sync'
+script:
+ - python3 -m unittest QualtricsAPI.tests.test

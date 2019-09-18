@@ -25,8 +25,6 @@ setuptools.setup(
     install_requires=[
           'pandas',
           'numpy',
-          'time',
-          'datetime',
           'requests'
       ]
 )

@@ -4,7 +4,9 @@ python:
   - "3.6"
   - "3.7"
 install:
- - pip install pipenv
- - pipenv install
+ - 'pip install pipenv'
+ - 'pipenv install pandas'
+ - 'pipenv install numpy'
+ - 'pipenv install requests'
 script:
  - python3 -m unittest QualtricsAPI.tests.test

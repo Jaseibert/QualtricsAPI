@@ -13,7 +13,6 @@ class Parser(object):
         :return: the value associated with the given key
         '''
         values = []
-
         def extract(obj, values, key):
             '''This inner method recursively searches for the given key in a nested dictionary. (Not a User-Facing Method)
 

@@ -8,6 +8,9 @@ QualtricsAPI.egg-info
 Pipfile
 /build
 /dist
+docs
 tests/__inti__.pyc
 tests/test.pyc
 Setup/__init__.pyc
+QualtricsAPI/Setup/__pycache__/
+QualtricsAPI/JSON/__pycache__/

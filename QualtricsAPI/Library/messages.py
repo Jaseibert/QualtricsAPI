@@ -60,7 +60,7 @@ class Messages(Credentials):
         :param message: The Message ID corresponding specific message.
         :type message: str
         :return: A tuple containing the MessageID, MessageCategory, and MessageDescription
-         '''
+        '''
 
         assert len(library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
         assert len(message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
@@ -74,7 +74,6 @@ class Messages(Credentials):
         response = request.json()
         try:
             msg_html = response['result']['messages']['en']
-            #pretty_html = bs4(msg_html, 'html.parser').prettify()
         except:
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return message, response['result']['category'], response['result']['description']

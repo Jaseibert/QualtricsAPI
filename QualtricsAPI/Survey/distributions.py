@@ -30,14 +30,15 @@ class Distributions(Credentials):
         :type minutes: int
         :param seconds: The second offset for the send_date. [Default = 0]
         :type seconds: int
+        :return: The formatted DateTime. (str)
         '''
         send_date = datetime.now() + timedelta(weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds)
         return date.strftime(send_date, '%Y-%m-%dT%H:%M:%SZ')
 
     def create_distribution(self, subject, reply_email, from_email, from_name, mailing_list, library, survey, message, send_date, link_type='Individual'):
         '''This method gives users the ability to create a distribution for a given mailing list and survey. In order to use this method you
-        must already have access to pre-defined Messages and their MessageID's existing within a User-Defined (starts with UR_)
-        or Global (starts with GR_) Library. You can list the messages and their MessageID's(starts with MS_)  that are available to your user
+        must already have access to pre-defined Messages and their MessageID's existing within a User-Defined (starts with UR)
+        or Global (starts with GR) Library. You can list the messages and their MessageID's(starts with MS)  that are available to your user
         account by using the "QualtricsAPI.Library.Messages.list_messages()" method. As a final note, this method gives users the ability to
         define the different types of messages.
 
@@ -61,6 +62,7 @@ class Distributions(Credentials):
         :type send_date: str
         :param link_type: This parameter refers to the type of link that is to be sent within the distribution.
         :type link_type: str
+        :return: The Distribution ID. (str)
         '''
 
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
@@ -82,7 +84,7 @@ class Distributions(Credentials):
             },
             'surveyLink': {
                 'surveyId': survey,
-                'type': 'Individual'
+                'type': link_type
             },
             'recipients': {
                 'mailingListId': mailing_list
@@ -126,6 +128,7 @@ class Distributions(Credentials):
         :type distribution: str
         :param send_date: The date that the reminder is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
         :type send_date: str
+        :return: The "Reminder" Distribution ID. (str)
         '''
 
         assert len(distribution) == 19, 'Hey, the parameter for "distribution" that was passed is the wrong length. It should have 19 characters.'
@@ -163,11 +166,11 @@ class Distributions(Credentials):
         return
 
     def create_thank_you(self, subject, reply_email, from_email, from_name, library, message, distribution, send_date):
-        '''This method gives users the ability to create a thank you for a given distribution. In order to create thank you distributions,
-         you must have already created a distribution for a given mailing list and survey. Once created, you will pass the Distribution ID
-         corresponding to the correct distribution to the distribution parameter and the reminder will be set to that specific distribution.
-         Unlike the  QualtricsAPI.Survey.Distribution.create_distribution() method, this method does not require you to specify the mailing
-         list or survey because it will use the parameters defined when the associated distribution was set up.
+        '''This method gives users the ability to create a thank you for a given distribution. In order to create thank you distributions you
+        must have already created a distribution for a given mailing list and survey. Once created, you will pass the Distribution ID
+        corresponding to the correct distribution to the distribution parameter and the reminder will be set to that specific distribution.
+        Unlike the  QualtricsAPI.Survey.Distribution.create_distribution() method, this method does not require you to specify the mailing
+        list or survey because it will use the parameters defined when the associated distribution was set up.
 
         :param subject: The subject for the reminder email.
         :type subject: str
@@ -185,6 +188,7 @@ class Distributions(Credentials):
         :type distribution: str
         :param send_date: The date that the reminder is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
         :type send_date: str
+        :return: The "Thank You" Distribution ID. (str)
         '''
 
         assert len(distribution) == 19, 'Hey, the parameter for "distribution" that was passed is the wrong length. It should have 19 characters.'

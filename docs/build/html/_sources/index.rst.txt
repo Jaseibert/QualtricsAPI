@@ -49,6 +49,7 @@ the Contact Data (i.e. the XMDirectory, or Mailing Lists). `CRAN`_
    quickstart
    responses
    distributions
+   messages
    xmdirectory(XM Subscribers)
    mailinglist(XM Subscribers)
 

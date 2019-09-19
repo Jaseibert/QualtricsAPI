@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Survey Responses &mdash; QualtricsAPI 0.1.3 documentation</title>
+  <title>Survey Responses &mdash; QualtricsAPI 0.2.2 documentation</title>
   
 
   
@@ -170,13 +170,13 @@ questions within a given survey.</p>
 <dl class="method">
 <dt id="QualtricsAPI.Survey.responses.Responses.get_responses">
 <code class="descclassname">Responses.</code><code class="descname">get_responses</code><span class="sig-paren">(</span><em>survey_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#QualtricsAPI.Survey.responses.Responses.get_responses" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function accepts the survey id, and returns the responses associated with that survey.</p>
+<dd><p>This function accepts the file format, and the survey id, and returns the responses associated with that survey.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>survey_id</strong> (<em>str</em>) – The Survey ID.</p>
+<dd class="field-odd"><p><strong>survey_id</strong> – the id associated with a given survey.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a Pandas DataFrame with the Survey’s responses.</p>
+<dd class="field-even"><p>a Pandas DataFrame with the responses</p>
 </dd>
 </dl>
 </dd></dl>
@@ -214,10 +214,10 @@ in this case ‘SV_AFakeSurveyID’, and pass it as an argument to the survey_id
 <dd><p>This method returns a DataFrame containing the Survey questions and the QuestionIDs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>survey_id</strong> (<em>str</em>) – The Survey ID.</p>
+<dd class="field-odd"><p><strong>survey_id</strong> – </p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a Pandas DataFrame with the survey’s questions.</p>
+<dd class="field-even"><p>a DataFrame with the Surveys questions</p>
 </dd>
 </dl>
 </dd></dl>

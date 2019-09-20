@@ -44,28 +44,28 @@ class Responses(Credentials):
         except:
             print(f"ServerError:\nError Code: {content['meta']['error']['errorCode']}\nError Message: {content['meta']['error']['errorMessage']}")
 
-    def get_responses(self, survey_id=None):
+    def get_responses(self, survey=None):
         '''This function accepts the file format, and the survey id, and returns the responses associated with that survey.
 
-        :param survey_id: the id associated with a given survey.
-        :return: a Pandas DataFrame with the responses
+        :param survey_id: This is the id associated with a given survey.
+        :return: a Pandas DataFrame with the surveys responses
         '''
 
-        download_request = self.send_request(file_format='csv', survey_id=survey_id)
+        download_request = self.send_request(file_format='csv', survey_id=survey)
         with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
             for s in survey_zip.infolist():
                 df = pd.read_csv(survey_zip.open(s.filename))
                 return df
 
 
-    def get_questions(self, survey_id=None):
+    def get_questions(self, survey=None):
         '''This method returns a DataFrame containing the Survey questions and the QuestionIDs.
 
-        :param survey_id:
-        :return: a DataFrame with the Surveys questions
+        :param survey_id: This is the id associated with a given survey.
+        :return: a Pandas DataFrame with the surveys questions
         '''
 
-        df = self.get_responses(survey_id=survey_id)
+        df = self.get_responses(survey_id=survey)
         questions = pd.DataFrame(df[:1].T)
         questions.columns = ['Questions']
         return questions

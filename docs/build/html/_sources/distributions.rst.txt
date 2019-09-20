@@ -1,0 +1,187 @@
+Distributions
+===============
+The methods available in the Distributions module give you the ability to create new (email) distributions,
+create reminders, create thanks you's, list all of the available distributions for a survey, get a distribution's information,
+and a helper method to properly format the set send by date for a distribution.
+
+Format a Distribution's Send Date
+##################################
+.. automethod:: QualtricsAPI.Survey.distributions.Distributions.set_send_date
+
+Example Implementation
+----------------------
+Here is an example on how to implement the set_send_date() method, which is a helper method for properly defining the send_date
+parameter in the create_distribution, create_reminder, create_thank_you methods. So in this example, we will create a new properly
+formatted send date.
+::
+    #Setup your Credentials, if not already done.
+    #You only have to do this once.
+
+    #Import the module
+    from QualtricsAPI.Survey import Distributions
+
+    #Create an instance
+    d = Distributions()
+
+    #Call the method
+    d.set_send_date(weeks=0, days=2, hours=0, minutes=0, seconds=0)
+
+Technically, you do not need to pass "0" as arguments to the other parameters that were not defined, however in this example
+I left them in there for you to see. This will return a properly formatted string "strftime" containing the a string representing
+a timedelta from the time that you execute this method plus the specified timedelta. So, put simply this will return a date two
+days from the current time.
+::
+    '2019-10-01T12:00:00Z'
+
+Create a Distribution
+#######################
+.. automethod:: QualtricsAPI.Survey.distributions.Distributions.create_distribution
+
+Example Implementation
+-----------------------
+Here is an example on how to implement the create_distribution() method. It is important to mention that you can only create an email distribution using this
+method. Here we pass in arguments to all of the necessary parameters and we are returned a Distribution ID. To find the IDs associated with the Library, Survey,
+Message, and Mailing List IDs you can go to you Qualtrics account and find them under the Account Settings tab. As a final comment, if you want to send the
+distribution immediately, you can pass in gmtime() as the argument to the send_date parameter.
+::
+    #Setup your Credentials, if not already done.
+    #You only have to do this once.
+
+    #Import the module
+    from QualtricsAPI.Survey import Distributions
+
+    #Create an instance
+    d = Distributions()
+
+    #Call the method
+    d.create_distribution(subject="Test Survey", reply_email="fake@fake.com", from_email"fake@fake.com", from_name="Survey Joe", mailing_list="CG_ThisIsaFakeID!!", library="GR_ThisIsaFakeID!!", survey="SV_ThisIsaFakeID!!", message="MS_ThisIsaFakeID!", send_date=gmtime(), link_type='Individual'))
+
+This will return a string containing the Distribution ID associated with the distribution that you just setup.
+::
+    'EMD_ThisIsaDistID'
+
+Create a Reminder
+######################
+.. automethod:: QualtricsAPI.Survey.distributions.Distributions.create_reminder
+
+Example Implementation
+----------------------
+Here is an example on how to implement the create_reminder() method. As with the create distribution method, it is important to mention that you can only create
+an email reminder distribution using this method. Here we pass in arguments to all of the necessary parameters and we are returned a Distribution ID. Again, to find the IDs associated
+with the Library, Message, and Distribution IDs you can go to you Qualtrics account and find them under the Account Settings tab. As a with the create_distribution method,
+if you want to send the distribution immediately, you can pass in gmtime() as the argument to the send_date parameter. However, in most circumstances you will need to use
+the set_send_date method to create a send_date delay.
+::
+    #Setup your Credentials, if not already done.
+    #You only have to do this once.
+
+    #Import the module
+    from QualtricsAPI.Survey import Distributions
+
+    #Create an instance
+    d = Distributions()
+
+    #Call the method
+    send_date = d.set_send_date(weeks=0, days=2, hours=0, minutes=0, seconds=0)
+    d.create_reminder(subject="Test Survey", reply_email="fake@fake.com", from_email"fake@fake.com", from_name="Survey Joe", library="GR_ThisIsaFakeID!!", message="MS_ThisIsaFakeID!", distribution="EMD_ThisIsaFakeID!!", send_date=send_date)
+
+This will return a string containing the Reminder ID associated with the reminder distribution that you just setup.
+::
+    "EMD_ThisIsaRmdrID!!"
+
+Create a Thank You
+######################
+.. automethod:: QualtricsAPI.Survey.distributions.Distributions.create_thank_you
+
+Example Implementation
+----------------------
+Here is an example on how to implement the create_thank_you() method. As with the create distribution method, it is important to mention that you can only create
+an email thank you distribution using this method. Here we pass in arguments to all of the necessary parameters and we are returned a Distribution ID. Again, to find the IDs
+associated with the Library, Message, and Distribution IDs you can go to you Qualtrics account and find them under the Account Settings tab. As a with the create_reminder
+method, if you want to send the distribution immediately, you can pass in gmtime() as the argument to the send_date parameter. However, in most circumstances you will need to use
+the set_send_date method to create a send_date delay.
+::
+    #Setup your Credentials, if not already done.
+    #You only have to do this once.
+
+    #Import the module
+    from QualtricsAPI.Survey import Distributions
+
+    #Create an instance
+    d = Distributions()
+
+    #Call the method
+    send_date = d.set_send_date(weeks=0, days=2, hours=0, minutes=0, seconds=0)
+    d.create_thank_you(subject="Test Survey", reply_email="fake@fake.com", from_email"fake@fake.com", from_name="Survey Joe", library="GR_ThisIsaFakeID!!", message="MS_ThisIsaFakeID!", distribution="EMD_ThisIsaFakeID!!" send_date=send_date)
+
+This will return a string containing the Thank You Distribution ID associated with the Thank You distribution that you just setup.
+::
+    "EMD_ThisIsaTyouID!!"
+
+List Distributions
+######################
+.. automethod:: QualtricsAPI.Survey.distributions.Distributions.list_distributions
+
+Example Implementation
+-----------------------
+Here is an example on how to implement the list_distributions() method. This method lists all of the distributions associated with
+a given survey. In this list, there will be all different types of distributions (invite, reminder, thank you, etc.) returned from
+the method call.
+::
+    #Setup your Credentials, if not already done.
+    #You only have to do this once.
+
+    #Import the module
+    from QualtricsAPI.Survey import Distributions
+
+    #Create an instance
+    d = Distributions()
+
+    #Call the method
+    df = d.list_distributions(survey="SV_ThisIsaSurvID!!")
+    print(df.columns)
+
+This will return a Pandas DataFrame containing the list of distributions associated with a given survey. Below is a list of the
+columns available within the DataFrame when returned.
+::
+    Index(['id', 'parentDistributionId', 'ownerId', 'organizationId', 'requestStatus', 'requestType',
+     'sendDate', 'createdDate', 'modifiedDate', 'headers', 'fromEmail', 'replyToEmail', 'fromName',
+     'subject', 'recipients', 'mailingListId', 'contactId', 'sampleId', 'message', 'messageId',
+     'messageText', 'surveyLink', 'surveyId', 'expirationDate', 'linkType', 'stats', 'sent', 'failed',
+     'started', 'bounced', 'opened', 'skipped', 'finished', 'complaints', 'blocked'],
+     dtype='object')
+
+Get a Distribution
+######################
+.. automethod:: QualtricsAPI.Survey.distributions.Distributions.get_distribution
+
+Example Implementation
+----------------------
+Here is an example on how to implement the get_distribution() method. This method will get all of the relevant information
+regarding a given distribution.
+::
+    #Setup your Credentials, if not already done.
+    #You only have to do this once.
+
+    #Import the module
+    from QualtricsAPI.Survey import Distributions
+
+    #Create an instance
+    d = Distributions()
+
+    #Call the method
+    df = d.get_distribution(survey="SV_ThisIsaSurvID!!", distribution="EMD_ThisIsaDistID!!")
+    print(df.index)
+
+This will return a Pandas DataFrame containing the relevant information for a distribution associated with a given survey. The
+DataFrame returned is a single column wide with whose index contains the distributions information.
+::
+    Index(['id', 'parentDistributionId', 'ownerId', 'organizationId',
+       'requestStatus', 'requestType', 'sendDate', 'createdDate',
+       'modifiedDate', 'headers', 'fromEmail', 'replyToEmail', 'fromName',
+       'subject', 'recipients', 'mailingListId', 'contactId', 'sampleId',
+       'message', 'messageId', 'messageText', 'surveyLink', 'surveyId',
+       'expirationDate', 'linkType', 'stats', 'sent', 'failed', 'started',
+       'bounced', 'opened', 'skipped', 'finished', 'complaints', 'blocked',
+       'mailing_list_library_id', 'message_library_id'],
+      dtype='object')

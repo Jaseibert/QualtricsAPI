@@ -1,5 +1,6 @@
 import requests as r
 import zipfile
+import io
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser

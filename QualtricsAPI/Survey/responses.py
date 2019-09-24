@@ -14,7 +14,7 @@ class Responses(Credentials):
     def setup_request(self, file_format='csv', survey=None):
         ''' This method sets up the request and handles the setup of the request for the survey.'''
 
-        assert survey != None, 'Hey, the survey parameter can not be None. You need to pass in a survey ID as a string into the survey parameter.'
+        assert survey != None, 'Hey, the survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
         assert isinstance(survey, str) == True, 'Hey there, the survey parameter must be of type string.'
         assert len(survey) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
         assert survey[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
@@ -48,7 +48,7 @@ class Responses(Credentials):
             print(f"ServerError:\nError Code: {content['meta']['error']['errorCode']}\nError Message: {content['meta']['error']['errorMessage']}")
 
     def get_responses(self, survey=None):
-        '''This function accepts the file format, and the survey id, and returns the responses associated with that survey.
+        '''This function accepts the survey id, and returns the survey responses associated with that survey.
 
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
@@ -60,10 +60,10 @@ class Responses(Credentials):
                 return df
 
     def get_questions(self, survey=None):
-        '''This method returns a DataFrame containing the Survey questions and the QuestionIDs.
+        '''This method returns a DataFrame containing the survey questions and the Question IDs.
 
         :param survey: This is the id associated with a given survey.
-        :return: a Pandas DataFrame with the Surveys questions
+        :return: a Pandas DataFrame
         '''
         df = self.get_responses(survey=survey)
         questions = pd.DataFrame(df[:1].T)

@@ -5,7 +5,6 @@ import requests as r
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
-from QualtricsAPI.Exceptions import ContactIDError, ServerError
 
 class XMDirectory(Credentials):
     ''' This class contains methods that give users the ability to work with their contact data within the
@@ -17,8 +16,9 @@ class XMDirectory(Credentials):
         self.directory_id = directory_id
 
     def create_contact_in_XM(self, first_name=None, last_name=None, email=None, phone=None, language="en", metadata={}):
-        '''This function gives you the ability to create a contact in your XM Directory. This method does not every item
-        in that you just created, but it does return the XMDirectory contact id associated with the newly created contact.
+        '''This function gives you the ability to create a contact in your XM Directory. This method does re-list not each
+        element that you just created. It returns the XMDirectory "Contact id" associated with the newly created XM directory
+        contact.
 
         :param first_name: The contacts first name.
         :type first_name: str
@@ -35,7 +35,12 @@ class XMDirectory(Credentials):
         :return: The newly created contact id (CID) in XMDirectory.
         :type return: str
         '''
-
+        assert isinstance(first_name, (str, type(None))) == True, 'The first_name parameter must be of type None, or a string.'
+        assert isinstance(last_name, (str, type(None))) == True, 'The last_name parameter must be of type None, or a string.'
+        assert isinstance(email, (str, type(None))) == True, 'The email_name parameter must be of type None, or a string.'
+        assert isinstance(phone, (str, type(None))) == True, 'The phone parameter must be of type None, or a string.'
+        assert isinstance(language, (str, type(None))) == True, 'The language parameter must be of type None, or a string.'
+        assert isinstance(metadata, dict) == True, 'The metadata parameter must be of dict.'
 
         contact_data = {
             "firstName": first_name,
@@ -46,12 +51,11 @@ class XMDirectory(Credentials):
             "embeddedData": metadata,
         }
         headers, base_url = self.header_setup(content_type=True, xm=True)
-        url = base_url + "/contacts"
+        url = f"{base_url}/contacts"
         request = r.post(url, json=contact_data, headers=headers)
         response = request.json()
         try:
-            contact_id = response['result']['id']
-            return contact_id
+            return response['result']['id']
         except:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
@@ -61,21 +65,20 @@ class XMDirectory(Credentials):
 
         :param contact_id: The unique id associated with each contact in the XM Directory.
         :type contact_id: str
-        :return: Nothing, but prints if successful, and if there was an error.
-
+        :return:  A string indicating the success or failure of the method call.
         '''
+        assert contact_id != None, 'Hey, the contact_id parameter cannot be None. You need to pass in a XM Directory Contact ID as a string into the contact_id parameter.'
+        assert isinstance(contact_id, str) == True, 'Hey there, the contact_id parameter must be of type string.'
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
 
-
         headers, base_url = self.header_setup(xm=True)
-        url = base_url + f"/contacts/{contact_id}"
+        url = f"{base_url}/contacts/{contact_id}"
         request = r.delete(url, headers=headers)
         response = request.json()
         try:
             if response['meta']['httpStatus'] == '200 - OK':
-                print(f'Your XM Contact"{contact_id}" has been deleted from the XM Directory.')
-            return
+                return f'Your XM Contact"{contact_id}" has been deleted from the XM Directory.'
         except:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
@@ -86,11 +89,13 @@ class XMDirectory(Credentials):
         :type contact_id: str
         :return: Nothing
         '''
+        assert contact_id != None, 'Hey, the contact_id parameter cannot be None. You need to pass in a XM Directory Contact ID as a string into the contact_id parameter.'
+        assert isinstance(contact_id, str) == True, 'Hey there, the contact_id parameter must be of type string.'
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
 
         headers, base_url = self.header_setup(xm=True)
-        url = base_url + f"/contacts/{contact_id}"
+        url = f"{base_url}/contacts/{contact_id}"
         contact_data = {}
         for key, value in kwargs.items():
             contact_data.update({key: str(value)})
@@ -103,62 +108,60 @@ class XMDirectory(Credentials):
         except:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
+    def list_contacts_in_directory(self):
+        '''This method will list the top-level information about the contacts in your XM Directory. As a word of caution,
+        this method may take a while to complete depending on the size of your XM Directory. There exists some latency
+        with between
 
-    def list_contacts_in_directory(self, page_size=1000, offset=0, url=None):
-        '''This method will list the top-level information about the contacts in your XM Directory. Depending
-        on the argument that you pass to the parameter 'to_df', the method will either return a Pandas DataFrame
-        or a dictionary containing the contact data. Use the parameters 'page_size' and 'offset' to dictate the
-        size and position of the slice that you are requesting from the XMDirectory. As an additional point, when
-        itteratively calling this function you may experience some latency, so as a courtesy to Qualtrics and their
-        Dev team I recommend calling time.sleep(3) between each request.
-
-        :param page_size: This parameter sets chunk size of the number of contacts requested.
-        :type page_size: int
-        :param offset: This parameter specifies the where start index value of the call. (i.e offset = 300 means start the request at the 300th contact in the directory.)
-        :type offset: int
-        :param to_df: If True, the contacts will be returned in a Pandas DataFrame. If False, a Dictionary is returned.
-        :type to_df: Boolean
-        :return: A Pandas DataFrame, or Dictionary containing the top-level information regarding a contact in the XMDirectory.
-        :type return: DataFrame, Dict
+        :return: A Pandas DataFrame
         '''
-        try:
-            contact_list = pd.DataFrame()
-            def extract_page(url=url, contact_list=contact_list, offset=offset, page_size=page_size):
-                ''' This is a method that extracts a single page of contacts in a mailing list.'''
-                headers, base_url = self.header_setup(xm=True)
-                url = base_url + f"/contacts?pageSize={page_size}" if url == None else url
-                request = r.get(url, headers=headers)
-                response = request.json()
-                try:
-                    keys = ['contactId','firstName', 'lastName', 'email', 'phone','unsubscribed', 'language', 'extRef', 'nextPage']
-                    contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
-                    next_page = contact_lists[-1][0] if len(contact_lists[0]) == page_size else None
-                    single_contact_list = pd.DataFrame(contact_lists[:-1]).transpose()
-                    single_contact_list.columns = keys[:-1]
-                    contact_list = pd.concat([contact_list, single_contact_list]).reset_index(drop=True)
-                    return contact_list, next_page
-                except:
-                    print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
-            contact_list, next_page = extract_page()
-            while next_page != None:
-                contact_list, next_page = extract_page(url=next_page, contact_list=contact_list)
-            #return contact_list
-        except:
-            print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
+        # Figure out a work around for the 500-error
+        i=0
+        url=None
+        page_size=250
+        contact_list = pd.DataFrame()
+
+        def extract_page(url=url, contact_list=contact_list, page_size=page_size):
+            ''' This is a method that extracts a single page of contacts in a mailing list.'''
+
+            headers, base_url = self.header_setup(xm=True)
+            url = base_url + f"/contacts?pageSize={page_size}" if url == None else url
+            request = r.get(url, headers=headers)
+            response = request.json()
+            if response['meta']['httpStatus'] == '200 - OK':
+                keys = ['contactId','firstName', 'lastName', 'email', 'phone','unsubscribed', 'language', 'extRef', 'nextPage']
+                contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
+                next_page = contact_lists[-1][0] if len(contact_lists[0]) == page_size else None
+                single_contact_list = pd.DataFrame(contact_lists[:-1]).transpose()
+                single_contact_list.columns = keys[:-1]
+                contact_list = pd.concat([contact_list, single_contact_list]).reset_index(drop=True)
+                return contact_list, next_page
+            else:
+                print(response['meta'])
+                contact_list, next_page = extract_page()
+
+        contact_list, next_page = extract_page()
+        while next_page != None:
+            i+=1
+            contact_list, next_page = extract_page(url=next_page, contact_list=contact_list)
+            print(i)
+            print(len(contact_list))
+            if i == 25:
+                return contact_list
 
     def get_contact(self, contact_id=None):
-        ''' This method is similar to the 'list_contacts_in_directory' method, in that it will return a single contact's
+        ''' This method is similar to the 'list_contacts_in_directory' method. Except it will just return a single contact's
         information.
 
         :param contact_id: The unique id associated with each contact in the XM Directory.
         :type contact_id: str
-        :return: A Pandas DataFrame containing the contact's informaion
-        :type return: DataFrame
+        :return: A Pandas DataFrame
         '''
+        assert contact_id != None, 'Hey, the contact_id parameter cannot be None. You need to pass in a XM Directory Contact ID as a string into the contact_id parameter.'
+        assert isinstance(contact_id, str) == True, 'Hey there, the contact_id parameter must be of type string.'
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
-
 
         headers, base_url = self.header_setup(xm=True)
         url = base_url + f'/contacts/{str(contact_id)}'
@@ -171,7 +174,6 @@ class XMDirectory(Credentials):
             return primary
         except:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
-
 
     def get_contact_additional_info(self, contact_id=None, content=None):
         ''' This method will return the additional "nested" information associated with a contact in the XMDirectory.
@@ -186,12 +188,12 @@ class XMDirectory(Credentials):
         :param content: A string representing either 'mailingListMembership', 'stats', 'embeddedData'
         :type content: str
         :return: A Pandas DataFrame
-        :type return: DataFrame
         '''
-
+        assert contact_id != None, 'Hey, the contact_id parameter cannot be None. You need to pass in a XM Directory Contact ID as a string into the contact_id parameter.'
+        assert isinstance(contact_id, str) == True, 'Hey there, the contact_id parameter must be of type string.'
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
-        assert content is not None, 'Hey there, you need to pass an argument ("embeddedData", or "mailingListMembership") to the "content" parameter.'
+        assert content != None, 'Hey there, you need to pass an argument ("embeddedData", or "mailingListMembership") to the "content" parameter.'
 
         try:
             primary = self.get_contact(contact_id=contact_id)

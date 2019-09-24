@@ -316,21 +316,35 @@ class TestQualtricsAPI(unittest.TestCase):
         '''This method tests that an assertion is raised in the Responses Module when the user enters a survey_id that is too long. '''
         survey_id, bad_id = setup_tests().setup_test_survey_id(short=False, false_id=False)
         with self.assertRaises(AssertionError):
-            Responses().setup_request(file_format='csv', survey_id=survey_id)
+            Responses().setup_request(file_format='csv', survey=survey_id)
 
     #Test Assertion Error is handled: Short Survey id
     def test_responses_long_survey_id(self):
         '''This method tests that an assertion is raised in the Responses Module when the user enters a survey_id that is too short. '''
         survey_id, bad_id = setup_tests().setup_test_survey_id(short=True, false_id=False)
         with self.assertRaises(AssertionError):
-            Responses().setup_request(file_format='csv', survey_id=survey_id)
+            Responses().setup_request(file_format='csv', survey=survey_id)
 
     #Test Assertion Error is handled: Incorrect Survey id
     def test_responses_bad_survey_id(self):
         '''This method tests that an assertion is raised in the Responses Module when the user enters a survey_id that is incorrect. '''
         survey_id, bad_id = setup_tests().setup_test_survey_id(short=False, false_id=True)
         with self.assertRaises(AssertionError):
-            Responses().setup_request(file_format='csv', survey_id=bad_id)
+            Responses().setup_request(file_format='csv', survey=bad_id)
+
+    #Test Assertion Error is handled: (None) Survey id
+    def test_responses_bad_survey_id(self):
+        '''This method tests that an assertion is raised in the Responses Module when the user enters a survey_id that is incorrect. '''
+        survey_id, bad_id = setup_tests().setup_test_survey_id(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            Responses().setup_request(file_format='csv', survey=bad_id)
+
+    #Test Assertion Error is handled: Non-String Survey id
+    def test_responses_bad_survey_id(self):
+        '''This method tests that an assertion is raised in the Responses Module when the user enters a survey_id that is incorrect. '''
+        NonStringSurveyId = 1234
+        with self.assertRaises(AssertionError):
+            Responses().setup_request(file_format='csv', survey=NonStringSurveyId)
 
     ## Messages: Library IDs ##
     #Test Assertion Error is handled: Long Library id (list_messages: UR)

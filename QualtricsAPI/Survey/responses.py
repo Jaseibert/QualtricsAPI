@@ -14,11 +14,13 @@ class Responses(Credentials):
     def setup_request(self, file_format='csv', survey=None):
         ''' This method sets up the request and handles the setup of the request for the survey.'''
 
+        assert survey != None, 'Hey, the survey parameter can not be None. You need to pass in a survey ID as a string into the survey parameter.'
+        assert isinstance(survey, str) == True, 'Hey there, the survey parameter must be of type string.'
         assert len(survey) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
         assert survey[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
 
         headers, url = self.header_setup(content_type=True, xm=False, path='responseexports/')
-        payload = '{"format":"' + file_format + '","surveyId":"' + survey + '"}'
+        payload = '{"format":"' + file_format + '","surveyId":"' + survey +'"}'
         request = r.request("POST", url, data=payload, headers=headers)
         response = request.json()
         try:
@@ -51,13 +53,11 @@ class Responses(Credentials):
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
         '''
-
         download_request = self.send_request(file_format='csv', survey=survey)
         with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
             for s in survey_zip.infolist():
                 df = pd.read_csv(survey_zip.open(s.filename))
                 return df
-
 
     def get_questions(self, survey=None):
         '''This method returns a DataFrame containing the Survey questions and the QuestionIDs.
@@ -65,7 +65,6 @@ class Responses(Credentials):
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame with the Surveys questions
         '''
-
         df = self.get_responses(survey=survey)
         questions = pd.DataFrame(df[:1].T)
         questions.columns = ['Questions']

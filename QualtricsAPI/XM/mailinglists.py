@@ -3,7 +3,6 @@ import requests as r
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
-from QualtricsAPI.Exceptions import MailingListIDError
 
 class MailingList(Credentials):
     ''' This class contains methods that give users the ability to work with their users Mailing list's and
@@ -19,11 +18,13 @@ class MailingList(Credentials):
         '''This method will create a mailing list in the XM Directory for the your specified user's account.
 
         :param list_name: the name of the list to be created.
-        :return: tuple containing the list_name and the list's new id
+        :return: tuple containing the Mailing List's and the Mailing List's new id.
         '''
+        assert name != None, 'Hey there! The name parameter cannot be None. You need to pass in a new Mailing List name as a string into the name parameter.'
+        assert isinstance(name, str) == True, 'Hey there! The name parameter must be of type string.'
 
-        headers, url = self.header_setup(content_type=True, xm=True)
-        url = url + "/mailinglists"
+        headers, base_url = self.header_setup(content_type=True, xm=True)
+        url = f"{base_url}/mailinglists"
         data = {"name": "{0}".format(name)}
         request = r.post(url, json=data, headers=headers)
         response = request.json()
@@ -45,6 +46,7 @@ class MailingList(Credentials):
         :return: A Pandas DataFrame
         '''
         assert page_size != 0, 'Hey there! You need to have a page size greater than 1'
+
         try:
             mailing_list = pd.DataFrame()
             def extract_page(page_size=page_size, url=url, mailing_list=mailing_list):
@@ -80,12 +82,13 @@ class MailingList(Credentials):
         :type mailing_list: str
         :return: A Pandas DataFrame
         '''
-
+        assert mailing_list != None, 'Hey there! The mailing_list parameter cannot be None. You need to pass in a Mailing List ID as a string into the mailing_list parameter.'
+        assert isinstance(mailing_list, str) == True, 'Hey there! The mailing_list parameter must be of type string.'
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.'
 
         headers, base_url = self.header_setup(xm=True)
-        url = base_url + f"/mailinglists/{mailing_list}"
+        url = f"{base_url}/mailinglists/{mailing_list}"
         request = r.get(url, headers=headers)
         response = request.json()
         try:
@@ -105,22 +108,24 @@ class MailingList(Credentials):
             print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def rename_list(self, mailing_list=None, name=None):
-        '''This method takes an existing mailing list name and updates it to reflect the name defined in the name method.
+        '''This method takes an existing mailing list name and updates it to reflect the name defined in the name parameter.
 
-        :param mailing_list: Your mailing list id that you are interested in renaming.
+        :param mailing_list: the mailing list that you want to rename.
         :type mailing_list: str
         :param name: The new name for the mailing list.
         :type name: str
-        :return: A string confirming that you successfully renamed the list.
+        :return: A string indicating the success or failure of the method call.
         '''
-
+        assert mailing_list != None, 'Hey there! The mailing_list parameter cannot be None. You need to pass in a Mailing List ID as a string into the mailing_list parameter.'
+        assert isinstance(mailing_list, str) == True, 'Hey there! The mailing_list parameter must be of type string.'
+        assert name != None, 'Hey there! The name parameter cannot be None. You need to pass in a new Mailing List name as a string into the name parameter.'
+        assert isinstance(name, str) == True, 'Hey there! The name parameter must be of type string.'
         assert len(mailing_list) == 18, 'Hey there! The parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
-
         data = {"name": f"{name}"}
         headers, base_url = self.header_setup(content_type=True, xm=True)
-        url = base_url + f"/mailinglists/{mailing_list}"
+        url = f"{base_url}/mailinglists/{mailing_list}"
         request = r.put(url, json=data, headers=headers)
         response = request.json()
         try:
@@ -135,15 +140,17 @@ class MailingList(Credentials):
 
         :param mailing_list: Your mailing list id that you are interested in deleting.
         :type mailing_list: str
-        :return: A string confirming that you successfully deleted the list.
+        :return: A string indicating the success or failure of the method call.
         '''
+
+        assert mailing_list != None, 'Hey, the mailing_list parameter cannot be None. You need to pass in a Mailing List ID as a string into the mailing_list parameter.'
+        assert isinstance(mailing_list, str) == True, 'Hey there, the mailing_list parameter must be of type string.'
         assert len(mailing_list) == 18, 'Hey there! The parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
-
         data = {"name": f"{mailing_list}"}
         headers, base_url = self.header_setup(xm=True)
-        url = base_url + f"/mailinglists/{mailing_list}"
+        url = f"{base_url}/mailinglists/{mailing_list}"
         request = r.delete(url, json=data, headers=headers)
         response = request.json()
         try:

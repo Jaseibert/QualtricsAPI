@@ -14,8 +14,8 @@ class Responses(Credentials):
     def setup_request(self, file_format='csv', survey=None):
         ''' This method sets up the request and handles the setup of the request for the survey.'''
 
-        assert survey != None, 'Hey, the survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
-        assert isinstance(survey, str) == True, 'Hey there, the survey parameter must be of type string.'
+        assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
+        assert isinstance(survey, str) == True, 'Hey There! The survey parameter must be of type string.'
         assert len(survey) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
         assert survey[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
 
@@ -31,21 +31,18 @@ class Responses(Credentials):
 
     def send_request(self, file_format='csv', survey=None):
         '''This method sends the request, and sets up the download request.'''
-        try:
-            file = None
-            progress_id, url, headers = self.setup_request(file_format=file_format, survey=survey)
-            check_progress = 0
-            progress_status = "in progress"
-            while check_progress < 100 and progress_status is not "complete" and file is None:
-                check_url = url + progress_id
-                check_response = r.request("GET", check_url, headers=headers)
-                file = check_response.json()["result"]["file"]
-                check_progress = check_response.json()["result"]["percentComplete"]
-            download_url = url + progress_id + '/file'
-            download_request = r.get(download_url, headers=headers, stream=True)
-            return download_request
-        except:
-            print(f"ServerError:\nError Code: {content['meta']['error']['errorCode']}\nError Message: {content['meta']['error']['errorMessage']}")
+        file = None
+        progress_id, url, headers = self.setup_request(file_format=file_format, survey=survey)
+        check_progress = 0
+        progress_status = "in progress"
+        while check_progress < 100 and progress_status is not "complete" and file is None:
+            check_url = url + progress_id
+            check_response = r.request("GET", check_url, headers=headers)
+            file = check_response.json()["result"]["file"]
+            check_progress = check_response.json()["result"]["percentComplete"]
+        download_url = url + progress_id + '/file'
+        download_request = r.get(download_url, headers=headers, stream=True)
+        return download_request
 
     def get_responses(self, survey=None):
         '''This function accepts the survey id, and returns the survey responses associated with that survey.

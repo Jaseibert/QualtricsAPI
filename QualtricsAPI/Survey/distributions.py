@@ -140,7 +140,7 @@ class Distributions(Credentials):
 
 
         headers, base_url = self.header_setup(content_type=True, xm=False, path='distributions')
-        url = base_url + f'/{distribution}/reminders'
+        url = f'{base_url}/{distribution}/reminders'
         data = {
             'header': {
                 'fromEmail': from_email,
@@ -199,7 +199,7 @@ class Distributions(Credentials):
 
 
         headers, base_url = self.header_setup(content_type=True, xm=False, path='distributions')
-        url = base_url + f'/{distribution}/thankyous'
+        url = f'{base_url}/{distribution}/thankyous'
         data = {
             'header': {
                 'fromEmail': from_email,
@@ -238,7 +238,7 @@ class Distributions(Credentials):
 
 
         headers, base_url = self.header_setup(xm=False, path='distributions')
-        url = base_url + f'?surveyId={survey}'
+        url = f'{base_url}?surveyId={survey}'
         request = r.get(url, headers=headers)
         try:
             response = request.json()
@@ -253,9 +253,10 @@ class Distributions(Credentials):
             library_ids = Parser().json_parser(response=response, keys=['libraryId'], arr=False)
             dist_df['mailing_list_library_id'] = library_ids[0][:len(dist_df)]
             dist_df['message_library_id'] = library_ids[0][len(dist_df):]
+            return dist_df
         except:
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
-        return dist_df
+
 
     def get_distribution(self, survey, distribution):
         ''' This method gives users the ability to get a specific distribution corresponding with a given survey. Given that
@@ -275,9 +276,8 @@ class Distributions(Credentials):
         assert len(distribution) == 19, 'Hey, the parameter for "distribution" that was passed is the wrong length. It should have 19 characters.'
         assert distribution[:4] == 'EMD_', 'Hey there! It looks like your distributionID is incorrect. You can find the distributionID by using the list_distributions method in this module. It will begin with "UMD_". Please try again.'
 
-
         headers, base_url = self.header_setup(xm=False, path='distributions')
-        url = base_url + f'/{distribution}?surveyId={survey}'
+        url = f'{base_url}/{distribution}?surveyId={survey}'
         request = r.get(url, headers=headers)
         try:
             response = request.json()
@@ -295,4 +295,3 @@ class Distributions(Credentials):
             return dist_df
         except:
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
-        return

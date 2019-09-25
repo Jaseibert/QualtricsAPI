@@ -87,7 +87,7 @@ class XMDirectory(Credentials):
 
         :param contact_id: The unique id associated with each contact in the XM Directory.
         :type contact_id: str
-        :return: Nothing
+        :return: A string indicating the success or failure of the method call.
         '''
         assert contact_id != None, 'Hey, the contact_id parameter cannot be None. You need to pass in a XM Directory Contact ID as a string into the contact_id parameter.'
         assert isinstance(contact_id, str) == True, 'Hey there, the contact_id parameter must be of type string.'
@@ -103,8 +103,7 @@ class XMDirectory(Credentials):
         response = request.json()
         try:
             if response['meta']['httpStatus'] == '200 - OK':
-                print(f'Your XM Contact"{contact_id}" has been updated in the XM Directory.')
-            return
+                return f'Your XM Contact"{contact_id}" has been updated in the XM Directory.'
         except:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
@@ -201,4 +200,4 @@ class XMDirectory(Credentials):
             data = pd.DataFrame.from_dict(primary[content][0], orient='index').transpose()
             return data
         except:
-            'Hey there! Something went wrong please try again.'
+            print('Hey there! Something went wrong please try again.')

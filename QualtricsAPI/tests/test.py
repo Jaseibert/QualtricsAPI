@@ -156,6 +156,55 @@ class TestQualtricsAPI(unittest.TestCase):
         with self.assertRaises(AssertionError):
             MailingList().rename_list(mailing_list=bad_id, name='Fake')
 
+    #Test Assertion Error is handled: (None) Mailing List ID
+    def test_ml_none_ml_id_rename(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id that is incorrect. '''
+        mailing_list_id, bad_id = setup_tests().setup_test_mailing_list_id(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            MailingList().rename_list(mailing_list=bad_id, name='Fake')
+
+    #Test Assertion Error is handled: bool Mailing List ID
+    def test_ml_bool_ml_id_rename(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id that is incorrect. '''
+        NonString = bool()
+        with self.assertRaises(AssertionError):
+            MailingList().rename_list(mailing_list=NonString, name='Fake')
+
+    #Test Assertion Error is handled: bool Mailing List ID
+    def test_ml_list_ml_id_rename(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id that is incorrect. '''
+        NonString = list()
+        with self.assertRaises(AssertionError):
+            MailingList().rename_list(mailing_list=NonString, name='Fake')
+
+    #Test Assertion Error is handled: float Mailing List ID
+    def test_ml_float_ml_id_rename(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id that is incorrect. '''
+        NonString = float()
+        with self.assertRaises(AssertionError):
+            MailingList().rename_list(mailing_list=NonString, name='Fake')
+
+    #Test Assertion Error is handled: int Mailing List ID
+    def test_ml_int_ml_id_rename(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id that is incorrect. '''
+        NonString = int()
+        with self.assertRaises(AssertionError):
+            MailingList().rename_list(mailing_list=NonString, name='Fake')
+
+    #Test Assertion Error is handled: dict Mailing List ID
+    def test_ml_dict_ml_id_rename(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id that is incorrect. '''
+        NonString = dict()
+        with self.assertRaises(AssertionError):
+            MailingList().rename_list(mailing_list=NonString, name='Fake')
+
+    #Test Assertion Error is handled: tuple Mailing List ID
+    def test_ml_tuple_ml_id_rename(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id that is incorrect. '''
+        NonString = tuple()
+        with self.assertRaises(AssertionError):
+            MailingList().rename_list(mailing_list=NonString, name='Fake')
+
     ## MailingList: Mailing List IDs (delete_list)
     #Test Assertion Error is handled: Long Mailing List ID
     def test_ml_short_ml_id_delete(self):
@@ -312,6 +361,76 @@ class TestQualtricsAPI(unittest.TestCase):
     def test_xm_bad_contact_id_update(self):
         '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
         contact_id, bad_id = setup_tests().setup_test_contact_id(short=False, false_id=True)
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=bad_id)
+
+    #Test Assertion Error is handled: (None) Contact id
+    def test_xm_bad_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        contact_id, bad_id = setup_tests().setup_test_contact_id(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=bad_id)
+
+    #Test Assertion Error is handled: (None) Contact id
+    def test_xm_bad_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        contact_id, bad_id = setup_tests().setup_test_contact_id(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=bad_id)
+
+    #Test Assertion Error is handled: (None) Contact id
+    def test_xm_none_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        contact_id, bad_id = setup_tests().setup_test_contact_id(short=False, false_id=False)
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=bad_id)
+
+    #Test Assertion Error is handled: bool Contact id
+    def test_xm_bool_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        NonString = bool()
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=NonString)
+
+    #Test Assertion Error is handled: list Contact id
+    def test_xm_list_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        NonString = list()
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=NonString)
+
+    #Test Assertion Error is handled: int Contact id
+    def test_xm_int_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        NonString = int()
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=NonString)
+
+    #Test Assertion Error is handled: float Contact id
+    def test_xm_float_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        NonString = float()
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=NonString)
+
+    #Test Assertion Error is handled: dict Contact id
+    def test_xm_dict_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        NonString = dict()
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=NonString)
+
+    #Test Assertion Error is handled: tuple Contact id
+    def test_xm_tuple_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        NonString = tuple()
+        with self.assertRaises(AssertionError):
+            XMDirectory().update_contact(contact_id=NonString)
+
+    #Test Assertion Error is handled: (None) Contact id
+    def test_xm_bad_contact_id_update(self):
+        '''This method tests that an assertion is raised in the XMDirectory Module when the user enters a contact_id that is incorrect. '''
+        contact_id, bad_id = setup_tests().setup_test_contact_id(short=False, false_id=False)
         with self.assertRaises(AssertionError):
             XMDirectory().update_contact(contact_id=bad_id)
 

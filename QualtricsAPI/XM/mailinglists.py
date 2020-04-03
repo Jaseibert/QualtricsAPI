@@ -197,7 +197,7 @@ class MailingList(Credentials):
         except:
             print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
-    def create_contact_in_list(self, mailing_list=None, first_name='', email='', unsubscribed=False, language="en", external_ref='null', phone='null', last_name='null', metadata={}):
+    def create_contact_in_list(self, mailing_list=None, **kwargs):
         '''This method creates contacts in the specified mailing list. It is important to remember here that whenever you create a contact in
         a mailing list, you are also creating that contact in the XMDirectory. Once created 2 seperate IDs are created for the contact. The ContactID
         is the reference for the contact in the XMDirectory, and the Contact Lookup ID is the reference of the contact in the Mailing List.
@@ -225,20 +225,30 @@ class MailingList(Credentials):
         assert len(mailing_list) == 18, 'Hey there! The parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
-        data = {
-            "firstName": first_name,
-            "lastName": last_name,
-            "email": email,
-            "phone": phone,
-            "embeddedData": metadata,
-            "language": language,
-            "extRef": external_ref,
-            "unsubscribed": unsubscribed
-        }
+        dynamic_payload = {}
+        for key in list(kwargs.keys()):
+            assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
+            if key == 'first_name':
+                dynamic_payload.update({'firstName': kwargs[str(key)]})
+            elif key == 'last_name':
+                dynamic_payload.update({'lastName': kwargs[str(key)]})
+            elif key == 'email':
+                dynamic_payload.update({'email': kwargs[str(key)]})
+            elif key == 'phone':
+                dynamic_payload.update({'phone': kwargs[str(key)]})
+            elif key == 'language':
+                dynamic_payload.update({'language': kwargs[str(key)]})
+            elif key == 'external_ref':
+                dynamic_payload.update({'extRef': kwargs[str(key)]})
+            elif key == 'unsubscribed':
+                dynamic_payload.update({'unsubscribed': kwargs[str(key)]})
+            elif key == 'metadata':
+                assert isinstance(kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
+                dynamic_payload.update({'embeddedData': kwargs[str(key)]})
 
         headers, base_url = self.header_setup(content_type=True, xm=True)
         url = base_url + f"/mailinglists/{mailing_list}/contacts"
-        request = r.post(url, json=data, headers=headers)
+        request = r.post(url, json=dynamic_payload, headers=headers)
         response = request.json()
         try:
             contact_id = response['result']['id']

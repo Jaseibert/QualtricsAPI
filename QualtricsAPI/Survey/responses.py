@@ -35,7 +35,7 @@ class Responses(Credentials):
         progress_id, url, headers = self.setup_request(file_format=file_format, survey=survey)
         check_progress = 0
         progress_status = "in progress"
-        while check_progress < 100 and progress_status is not "complete" and file is None:
+        while check_progress < 100 and (progress_status != "complete") and (file is None):
             check_url = url + progress_id
             check_response = r.request("GET", check_url, headers=headers)
             file = check_response.json()["result"]["file"]

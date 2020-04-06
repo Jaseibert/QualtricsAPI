@@ -160,13 +160,12 @@ class MailingList(Credentials):
             print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
         return
 
-    def list_contacts(self, mailing_list=None, page_size=500, url=None):
+    def list_contacts(self, mailing_list=None, page_size=100):
         '''This method creates a pandas DataFrame of all the contacts information within the defined mailing list.
 
         :param mailing_list: the mailing list id
         :type mailing_list: str
-        :param url: the url for a single contact page (typically this doesn't not need to be changed.)
-        :param page_size: The number of contacts in the mailing list to return per call.
+        :param page_size: The number of contacts in the mailing list to return per call. (typically this doesn't not need to be changed.)
         :type page_size: int
         :return: A Pandas DataFrame
         '''
@@ -175,27 +174,26 @@ class MailingList(Credentials):
         assert page_size != 0, 'Hey there! You need to have a page size greater than 1'
 
         try:
-            contact_list = pd.DataFrame()
-            def extract_page(mailing_list=mailing_list, url=url, contact_list=contact_list, page_size=page_size):
-                ''' This is a method that extracts a single page of contacts in a mailing list.'''
-                headers, base_url = self.header_setup(xm=True)
-                url = base_url + f"/mailinglists/{mailing_list}/contacts?pageSize={page_size}" if url == None else url
-                request = r.get(url, headers=headers)
-                response = request.json()
-                keys = ['contactId','firstName', 'lastName', 'email', 'phone', 'extRef', 'language', 'unsubscribed', 'nextPage']
-                contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
-                next_page = contact_lists[-1][0] if len(contact_lists[0]) == page_size else None
-                single_contact_list = pd.DataFrame(contact_lists[:-1]).transpose()
-                single_contact_list.columns = keys[:-1]
-                single_contact_list['mailing_list'] = mailing_list
-                contact_list = pd.concat([contact_list, single_contact_list]).reset_index(drop=True)
-                return contact_list, next_page
-            contact_list, next_page = extract_page()
-            while next_page != None:
-                contact_list, next_page = extract_page(url=next_page, contact_list=contact_list)
-            return contact_list
+          contact_list = pd.DataFrame()
+          headers, base_url = self.header_setup(xm=True)
+          url = base_url + f"/mailinglists/{mailing_list}/contacts?pageSize={page_size}"
+          def get_page(mailing_list=mailing_list, contact_list=contact_list, url=url):
+            request = r.get(url, headers=headers)
+            response = request.json()
+            keys = ['contactId','firstName','lastName','email','phone','extRef','language','unsubscribed']
+            contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
+            single_page = pd.DataFrame(contact_lists).transpose()
+            single_page.columns = keys
+            single_page['mailing_list'] = mailing_list
+            contact_list = pd.concat([contact_list, single_page]).reset_index(drop=True)
+            next_page = str(response['result']['nextPage'])
+            return contact_list, next_page, response
+          contact_list, next_page, response = get_page(mailing_list=mailing_list, contact_list=contact_list, url=url)
+          while next_page != 'None':
+            contact_list, next_page, response = get_page(mailing_list=mailing_list, contact_list=contact_list, url=next_page)
+          return contact_list
         except:
-            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+          print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def create_contact_in_list(self, mailing_list=None, **kwargs):
         '''This method creates contacts in the specified mailing list. It is important to remember here that whenever you create a contact in

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='QualtricsAPI',
-    version='0.2.5',
+    version='0.2.7',
     author='Jeremy A. Seibert',
     author_email='Jaskzc@mail.missouri.edu',
     description="QualtricsAPI is a lightweight Python library for the Qualtrics Web API. ",
@@ -18,6 +18,7 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],

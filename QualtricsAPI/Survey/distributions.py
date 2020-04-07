@@ -14,7 +14,7 @@ class Distributions(Credentials):
         return
 
     def set_send_date(self, weeks=0, days=0, hours=0, minutes=0, seconds=0):
-        '''This method is a helper function to format the send date arguements for several methods in the Distribution Module.
+        '''This method is a helper function to format the send date arguments for several methods in the Distribution Module.
         The send_date parameter must be in the format ""%Y-%m-%dT%H:%M:%SZ" in order for the API to properly parse the send date.
         Thus, this method defines the offset for the send_date, and formats it properly. An example would be if you wanted to send
         a reminder one week from now, simply pass "1" as an argument in to the "weeks" parameter. The default behaviour is for the

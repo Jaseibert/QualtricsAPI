@@ -220,6 +220,20 @@ class TestQualtricsAPI(unittest.TestCase):
         with self.assertRaises(AssertionError):
             MailingList().delete_list(mailing_list=mailing_list_id)
 
+    #Test Assertion Error is handled: None Mailing List ID
+    def test_ml_none_ml_id_delete(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id that is too short.'''
+        mailing_list_id, bad_id = setup_tests().setup_test_mailing_list_id(short=True, false_id=True)
+        with self.assertRaises(AssertionError):
+            MailingList().delete_list(mailing_list=mailing_list_id)
+
+    #Test Assertion Error is handled: bool Mailing List ID
+    def test_ml_bool_ml_id_delete(self):
+        '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id that is too short.'''
+        NonString = bool()
+        with self.assertRaises(AssertionError):
+            MailingList().delete_list(mailing_list=NonString)
+
     #Test Assertion Error is handled: Incorrect Mailing List ID
     def test_ml_bad_ml_id_delete(self):
         '''This method tests that an assertion is raised in the MailingList Module when the user enters a mailing_list_id is that is incorrect.'''

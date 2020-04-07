@@ -34,46 +34,39 @@ class MailingList(Credentials):
         except:
             print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
-
-    def list_lists(self, page_size=100, url=None):
+    def list_lists(self, page_size=100):
         '''This method lists all the mailing lists in the directory for the specified user token. You won't typically need to adjust
         the pre-defined parameters.
 
         :param page_size: The number of mailing lists to return per call.
         :type page_size: int
-        :param url: The url parameter is used to hold the next page url when itterating.
-        :type url: string
         :return: A Pandas DataFrame
         '''
         assert page_size != 0, 'Hey there! You need to have a page size greater than 1'
 
+        mailing_lists = pd.DataFrame()
+        headers, base_url = self.header_setup(xm=True)
+        url = base_url + f"/mailinglists/?pageSize={page_size}"
         try:
-            mailing_list = pd.DataFrame()
-            def extract_page(page_size=page_size, url=url, mailing_list=mailing_list):
-                ''' This method is a nested method that extracts a single page of mailing lists. '''
-                headers, base_url = self.header_setup(xm=True)
-                url = base_url + f"/mailinglists?pageSize={page_size}" if url == None else url
-                request = r.get(url, headers=headers)
-                response = request.json()
-                try:
-                    keys = ['mailingListId', 'name', 'ownerId', 'lastModifiedDate', 'creationDate','contactCount', 'nextPage']
-                    mailing_lists = Parser().json_parser(response=response, keys=keys, arr=False)
-                    next_page = mailing_lists[-1][0] if len(mailing_lists[0]) == page_size else None
-                    single_mailing_list = pd.DataFrame(mailing_lists[:-1]).transpose()
-                    single_mailing_list.columns = keys[:-1]
-                    single_mailing_list['creationDate'] = pd.to_datetime(single_mailing_list['creationDate'], unit='ms')
-                    single_mailing_list['lastModifiedDate'] = pd.to_datetime(single_mailing_list['lastModifiedDate'], unit='ms')
-                    mailing_list = pd.concat([mailing_list, single_mailing_list]).reset_index(drop=True)
-                    return mailing_list, next_page
-                except:
-                    print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
-            mailing_list, next_page = extract_page()
-            while next_page != None:
-                mailing_list, next_page = extract_page(url=next_page,mailing_list=mailing_list)
-            return
+          def get_page(mailing_lists=mailing_lists, url=url):
+            ''' This method is a nested method that extracts a single page of mailing lists. '''
+            request = r.get(url, headers=headers)
+            response = request.json()
+            keys = ['mailingListId', 'name', 'ownerId', 'lastModifiedDate', 'creationDate','contactCount', 'nextPage']
+            lists = Parser().json_parser(response=response, keys=keys, arr=False)
+            single_page = pd.DataFrame(lists).transpose()
+            single_page.columns = keys
+            single_page['creationDate'] = pd.to_datetime(single_page['creationDate'], unit='ms')
+            single_page['lastModifiedDate'] = pd.to_datetime(single_page['lastModifiedDate'], unit='ms')
+            mailing_lists = pd.concat([mailing_lists, single_page]).reset_index(drop=True)
+            next_page = str(response['result']['nextPage'])
+            return mailing_lists, next_page, response
+          mailing_lists, next_page, response = get_page(mailing_lists=mailing_lists, url=url)
+          while next_page != 'None':
+            mailing_lists, next_page, response = get_page(mailing_lists=mailing_lists, url=next_page)
+          return mailing_lists
         except:
-            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
-
+          print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def get_list(self, mailing_list=None):
         '''This function gets the list specfied by the mailing list param and returns the list members.
@@ -172,11 +165,11 @@ class MailingList(Credentials):
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
         assert page_size != 0, 'Hey there! You need to have a page size greater than 1'
-
+ 
+        contact_list = pd.DataFrame()
+        headers, base_url = self.header_setup(xm=True)
+        url = base_url + f"/mailinglists/{mailing_list}/contacts?pageSize={page_size}"
         try:
-          contact_list = pd.DataFrame()
-          headers, base_url = self.header_setup(xm=True)
-          url = base_url + f"/mailinglists/{mailing_list}/contacts?pageSize={page_size}"
           def get_page(mailing_list=mailing_list, contact_list=contact_list, url=url):
             request = r.get(url, headers=headers)
             response = request.json()
@@ -225,7 +218,7 @@ class MailingList(Credentials):
 
         dynamic_payload = {}
         for key in list(kwargs.keys()):
-            assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
+            assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
             if key == 'first_name':
                 dynamic_payload.update({'firstName': kwargs[str(key)]})
             elif key == 'last_name':
@@ -240,6 +233,8 @@ class MailingList(Credentials):
                 dynamic_payload.update({'extRef': kwargs[str(key)]})
             elif key == 'unsubscribed':
                 dynamic_payload.update({'unsubscribed': kwargs[str(key)]})
+            elif key == 'phone':
+                dynamic_payload.update({'phone': kwargs[str(key)]})
             elif key == 'metadata':
                 assert isinstance(kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
                 dynamic_payload.update({'embeddedData': kwargs[str(key)]})

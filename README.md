@@ -37,7 +37,7 @@ There are currently three primary uses of this package.
 The installation of the package is pretty straight forward. Open up your terminal and run the command below. If you do not already have pip installed on your machine, you may have to install pip first, see [Pip Installation Instructions](https://docs.python.org/3/installing/index.html) for help!
 
 ```
-$ pip install Qualtrics
+$ pip install QualtricsAPI
 ```
 
 ## Credentials Code Flow

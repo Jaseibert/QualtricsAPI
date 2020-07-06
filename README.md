@@ -63,4 +63,4 @@ For any R users there is an equally awesome package called ["qualtRics"](https:/
 
 ### Want to Contribute?
 
-This project abides by the [Contributor Code of Conduct](Conduct.md). By participating in this project you agree to abide by its terms. Feedback, bugs, any potential fixes, and feature requests are welcome!
+This project abides by the [Contributor Code of Conduct](Conduct.md). By participating in this project you agree to abide by it's terms. Feedback, bugs, any potential fixes, and feature requests are welcome!

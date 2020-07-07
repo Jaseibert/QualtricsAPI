@@ -3,6 +3,7 @@ import requests as r
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
+from QualtricsAPI.Exceptions import Qualtrics500Error
 
 class MailingList(Credentials):
     ''' This class contains methods that give users the ability to work with their users Mailing list's and
@@ -244,8 +245,23 @@ class MailingList(Credentials):
         request = r.post(url, json=dynamic_payload, headers=headers)
         response = request.json()
         try:
+            if response['meta']['httpStatus'] == '500 - Internal Server Error':
+                raise Qualtrics500Error('500 - Internal Server Error')
             contact_id = response['result']['id']
+        except Qualtrics500Error:
+            attempt = 0
+            while attempt < 20:
+                request = r.post(url, json=dynamic_payload, headers=headers)
+                response = request.json()
+                if response['meta']['httpStatus'] == '500 - Internal Server Error':
+                    attempt+=1
+                    time.sleep(0.25)
+                    continue
+                elif response['meta']['httpStatus'] == '200 - OK':
+                    return response['result']['id'], response['result']['contactLookupId']
+            return print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+        except Exception:
+            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+        else:
             contact_list_id = response['result']['contactLookupId']
             return contact_id, contact_list_id
-        except:
-            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")

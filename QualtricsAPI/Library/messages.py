@@ -5,7 +5,6 @@ import io
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
-from QualtricsAPI.Exceptions import ServerError
 
 class Messages(Credentials):
     '''This is a child class to the Credentials class and it gathers information about Qualtric's Messages.'''

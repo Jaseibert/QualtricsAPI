@@ -255,7 +255,7 @@ class MailingList(Credentials):
                 response = request.json()
                 if response['meta']['httpStatus'] == '500 - Internal Server Error':
                     attempt+=1
-                    time.sleep(0.25)
+                    t.sleep(0.25)
                     continue
                 elif response['meta']['httpStatus'] == '200 - OK':
                     return response['result']['id'], response['result']['contactLookupId']

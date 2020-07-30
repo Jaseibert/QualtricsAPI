@@ -268,9 +268,6 @@ class Distributions(Credentials):
         else:
             while next_page != None:
                 master, next_page = extract_distributions(url=next_page, master=master)
-                print(i)
-                print(len(master))
-                i+=1
             return master
                 
 

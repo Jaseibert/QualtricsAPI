@@ -38,7 +38,7 @@ class XMDirectory(Credentials):
         :return: The newly created contact id (CID) in XMDirectory.
         :type return: str
         '''
-        # If the dynamic payload dictionary is empty, then use the kwargs to populate the payload.
+        
         if len(dynamic_payload) == 0:
             for key in list(kwargs.keys()):
                 assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"

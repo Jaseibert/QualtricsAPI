@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='QualtricsAPI',
-    version='0.2.8',
+    version='0.2.9',
     author='Jeremy A. Seibert',
-    author_email='Jaskzc@mail.missouri.edu',
+    author_email='jeremy@seibert.industries',
     description="QualtricsAPI is a lightweight Python library for the Qualtrics Web API. ",
     long_description=long_description,
     long_description_content_type="text/markdown",

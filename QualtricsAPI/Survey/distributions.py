@@ -236,27 +236,43 @@ class Distributions(Credentials):
         assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'
         assert len(survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
 
-
         headers, base_url = self.header_setup(xm=False, path='distributions')
         url = f'{base_url}?surveyId={survey}'
-        request = r.get(url, headers=headers)
-        try:
-            response = request.json()
-            keys = ['id', 'parentDistributionId', 'ownerId', 'organizationId', 'requestStatus', 'requestType',
+        columns = ['id', 'parentDistributionId', 'ownerId', 'organizationId', 'requestStatus', 'requestType',
                     'sendDate', 'createdDate', 'modifiedDate', 'headers', 'fromEmail', 'replyToEmail', 'fromName',
                      'subject', 'recipients', 'mailingListId', 'contactId', 'sampleId', 'message', 'messageId',
                      'messageText', 'surveyLink', 'surveyId', 'expirationDate', 'linkType', 'stats', 'sent', 'failed',
-                     'started', 'bounced', 'opened', 'skipped', 'finished', 'complaints', 'blocked']
-            dists = Parser().json_parser(response=response, keys=keys, arr=False)
-            dist_df = pd.DataFrame(dists).transpose()
-            dist_df.columns = keys
-            library_ids = Parser().json_parser(response=response, keys=['libraryId'], arr=False)
-            dist_df['mailing_list_library_id'] = library_ids[0][:len(dist_df)]
-            dist_df['message_library_id'] = library_ids[0][len(dist_df):]
-            return dist_df
-        except:
-            print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
+                     'started', 'bounced', 'opened', 'skipped', 'finished', 'complaints', 'blocked', 'mailing_list_library_id', 'message_library_id']
+        master = pd.DataFrame(columns=columns)
+        def extract_distributions(url=url, master=master):
+            request = r.get(url, headers=headers)
+            response = request.json()
+            if response['meta']['httpStatus'] == '200 - OK':
+                keys = columns[:-2]
+                dists = Parser().json_parser(response=response, keys=keys, arr=False)
+                dist_df = pd.DataFrame(dists).transpose()
+                dist_df.columns = keys
+                library_ids = Parser().json_parser(response=response, keys=['libraryId'], arr=False)
+                dist_df['mailing_list_library_id'] = library_ids[0][:len(dist_df)]
+                dist_df['message_library_id'] = library_ids[0][len(dist_df):]
+                master = pd.concat([master, dist_df], sort=False).reset_index(drop=True)
+                next_page = response['result']['nextPage']
+                return master, next_page
+            else:
+                print(response['meta'])
+                master, next_page = extract_distributions(url=url, master=master)
 
+        master, next_page = extract_distributions()
+        if next_page == None:
+            return master
+        else:
+            while next_page != None:
+                master, next_page = extract_distributions(url=next_page, master=master)
+                print(i)
+                print(len(master))
+                i+=1
+            return master
+                
 
     def get_distribution(self, survey, distribution):
         ''' This method gives users the ability to get a specific distribution corresponding with a given survey. Given that

@@ -2,9 +2,7 @@
 
 name: Upload QualtricsAPI to PyPi
 
-on:
-  release:
-    types: [created]
+on: push
 
 jobs:
   deploy:

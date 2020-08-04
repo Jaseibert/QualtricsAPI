@@ -200,8 +200,8 @@ class XMDirectory(Credentials):
 
         def extract_page(url=url, master=master, page_size=page_size):
             ''' This is a method that extracts a single page of contacts in a mailing list.'''
-            request = r.get(url, headers=headers)
             try:
+                request = r.get(url, headers=headers)
                 response = request.json()
                 if response['meta']['httpStatus'] == '500 - Internal Server Error':
                     raise Qualtrics500Error('500 - Internal Server Error')
@@ -215,6 +215,9 @@ class XMDirectory(Credentials):
             except Qualtrics504Error:
                 t.sleep(5)
                 extract_page(url=url, master=master)
+            except:
+                t.sleep(10)
+                extract_page(url=url, master=master)
             else:
                 keys = ['contactId','firstName', 'lastName', 'email', 'phone','unsubscribed', 'language', 'extRef']
                 contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
@@ -223,17 +226,16 @@ class XMDirectory(Credentials):
                 single_contact_list.columns = keys
                 master = pd.concat([master, single_contact_list]).reset_index(drop=True)
                 return master, next_page
-        i=0
         master, next_page = extract_page()
-        i+=1
-        print(i)
+        i=1000
+        print(f'{i} Contacts')
         if next_page == None:
             return master
         else:
           while next_page != None:
               master, next_page = extract_page(url=next_page, master=master)
-              i+=1
-              print(i)
+              i+=1000
+              print(f'{i} Contacts')
           return master
 
     def get_contact(self, contact_id=None):

@@ -229,10 +229,10 @@ class XMDirectory(Credentials):
         master, next_page = extract_page()
         i+=1000
         print(f'{i} Contacts')
-        if next_page == None:
+        if next_page is None:
             return master
         else:
-          while next_page != None:
+          while next_page is not None:
               master, next_page = extract_page(url=next_page, master=master)
               i+=1000
               print(f'{i} Contacts')

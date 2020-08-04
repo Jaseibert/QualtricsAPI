@@ -194,6 +194,7 @@ class XMDirectory(Credentials):
         '''
 
         page_size=1000
+        i=1000
         master = pd.DataFrame(columns=['contactId','firstName', 'lastName', 'email', 'phone','unsubscribed', 'language', 'extRef'])
         headers, base_url = self.header_setup(xm=True)
         url = base_url + f"/contacts?pageSize={page_size}&useNewPaginationScheme=true"
@@ -227,15 +228,14 @@ class XMDirectory(Credentials):
                 master = pd.concat([master, single_contact_list]).reset_index(drop=True)
                 return master, next_page
         master, next_page = extract_page()
-        i=1000
-        print(f'{i} Contacts')
+        print(i)
         if next_page is None:
             return master
         else:
           while next_page is not None:
               master, next_page = extract_page(url=next_page, master=master)
               i+=1000
-              print(f'{i} Contacts')
+              print(i)
           return master
 
     def get_contact(self, contact_id=None):

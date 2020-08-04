@@ -223,13 +223,17 @@ class XMDirectory(Credentials):
                 single_contact_list.columns = keys
                 master = pd.concat([master, single_contact_list]).reset_index(drop=True)
                 return master, next_page
-
+        i=0
         master, next_page = extract_page()
+        i+=1
+        print(i)
         if next_page == None:
             return master
         else:
           while next_page != None:
               master, next_page = extract_page(url=next_page, master=master)
+                  i+=1
+                  print(i)
           return master
 
     def get_contact(self, contact_id=None):

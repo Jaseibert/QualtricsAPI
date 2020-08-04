@@ -232,8 +232,8 @@ class XMDirectory(Credentials):
         else:
           while next_page != None:
               master, next_page = extract_page(url=next_page, master=master)
-                  i+=1
-                  print(i)
+              i+=1
+              print(i)
           return master
 
     def get_contact(self, contact_id=None):

@@ -227,7 +227,7 @@ class XMDirectory(Credentials):
                 master = pd.concat([master, single_contact_list]).reset_index(drop=True)
                 return master, next_page
         master, next_page = extract_page()
-        i=1000
+        i+=1000
         print(f'{i} Contacts')
         if next_page == None:
             return master

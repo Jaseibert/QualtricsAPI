@@ -230,8 +230,7 @@ class XMDirectory(Credentials):
         else:
           while next_page != None:
               master, next_page = extract_page(url=next_page, master=master)
-              if next_page == None:
-                  return master
+          return master
 
     def get_contact(self, contact_id=None):
         ''' This method is similar to the 'list_contacts_in_directory' method. Except it will just return a single contact's

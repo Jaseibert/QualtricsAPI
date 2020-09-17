@@ -308,3 +308,60 @@ class Distributions(Credentials):
             return dist_df
         except:
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
+
+
+    def create_sms_distribution(self, dist_name, mailing_list, library, survey, message, send_date, method='Invite'):
+        '''This method gives users the ability to create a SMS distribution for a given mailing list and survey. In order to use this method you
+        must already have access to pre-defined Messages and their MessageID's existing within a User-Defined (starts with UR)
+        or Global (starts with GR) Library. You can list the messages and their MessageID's(starts with MS)  that are available to your user
+        account by using the "QualtricsAPI.Library.Messages.list_messages()" method. 
+
+        :param dist_name: The name that shows up for the distribution.
+        :type dist_name: str
+        :param library: The (Global or User) Library ID which the messages are located within.
+        :type library: str
+        :param message: The Message ID corresponding with the message that is to be sent.
+        :type message: str
+        :param mailing_list: The Mailing List ID corresponding with the Mailing List that the distribution is to be sent to.
+        :type mailing_list: str
+        :param survey: The Survey ID corresponding with the Survey that the distribution is to be sent to.
+        :type survey: str
+        :param send_date: The date that the distribution is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
+        :type send_date: str
+        :param method: This parameter refers to the type of distribution that is to be sent out to the mailing list.
+        :type method: str
+        :return: The Distribution ID. (str)
+        '''
+
+        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert len(library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
+        assert len(survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
+        assert len(message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
+        assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.'
+        assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'
+        assert message[:3] == 'MS_', 'Hey there! It looks like your MessageID is incorrect. You can find the MessageID by using the list messages method available in the Messages module of this Package. It will begin with "MS_". Please try again.'
+        assert library[:3] == 'UR_' or library[:3] == 'GR_', 'Hey there! It looks like your Library ID is incorrect. You can find the Library ID on the Qualtrics site under your account settings. It will begin with "UR_" or "GR_". Please try again.'
+
+        headers, url = self.header_setup(content_type=True, xm=False, path='distributions/sms')
+        data = {
+            'sendDate': send_date,
+            'surveyId': survey,
+            'method': method,
+            'recipients': {
+                'mailingListId': mailing_list
+            },
+            'name': dist_name,
+            'message': {
+                    'libraryId': library,
+                    'messageId': message
+            }
+        }
+
+        request = r.post(url, json=data, headers=headers)
+        response = request.json()
+        try:
+            distribution_id = response['result']['id']
+            return distribution_id
+        except:
+            print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
+        return

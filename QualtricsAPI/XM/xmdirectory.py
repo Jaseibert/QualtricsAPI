@@ -42,7 +42,7 @@ class XMDirectory(Credentials):
         dynamic_payload={}
         verbose = False
         for key in list(kwargs.keys()):
-            assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
+            assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone', 'verbose', 'dynamic_payload'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
             if key == 'first_name':
                 dynamic_payload.update({'firstName': kwargs[str(key)]})
             elif key == 'last_name':

@@ -227,7 +227,9 @@ class XMDirectory(Credentials):
                 single_contact_list.columns = keys
                 master = pd.concat([master, single_contact_list]).reset_index(drop=True)
                 return master, next_page
+
         master, next_page = extract_page()
+        
         print(i)
         if next_page is None:
             return master

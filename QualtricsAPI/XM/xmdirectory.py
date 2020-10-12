@@ -61,6 +61,8 @@ class XMDirectory(Credentials):
             elif key == 'metadata':
                 assert isinstance(kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
                 dynamic_payload.update({'embeddedData': kwargs[str(key)]})
+            elif key == 'dynamic_payload':
+                dynamic_payload= kwargs[str(key)]
 
         headers, base_url = self.header_setup(content_type=True, xm=True)
         url = f"{base_url}/contacts"
@@ -110,7 +112,7 @@ class XMDirectory(Credentials):
         except:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
-    def update_contact(self, contact_id=None, dynamic_payload={}, **kwargs):
+    def update_contact(self, contact_id=None, **kwargs):
         '''This method will update a contact from your XMDirectory.
 
         :param contact_id: The unique id associated with each contact in the XM Directory.
@@ -138,29 +140,31 @@ class XMDirectory(Credentials):
         assert len(contact_id) == 19, 'Hey, the parameter for "contact_id" that was passed is the wrong length. It should have 19 characters.'
         assert contact_id[:4] == 'CID_', 'Hey there! It looks like the Contact ID that was entered is incorrect. It should begin with "CID_". Please try again.'
 
-        if len(dynamic_payload) == 0:
-            for key in list(kwargs.keys()):
-                assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
-                if key == 'first_name':
-                    dynamic_payload.update({'firstName': kwargs[str(key)]})
-                elif key == 'last_name':
-                    dynamic_payload.update({'lastName': kwargs[str(key)]})
-                elif key == 'email':
-                    dynamic_payload.update({'email': kwargs[str(key)]})
-                elif key == 'phone':
-                    dynamic_payload.update({'phone': kwargs[str(key)]})
-                elif key == 'language':
-                    dynamic_payload.update({'language': kwargs[str(key)]})
-                elif key == 'external_ref':
-                    dynamic_payload.update({'extRef': kwargs[str(key)]})
-                elif key == 'unsubscribed':
-                    dynamic_payload.update({'unsubscribed': kwargs[str(key)]})
-                elif key == 'phone':
-                    dynamic_payload.update({'phone': kwargs[str(key)]})
-                elif key == 'metadata':
-                    assert isinstance(kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
-                    dynamic_payload.update({'embeddedData': kwargs[str(key)]})
-        
+        dynamic_payload = {}
+        for key in list(kwargs.keys()):
+            assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
+            if key == 'first_name':
+                dynamic_payload.update({'firstName': kwargs[str(key)]})
+            elif key == 'last_name':
+                dynamic_payload.update({'lastName': kwargs[str(key)]})
+            elif key == 'email':
+                dynamic_payload.update({'email': kwargs[str(key)]})
+            elif key == 'phone':
+                dynamic_payload.update({'phone': kwargs[str(key)]})
+            elif key == 'language':
+                dynamic_payload.update({'language': kwargs[str(key)]})
+            elif key == 'external_ref':
+                dynamic_payload.update({'extRef': kwargs[str(key)]})
+            elif key == 'unsubscribed':
+                dynamic_payload.update({'unsubscribed': kwargs[str(key)]})
+            elif key == 'phone':
+                dynamic_payload.update({'phone': kwargs[str(key)]})
+            elif key == 'metadata':
+                assert isinstance(kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
+                dynamic_payload.update({'embeddedData': kwargs[str(key)]})
+            elif key == 'dynamic_payload':
+                dynamic_payload= kwargs[str(key)]
+    
         headers, base_url = self.header_setup(xm=True)
         url = f"{base_url}/contacts/{contact_id}"
         request = r.put(url, json=dynamic_payload, headers=headers)

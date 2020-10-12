@@ -40,6 +40,7 @@ class XMDirectory(Credentials):
         '''
         
         dynamic_payload={}
+        verbose = False
         for key in list(kwargs.keys()):
             assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
             if key == 'first_name':
@@ -61,32 +62,39 @@ class XMDirectory(Credentials):
             elif key == 'metadata':
                 assert isinstance(kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
                 dynamic_payload.update({'embeddedData': kwargs[str(key)]})
+            elif key == 'dynamic_payload':
+              dynamic_payload = dict(kwargs[str(key)])
+            elif key == 'verbose':
+              verbose = True
 
         headers, base_url = self.header_setup(content_type=True, xm=True)
         url = f"{base_url}/contacts"
         request = r.post(url, json=dynamic_payload, headers=headers)
         response = request.json()
-        print(response['meta']['httpStatus'])
         try:
             if response['meta']['httpStatus'] == '500 - Internal Server Error':
                 raise Qualtrics500Error('500 - Internal Server Error')
-        except Qualtrics500Error:
-            attempt = 0
-            while attempt < 20:
-                request = r.post(url, json=dynamic_payload, headers=headers)
-                response = request.json()
-                if response['meta']['httpStatus'] == '500 - Internal Server Error':
-                    attempt+=1
-                    t.sleep(0.25)
-                    continue
-                elif response['meta']['httpStatus'] == '200 - OK':
-                    return response['result']['id']
-            return print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
-        except Exception:
-            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+            elif response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':
+                raise Qualtrics503Error('503 - Temporary Internal Server Error')
+            elif response['meta']['httpStatus'] == '504 - Gateway Timeout':
+                raise Qualtrics504Error('504 - Gateway Timeout')
+            elif response['meta']['httpStatus'] == '400 - Bad Request':
+                raise Qualtrics400Error('Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
+            elif response['meta']['httpStatus'] == '401 - Unauthorized':
+                raise Qualtrics401Error('Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
+            elif response['meta']['httpStatus'] == '403 - Forbidden':
+                raise Qualtrics403Error('Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
+        except (Qualtrics500Error, Qualtrics503Error, Qualtrics504Error) as e:
+            # Recursive call to handle Internal Server Errors
+            return self.create_contact_in_XM(dynamic_payload=dynamic_payload)
+        except (Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
+            # Handle Authorization/Bad Request Errors
+            return print(e)
         else:
-            contact_id = response['result']['id']
-            return contact_id
+            if verbose == True:
+              return response['meta']['httpStatus'], response['result']['id']
+            else: 
+                return response['result']['id']
 
     def delete_contact(self, contact_id=None):
         '''This method will delete a contact from your XMDirectory. (Caution this cannot be reversed once deleted!)

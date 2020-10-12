@@ -66,10 +66,10 @@ class XMDirectory(Credentials):
         url = f"{base_url}/contacts"
         request = r.post(url, json=dynamic_payload, headers=headers)
         response = request.json()
+        print(response['meta']['httpStatus'])
         try:
             if response['meta']['httpStatus'] == '500 - Internal Server Error':
                 raise Qualtrics500Error('500 - Internal Server Error')
-            contact_id = response['result']['id']
         except Qualtrics500Error:
             attempt = 0
             while attempt < 20:
@@ -85,6 +85,7 @@ class XMDirectory(Credentials):
         except Exception:
             print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
         else:
+            contact_id = response['result']['id']
             return contact_id
 
     def delete_contact(self, contact_id=None):

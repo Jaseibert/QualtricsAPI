@@ -16,7 +16,7 @@ class XMDirectory(Credentials):
         self.data_center = data_center
         self.directory_id = directory_id
 
-    def create_contact_in_XM(self, dynamic_payload={}, **kwargs):
+    def create_contact_in_XM(self, **kwargs):
         '''This function gives you the ability to create a contact in your XM Directory. This method does re-list not each
         element that you just created. It returns the XMDirectory "Contact ID" associated with the newly created XM directory
         contact.
@@ -39,28 +39,28 @@ class XMDirectory(Credentials):
         :type return: str
         '''
         
-        if len(dynamic_payload) == 0:
-            for key in list(kwargs.keys()):
-                assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
-                if key == 'first_name':
-                    dynamic_payload.update({'firstName': kwargs[str(key)]})
-                elif key == 'last_name':
-                    dynamic_payload.update({'lastName': kwargs[str(key)]})
-                elif key == 'email':
-                    dynamic_payload.update({'email': kwargs[str(key)]})
-                elif key == 'phone':
-                    dynamic_payload.update({'phone': kwargs[str(key)]})
-                elif key == 'language':
-                    dynamic_payload.update({'language': kwargs[str(key)]})
-                elif key == 'external_ref':
-                    dynamic_payload.update({'extRef': kwargs[str(key)]})
-                elif key == 'unsubscribed':
-                    dynamic_payload.update({'unsubscribed': kwargs[str(key)]})
-                elif key == 'phone':
-                    dynamic_payload.update({'phone': kwargs[str(key)]})
-                elif key == 'metadata':
-                    assert isinstance(kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
-                    dynamic_payload.update({'embeddedData': kwargs[str(key)]})
+        dynamic_payload={}
+        for key in list(kwargs.keys()):
+            assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
+            if key == 'first_name':
+                dynamic_payload.update({'firstName': kwargs[str(key)]})
+            elif key == 'last_name':
+                dynamic_payload.update({'lastName': kwargs[str(key)]})
+            elif key == 'email':
+                dynamic_payload.update({'email': kwargs[str(key)]})
+            elif key == 'phone':
+                dynamic_payload.update({'phone': kwargs[str(key)]})
+            elif key == 'language':
+                dynamic_payload.update({'language': kwargs[str(key)]})
+            elif key == 'external_ref':
+                dynamic_payload.update({'extRef': kwargs[str(key)]})
+            elif key == 'unsubscribed':
+                dynamic_payload.update({'unsubscribed': kwargs[str(key)]})
+            elif key == 'phone':
+                dynamic_payload.update({'phone': kwargs[str(key)]})
+            elif key == 'metadata':
+                assert isinstance(kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
+                dynamic_payload.update({'embeddedData': kwargs[str(key)]})
 
         headers, base_url = self.header_setup(content_type=True, xm=True)
         url = f"{base_url}/contacts"

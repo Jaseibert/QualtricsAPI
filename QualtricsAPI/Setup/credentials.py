@@ -24,10 +24,10 @@ class Credentials(object):
         if directory_id: 
             assert len(directory_id) == 20, 'Hey there! It looks like your api directory ID is a the incorrect length. It needs to be 20 characters long. Please try again.'
             assert directory_id[:5] == 'POOL_', 'Hey there! It looks like your directory ID is incorrect. You can find the directory ID on the Qualtrics site under your account settings. Please try again.'
+            os.environ['directory_id'] = directory_id
 
         os.environ['token'] = token
         os.environ['data_center'] = data_center
-        os.environ['directory_id'] = directory_id
         return
 
     def header_setup(self, content_type=False, xm=True, path=None):
@@ -41,9 +41,9 @@ class Credentials(object):
         '''
         if xm:
             assert os.environ['directory_id'], 'Hey there! This endpoint is only accessible for XM Directory Users . If you have access to the XM Directory, then be sure to include your directory_id when you use the qualtrics_api_credentials() method. '
+            path = 'directories/{0}/'.format(os.environ['directory_id']) if xm else path
 
         header = {"x-api-token": os.environ['token']}
-        path = 'directories/{0}/'.format(os.environ['directory_id']) if xm else path
         base_url = f"https://{os.environ['data_center']}.qualtrics.com/API/v3/{path}"
         if content_type is True:
             header["Content-Type"] = "application/json"

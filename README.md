@@ -1,5 +1,9 @@
 # QualtricsAPI
 
+[![Build Status](https://travis-ci.org/Jaseibert/QualtricsAPI.svg?branch=master)](https://travis-ci.org/Jaseibert/QualtricsAPI)
+![PyPI](https://img.shields.io/pypi/v/QualtricsAPI)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/QualtricsAPI)
+
 **Author:** [Jeremy Seibert](https://www.jeremyseibert.com)<br/>
 **License:** [MIT](https://opensource.org/licenses/MIT)<br/>
 **Package Documentation:** [Documentation](https://www.qualtricsapi-pydocs.com)<br/>

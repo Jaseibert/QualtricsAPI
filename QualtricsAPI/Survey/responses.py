@@ -3,6 +3,8 @@ import zipfile
 import io
 import json
 import pandas as pd
+from datetime import date, datetime, timedelta
+from dateutil.parser import parse
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
 from QualtricsAPI.Exceptions import Qualtrics500Error, Qualtrics503Error, Qualtrics504Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error
@@ -99,7 +101,7 @@ class Responses(Credentials):
             progress_id = response['result']['progressId']
             return progress_id, url, headers
         
-            
+    # Version 3 Code
     def send_request_v3(self, survey=None, payload=None):
         '''This method sends the request, and sets up the download request.'''
         is_file = None
@@ -136,15 +138,33 @@ class Responses(Credentials):
 
     def get_survey_responses(self, survey=None, **kwargs):
         '''This function accepts the survey id, and returns the survey responses associated with that survey.
-        
+        :param useLabels: Instead of exporting the recode value for the answer choice, export the text of the answer choice. For more information on recode values, see Recode Values on the Qualtrics Support Page.
+        :type useLabels: bool
+        :param includeLabelColumns: For columns that have answer labels, export two columns: one that uses recode values and one that uses labels. The label column will has a IsLabelsColumn field in the 3rd header row. Note that this cannot be used with useLabels.
+        :type includeLabelColumns: bool
+        :param exportResponsesInProgress: Export only responses-in-progress.
+        :type exportResponsesInProgress: bool
+        :param limit: Maximum number of responses exported. This begins with the first survey responses recieved. So a Limit = 10, would be the surveys first 10 responses.
+        :type limit: int
+        :param seenUnansweredRecode: Recode seen-but-unanswered questions with this value.
+        :type seenUnansweredRecode: int
+        :param multiselectSeenUnansweredRecode: Recode seen-but-unanswered choices for multi-select questions with this value. If not set, this will be the seenUnansweredRecode value.
+        :type multiselectSeenUnansweredRecode: int
+        :param includeDisplayOrder: If true, include display order information in your export. This is useful for surveys with randomization.
+        :type includeDisplayOrder: bool
+        :param endDate: Only export responses recorded after the specified UTC date. Example Format: ('%Y-%m-%dT%H:%M:%SZ' => 2020-01-13T12:30:00Z)
+        :type endDate: str
+        :param startDate: Only export responses recorded after the specified UTC date. Example Format: ('%Y-%m-%dT%H:%M:%SZ'=> 2020-01-13T12:30:00Z)
+        :type startDate: str
+        :param timeZone: Timezone used to determine response date values. If this parameter is not provided, dates will be exported in UTC/GMT. See (https://api.qualtrics.com/instructions/docs/Instructions/dates-and-times.md) for the available timeZones.       :type timeZone: str
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
         '''
         dynamic_payload = {"format": 'csv'}
         for key in list(kwargs.keys()):
-            assert key in ['useLabels', 'includeLabelColumns', 'exportResponsesInProgress', 'limit', 'seenUnansweredRecode', 'multiselectSeenUnansweredRecode', 'includeDisplayOrder'], "Hey there! You can only pass in parameters with names in the list, ['useLabels', 'includeLabelColumns', 'exportResponsesInProgress', 'limit', 'seenUnansweredRecode', 'multiselectSeenUnansweredRecode', 'includeDisplayOrder']"
+            assert key in ['useLabels', 'includeLabelColumns', 'exportResponsesInProgress', 'limit', 'seenUnansweredRecode', 'multiselectSeenUnansweredRecode', 'includeDisplayOrder', 'startDate', 'endDate', 'timeZone'], "Hey there! You can only pass in parameters with names in the list, ['useLabels', 'includeLabelColumns', 'exportResponsesInProgress', 'limit', 'seenUnansweredRecode', 'multiselectSeenUnansweredRecode', 'includeDisplayOrder', 'startDate', 'endDate', 'timeZone']"
             if key == 'useLabels':
-                assert kwargs['includeLabelColumns'] is None, 'Hey there, you cannot pass both the "includeLabelColumns" and the "useLabels" parameters. Please pass just one and try again.'
+                assert 'includeLabelColumns' not in list(kwargs.keys()), 'Hey there, you cannot pass both the "includeLabelColumns" and the "useLabels" parameters at the same time. Please pass just one and try again.'
                 assert isinstance(kwargs['useLabels'], bool), 'Hey there, your "useLabels" parameter needs to be of type "bool"!'
                 dynamic_payload.update({'useLabels': kwargs[(key)]})
             elif key == 'exportResponsesInProgress':
@@ -154,15 +174,29 @@ class Responses(Credentials):
                 assert isinstance(kwargs['limit'], int), 'Hey there, your "limit" parameter needs to be of type "int"!'
                 dynamic_payload.update({'limit': kwargs[(key)]})
             elif key == 'seenUnansweredRecode':
-                assert isinstance(kwargs['seenUnansweredRecode'], str), 'Hey there, your "seenUnansweredRecode" parameter needs to be of type "str"!'
+                assert isinstance(kwargs['seenUnansweredRecode'], int), 'Hey there, your "seenUnansweredRecode" parameter needs to be of type "int"!'
                 dynamic_payload.update({'seenUnansweredRecode': kwargs[(key)]})
             elif key == 'multiselectSeenUnansweredRecode':
-                assert isinstance(kwargs['multiselectSeenUnansweredRecode'], str), 'Hey there, your "multiselectSeenUnansweredRecode" parameter needs to be of type "str"!'
+                assert isinstance(kwargs['multiselectSeenUnansweredRecode'], int), 'Hey there, your "multiselectSeenUnansweredRecode" parameter needs to be of type "int"!'
                 dynamic_payload.update({'multiselectSeenUnansweredRecode': kwargs[(key)]})
             elif key == 'includeLabelColumns':
                 assert isinstance(kwargs['includeLabelColumns'], bool), 'Hey there, your "includeLabelColumns" parameter needs to be of type "bool"!'
-                assert kwargs['useLabels'] is None, 'Hey there, you cannot pass both the "includeLabelColumns" and the "useLabels" parameters. Please pass just one and try again.'
+                assert 'useLabels'not in list(kwargs.keys()), 'Hey there, you cannot pass both the "includeLabelColumns" and the "useLabels" parameters at the same time. Please pass just one and try again.'
                 dynamic_payload.update({'includeLabelColumns': kwargs[(key)]})
+            elif key == 'includeDisplayOrder':
+                assert isinstance(kwargs['includeDisplayOrder'], bool), 'Hey there, your "includeDisplayOrder" parameter needs to be of type "bool"!'
+                dynamic_payload.update({'includeDisplayOrder': kwargs[(key)]})
+            elif key == 'startDate':
+                assert isinstance(kwargs['startDate'], str), 'Hey there, your "startDate" parameter needs to be of type "str"!'
+                start_date = parse(timestr=kwargs[(key)])
+                dynamic_payload.update({'startDate': start_date.strftime('%Y-%m-%dT%H:%M:%SZ')})
+            elif key == 'endDate':
+                assert isinstance(kwargs['endDate'], str), 'Hey there, your "endDate" parameter needs to be of type "str"!'
+                end_date = parse(timestr=kwargs[(key)])
+                dynamic_payload.update({'endDate': end_date.strftime('%Y-%m-%dT%H:%M:%SZ')})
+            elif key == 'timeZone':
+                assert isinstance(kwargs['timeZone'], str), 'Hey there, your "timeZone" parameter needs to be of type "str"!'
+                dynamic_payload.update({'timeZone': kwargs[(key)]})
         print(dynamic_payload)
         download_request = self.send_request_v3(survey=survey, payload=dynamic_payload)
         with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:

@@ -1,6 +1,6 @@
 # QualtricsAPI
 
-[![Build Status](https://travis-ci.org/Jaseibert/QualtricsAPI.svg?branch=master)](https://travis-ci.com/Jaseibert/QualtricsAPI)
+[![Build Status](https://travis-ci.com/Jaseibert/QualtricsAPI.svg?branch=master)](https://travis-ci.com/Jaseibert/QualtricsAPI)
 ![PyPI](https://img.shields.io/pypi/v/QualtricsAPI)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/QualtricsAPI)
 

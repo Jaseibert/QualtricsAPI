@@ -26,6 +26,6 @@ setuptools.setup(
           'pandas',
           'numpy',
           'requests', 
-          'dateutil'
+          'python-dateutil'
       ],
 )

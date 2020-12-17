@@ -181,7 +181,7 @@ class Responses(Credentials):
                 dynamic_payload.update({'multiselectSeenUnansweredRecode': kwargs[(key)]})
             elif key == 'includeLabelColumns':
                 assert isinstance(kwargs['includeLabelColumns'], bool), 'Hey there, your "includeLabelColumns" parameter needs to be of type "bool"!'
-                assert 'useLabels'not in list(kwargs.keys()), 'Hey there, you cannot pass both the "includeLabelColumns" and the "useLabels" parameters at the same time. Please pass just one and try again.'
+                assert 'useLabels' not in list(kwargs.keys()), 'Hey there, you cannot pass both the "includeLabelColumns" and the "useLabels" parameters at the same time. Please pass just one and try again.'
                 dynamic_payload.update({'includeLabelColumns': kwargs[(key)]})
             elif key == 'includeDisplayOrder':
                 assert isinstance(kwargs['includeDisplayOrder'], bool), 'Hey there, your "includeDisplayOrder" parameter needs to be of type "bool"!'

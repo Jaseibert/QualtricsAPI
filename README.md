@@ -35,11 +35,13 @@ We first create environment variables that will hold your API credentials, so yo
 ```python
 from QualtricsAPI.Setup import Credentials
 
-#Create an instance of Credentials
-c = Credentials()
+#Call the qualtrics_api_credentials() method (Non-XM Directory Users)
+Credentials().qualtrics_api_credentials(token='Your API Token',data_center='Your Data Center')
 
-#Call the qualtrics_api_credentials() method
-c.qualtrics_api_credentials(token='Your API Token',data_center='Your Data Center',directory_id='Your Directory ID')
+#Call the qualtrics_api_credentials() method (XM Directory Users)
+Credentials().qualtrics_api_credentials(token='Your API Token',data_center='Your Data Center',directory_id='Your Directory ID')
+
+
 ```
 This will generate environment variables that will be used to  populate the HTTP headers which are necessary to make your API calls.  
 

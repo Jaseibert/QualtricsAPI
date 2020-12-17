@@ -7,6 +7,6 @@ install:
  - 'pipenv install pandas'
  - 'pipenv install numpy'
  - 'pipenv install requests'
- - 'pipenv install dateutil'
+ - 'pipenv install python-dateutil'
 script:
  - python3 -m unittest QualtricsAPI.tests.test

@@ -71,6 +71,7 @@ class Responses(Credentials):
         questions.columns = ['Questions']
         return questions
 
+    # Version 3 Code
     def setup_request_v3(self, survey=None, payload=None):
         ''' This method sets up the request and handles the setup of the request for the survey.'''
 
@@ -136,6 +137,7 @@ class Responses(Credentials):
             download_request = r.get(download_url, headers=headers, stream=True)
             return download_request
 
+    # Version 3 Code
     def get_survey_responses(self, survey=None, **kwargs):
         '''This function accepts the survey id, and returns the survey responses associated with that survey.
         :param useLabels: Instead of exporting the recode value for the answer choice, export the text of the answer choice. For more information on recode values, see Recode Values on the Qualtrics Support Page.
@@ -204,6 +206,7 @@ class Responses(Credentials):
                 df = pd.read_csv(survey_zip.open(s.filename))
                 return df
 
+    # Version 3 Code
     def get_survey_questions(self, survey=None):
         '''This method returns a DataFrame containing the survey questions and the Question IDs.
 

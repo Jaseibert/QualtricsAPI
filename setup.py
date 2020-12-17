@@ -25,6 +25,7 @@ setuptools.setup(
     install_requires=[
           'pandas',
           'numpy',
-          'requests'
+          'requests', 
+          'dateutil'
       ],
 )

@@ -8,6 +8,7 @@ from dateutil.parser import parse
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
 from QualtricsAPI.Exceptions import Qualtrics500Error, Qualtrics503Error, Qualtrics504Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error
+import warnings
 
 class Responses(Credentials):
     '''This is a child class to the credentials class that gathers the survey responses from Qualtrics surveys'''
@@ -24,8 +25,8 @@ class Responses(Credentials):
         assert survey[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
 
         headers, url = self.header_setup(content_type=True, xm=False, path='responseexports/')
-        payload = {"format":" + file_format + '","surveyId":"' + survey +'"}
-        request = r.request("POST", url, data=payload, headers=headers)
+        payload = {"format": file_format, "surveyId": survey}
+        request = r.request("POST", url, data=json.dumps(payload), headers=headers)
         response = request.json()
         try:
             progress_id = response['result']['id']
@@ -54,6 +55,7 @@ class Responses(Credentials):
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
         '''
+        warnings.warn('This method is being actively depricated. Please migrate your code over to the new V3 method "Responses().get_survey_responses".', DeprecationWarning, stacklevel=2)
         download_request = self.send_request(file_format='csv', survey=survey)
         with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
             for s in survey_zip.infolist():
@@ -66,6 +68,7 @@ class Responses(Credentials):
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
         '''
+        warnings.warn('This method is being actively depricated. Please migrate your code over to the new V3 method "Responses().get_survey_questions".', DeprecationWarning, stacklevel=2)
         df = self.get_responses(survey=survey)
         questions = pd.DataFrame(df[:1].T)
         questions.columns = ['Questions']

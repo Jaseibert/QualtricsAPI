@@ -16,43 +16,54 @@ class Surveys(Credentials):
 
         :return: a Pandas DataFrame with the user's available surveys.
         '''
-        surveys = pd.DataFrame()
+        surveys = pd.DataFrame(columns=['id', 'name', 'ownerId', 'lastModified', 'creationDate', 'isActive', 'nextPage'])
         headers, url = self.header_setup(content_type=False, xm=False, path='surveys')
-        def get_page(surveys=surveys, url=url):
+      
+        def extract_page(surveys=surveys, url=url):
             ''' This method is a nested method that extracts a single page of surveys. '''
-            request = r.get(url, headers=headers)
-            response = request.json()
-            keys = ['id', 'name', 'ownerId', 'lastModified', 'creationDate', 'isActive', 'nextPage']
-            lists = Parser().json_parser(response=response, keys=keys, arr=False)
-            single_page = pd.DataFrame(lists).transpose()
-            single_page.columns = keys
-            surveys = pd.concat([surveys, single_page]).reset_index(drop=True)
-            next_page = str(response['result']['nextPage'])
-            return surveys, next_page, response
-        try:
-            surveys, next_page, response = get_page(surveys=surveys, url=url)
-            while next_page != 'None':
-                surveys, next_page, response = get_page(surveys=surveys, url=next_page)
-            if response['meta']['httpStatus'] == '500 - Internal Server Error':
-                raise Qualtrics500Error('500 - Internal Server Error')
-            elif response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':
-                raise Qualtrics503Error('503 - Temporary Internal Server Error')
-            elif response['meta']['httpStatus'] == '504 - Gateway Timeout':
-                raise Qualtrics504Error('504 - Gateway Timeout')
-            elif response['meta']['httpStatus'] == '400 - Bad Request':
-                raise Qualtrics400Error('Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
-            elif response['meta']['httpStatus'] == '401 - Unauthorized':
-                raise Qualtrics401Error('Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
-            elif response['meta']['httpStatus'] == '403 - Forbidden':
-                raise Qualtrics403Error('Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
-        except (Qualtrics500Error, Qualtrics503Error, Qualtrics504Error) as e:
-            # Recursive call to handle Internal Server Errors
-            return self.list_user_surveys()
-        except (Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
-            # Handle Authorization/Bad Request Errors
-            return print(e)      
+            try:
+                request = r.get(url, headers=headers)
+                response = request.json()
+                if response['meta']['httpStatus'] == '500 - Internal Server Error':
+                    raise Qualtrics500Error('500 - Internal Server Error')
+                elif response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':
+                    raise Qualtrics503Error('503 - Temporary Internal Server Error')
+                elif response['meta']['httpStatus'] == '504 - Gateway Timeout':
+                    raise Qualtrics504Error('504 - Gateway Timeout')
+                elif response['meta']['httpStatus'] == '400 - Bad Request':
+                    raise Qualtrics400Error('Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
+                elif response['meta']['httpStatus'] == '401 - Unauthorized':
+                    raise Qualtrics401Error('Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
+                elif response['meta']['httpStatus'] == '403 - Forbidden':
+                    raise Qualtrics403Error('Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
+            except (Qualtrics500Error, Qualtrics503Error):
+                t.sleep(0.25)
+                extract_page(surveys=surveys, url=url)
+            except Qualtrics504Error:
+                t.sleep(5)
+                extract_page(surveys=surveys, url=url)
+            except (Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
+                print(e)
+            except:
+                t.sleep(10)
+                extract_page(surveys=surveys, url=url)
+            else:
+                keys = ['id', 'name', 'ownerId', 'lastModified', 'creationDate', 'isActive']
+                lists = Parser().json_parser(response=response, keys=keys, arr=False)
+                single_page = pd.DataFrame(lists).transpose()
+                single_page.columns = keys
+                surveys = pd.concat([surveys, single_page]).reset_index(drop=True)
+                next_page = response['result']['nextPage']
+                return surveys, next_page
+
+        surveys, next_page = extract_page(surveys=surveys, url=url)
+
+        if next_page is None:
+              return surveys
         else:
-          return surveys
+            while next_page is not None:
+              surveys, next_page = extract_page(surveys=surveys, url=next_page)
+            return surveys
 
     def share_user_surveys(self, survey=None, recipient_id=None, permissions={}):
         '''This method provides functionality to share a survey within a given brand/organization.
@@ -75,9 +86,9 @@ class Surveys(Credentials):
           'recipientId': recipient_id, 
           'permissions': permissions
         }
-        request = r.post(url, json=data, headers=headers)
-        response = request.json()
         try:
+            request = r.post(url, json=data, headers=headers)
+            response = request.json()
             if response['meta']['httpStatus'] == '500 - Internal Server Error':
                 raise Qualtrics500Error('500 - Internal Server Error')
             elif response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':

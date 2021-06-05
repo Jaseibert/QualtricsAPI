@@ -23,14 +23,6 @@ For any R users there is an equally awesome package called ["qualtRics"](https:/
 **Authors:** [Julia Silge](https://juliasilge.com/), [Jasper Ginn](http://www.jasperginn.io)<br/>
 **License:** [MIT](https://opensource.org/licenses/MIT)
 
-# Functionality
-
-There are currently two primary uses of this package.
-
-1. Contact Data - to manage survey contacts within the XMDirectory and any associated Mailing Lists.
-
-2. Survey Data - to manage surveys and the data collected from each of your surveys.
-
 # Basic Usage
 
 ## Credentials Code Flow
@@ -45,9 +37,8 @@ Credentials().qualtrics_api_credentials(token='Your API Token',data_center='Your
 #Call the qualtrics_api_credentials() method (XM Directory Users)
 Credentials().qualtrics_api_credentials(token='Your API Token',data_center='Your Data Center',directory_id='Your Directory ID')
 
-
 ```
-This will generate environment variables that will be used to  populate the HTTP headers which are necessary to make your API calls.  
+This will generate environment variables that will be used to populate the HTTP headers which are necessary to make your API calls.  
 
 ## Contact Data
 
@@ -100,18 +91,18 @@ m.list_contacts()
 #Creates contacts in a Mailing List
 m.create_contact_in_list()
 ```
-## Survey Data
+## Survey Module
 
-There is currently only one module built to work with the Survey Data, `Responses()`. This modules has one method which downloads the responses associated with a given survey. That method can be called using the following methodology.
+The `Responses()` module has two methods. Each of those methods can be called using the following methodology.
 
 ```python
 from QualtricsAPI.Survey import Responses
 
-#Create instances of each
-r = Responses()
+#Get Survey Responses (Updated)
+Responses().get_survey_responses(survey="<survey_id>")
 
-#Call the method
-r.get_responses()
+#Get Survey Questions (Updated)
+Responses().get_survey_questions(survey="<survey_id>")
 ```
 
 # Wrap-up

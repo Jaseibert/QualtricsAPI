@@ -105,7 +105,7 @@ m.create_contact_in_list()
 There is currently only one module built to work with the Survey Data, `Responses()`. This modules has one method which downloads the responses associated with a given survey. That method can be called using the following methodology.
 
 ```python
-from QualtricsAPI.Surveys import Responses
+from QualtricsAPI.Survey import Responses
 
 #Create instances of each
 r = Responses()

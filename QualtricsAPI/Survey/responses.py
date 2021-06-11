@@ -262,7 +262,7 @@ class Responses(Credentials):
         return
 
 
-    def create_survey_response(self, survey=None, dynamic_payload={}, verbose=False, **kwargs): 
+    def create_survey_response(self, survey=None, dynamic_payload={}, verbose=False): 
         ''' This method creates a single response for a given survey. '''
 
         assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
@@ -294,7 +294,7 @@ class Responses(Credentials):
             return print(e)
         else:
             if verbose == True:
-              return response['meta']['httpStatus'], response['result']
+              return response['meta'], response['result']
             else: 
               return response['result']
         return

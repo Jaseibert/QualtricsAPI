@@ -291,7 +291,7 @@ class Responses(Credentials):
             return self.create_survey_response(self, survey=survey, dynamic_payload=dynamic_payload)
         except (Qualtrics500Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
             # Handle Authorization/Bad Request Errors
-            return print(e)
+            return print(e, response['meta'])
         else:
             if verbose == True:
               return response['meta'], response['result']

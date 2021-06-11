@@ -202,7 +202,6 @@ class Responses(Credentials):
             elif key == 'timeZone':
                 assert isinstance(kwargs['timeZone'], str), 'Hey there, your "timeZone" parameter needs to be of type "str"!'
                 dynamic_payload.update({'timeZone': kwargs[(key)]})
-        print(dynamic_payload)
         download_request = self.send_request_v3(survey=survey, payload=dynamic_payload)
         with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
             for s in survey_zip.infolist():
@@ -221,3 +220,81 @@ class Responses(Credentials):
         questions.columns = ['Questions']
         return questions
 
+    def get_survey_response(self, survey=None, response=None, verbose=False): 
+        ''' This method retrieves a single response from a given survey. '''
+
+        assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
+        assert response != None, 'Hey There! The response parameter cannot be None. You need to pass in a response ID as a string into the response parameter.'
+        assert isinstance(survey, str) == True, 'Hey There! The survey parameter must be of type string.'
+        assert isinstance(response, str) == True, 'Hey There! The response parameter must be of type string.'
+        assert len(survey) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
+        assert len(response) == 17, 'Hey there! It looks like your response ID is a the incorrect length. It needs to be 17 characters long. Please try again.'
+        assert survey[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
+        assert response[:2] == 'R_', 'Hey there! It looks like your response ID is incorrect. You can find the response ID on the Qualtrics site under your account settings. Please try again.'
+
+        headers, url = self.header_setup(content_type=True, xm=False, path=f'/surveys/{survey}/responses/{response}')
+        request = r.request("GET", url, headers=headers)
+        response = request.json()
+        try:
+            if response['meta']['httpStatus'] == '500 - Internal Server Error':
+                raise Qualtrics500Error('500 - Internal Server Error')
+            elif response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':
+                raise Qualtrics503Error('503 - Temporary Internal Server Error')
+            elif response['meta']['httpStatus'] == '504 - Gateway Timeout':
+                raise Qualtrics504Error('504 - Gateway Timeout')
+            elif response['meta']['httpStatus'] == '400 - Bad Request':
+                raise Qualtrics400Error('Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
+            elif response['meta']['httpStatus'] == '401 - Unauthorized':
+                raise Qualtrics401Error('Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
+            elif response['meta']['httpStatus'] == '403 - Forbidden':
+                raise Qualtrics403Error('Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
+        except (Qualtrics503Error, Qualtrics504Error) as e:
+            # Recursive call to handle Internal Server Errors
+            return self.get_survey_response(self, survey=survey, response=response, verbose=verbose)
+        except (Qualtrics500Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
+            # Handle Authorization/Bad Request Errors
+            return print(e)
+        else:
+            if verbose == True:
+              return response['meta']['httpStatus'], response['result']
+            else: 
+              return response['result']
+        return
+
+
+    def create_survey_response(self, survey=None, dynamic_payload={}, verbose=False, **kwargs): 
+        ''' This method creates a single response for a given survey. '''
+
+        assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
+        assert isinstance(survey, str) == True, 'Hey There! The survey parameter must be of type string.'
+        assert len(survey) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
+        assert survey[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
+
+        headers, url = self.header_setup(content_type=True, xm=False, path=f'/surveys/{survey}/responses')
+        request = r.post(url, json=dynamic_payload, headers=headers)
+        response = request.json()
+        try:
+            if response['meta']['httpStatus'] == '500 - Internal Server Error':
+                raise Qualtrics500Error('500 - Internal Server Error')
+            elif response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':
+                raise Qualtrics503Error('503 - Temporary Internal Server Error')
+            elif response['meta']['httpStatus'] == '504 - Gateway Timeout':
+                raise Qualtrics504Error('504 - Gateway Timeout')
+            elif response['meta']['httpStatus'] == '400 - Bad Request':
+                raise Qualtrics400Error('Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
+            elif response['meta']['httpStatus'] == '401 - Unauthorized':
+                raise Qualtrics401Error('Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
+            elif response['meta']['httpStatus'] == '403 - Forbidden':
+                raise Qualtrics403Error('Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
+        except (Qualtrics503Error, Qualtrics504Error) as e:
+            # Recursive call to handle Internal Server Errors
+            return self.create_survey_response(self, survey=survey, dynamic_payload=dynamic_payload)
+        except (Qualtrics500Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
+            # Handle Authorization/Bad Request Errors
+            return print(e)
+        else:
+            if verbose == True:
+              return response['meta']['httpStatus'], response['result']
+            else: 
+              return response['result']
+        return

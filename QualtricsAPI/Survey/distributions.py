@@ -310,7 +310,7 @@ class Distributions(Credentials):
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
 
 
-    def create_sms_distribution(self, dist_name, mailing_list, library, survey, message, send_date, method='Invite'):
+    def create_sms_distribution(self, dist_name, mailing_list, library, survey, message, send_date, parentDistributionId=None, method='Invite'):
         '''This method gives users the ability to create a SMS distribution for a given mailing list and survey. In order to use this method you
         must already have access to pre-defined Messages and their MessageID's existing within a User-Defined (starts with UR)
         or Global (starts with GR) Library. You can list the messages and their MessageID's(starts with MS)  that are available to your user
@@ -357,6 +357,9 @@ class Distributions(Credentials):
             }
         }
 
+        if parentDistributionId != None: 
+           data['parentDistributionId'] = parentDistributionId
+
         request = r.post(url, json=data, headers=headers)
         response = request.json()
         try:
@@ -365,3 +368,6 @@ class Distributions(Credentials):
         except:
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
+
+
+      

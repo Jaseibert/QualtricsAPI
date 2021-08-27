@@ -368,6 +368,3 @@ class Distributions(Credentials):
         except:
             print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
-
-
-      

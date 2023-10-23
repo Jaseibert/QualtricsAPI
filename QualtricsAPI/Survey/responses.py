@@ -3,6 +3,7 @@ import zipfile
 import io
 import json
 import pandas as pd
+import os
 from datetime import date, datetime, timedelta
 from dateutil.parser import parse
 from QualtricsAPI.Setup import Credentials
@@ -16,17 +17,18 @@ class Responses(Credentials):
     def __init__(self):
         return
 
-    def setup_request(self, file_format='csv', survey=None):
+    def setup_request(self, file_format='csv', survey=None， verify=None):
         ''' This method sets up the request and handles the setup of the request for the survey.'''
 
         assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
         assert isinstance(survey, str) == True, 'Hey There! The survey parameter must be of type string.'
         assert len(survey) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
         assert survey[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
-
+        assert os.path.isfile(verify), 'Hey there! It looks like the certification file path is not exist. Please try again.'
+        
         headers, url = self.header_setup(content_type=True, xm=False, path='responseexports/')
         payload = {"format": file_format, "surveyId": survey}
-        request = r.request("POST", url, data=json.dumps(payload), headers=headers)
+        request = r.request("POST", url, data=json.dumps(payload), headers=headers, verify=verify)
         response = request.json()
         try:
             progress_id = response['result']['id']
@@ -34,7 +36,7 @@ class Responses(Credentials):
         except:
             print(f"ServerError:\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
-    def send_request(self, file_format='csv', survey=None):
+    def send_request(self, file_format='csv', survey=None, verify=None):
         '''This method sends the request, and sets up the download request.'''
         file = None
         progress_id, url, headers = self.setup_request(file_format=file_format, survey=survey)
@@ -42,40 +44,40 @@ class Responses(Credentials):
         progress_status = "in progress"
         while check_progress < 100 and (progress_status != "complete") and (file is None):
             check_url = url + progress_id
-            check_response = r.request("GET", check_url, headers=headers)
+            check_response = r.request("GET", check_url, headers=headers, verify=verify)
             file = check_response.json()["result"]["file"]
             check_progress = check_response.json()["result"]["percentComplete"]
         download_url = url + progress_id + '/file'
         download_request = r.get(download_url, headers=headers, stream=True)
         return download_request
 
-    def get_responses(self, survey=None):
+    def get_responses(self, survey=None, verify=None):
         '''This function accepts the survey id, and returns the survey responses associated with that survey.
 
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
         '''
         warnings.warn('This method is being actively depricated. Please migrate your code over to the new V3 method "Responses().get_survey_responses".', DeprecationWarning, stacklevel=2)
-        download_request = self.send_request(file_format='csv', survey=survey)
+        download_request = self.send_request(file_format='csv', survey=survey, verify=verify)
         with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
             for s in survey_zip.infolist():
                 df = pd.read_csv(survey_zip.open(s.filename))
                 return df
 
-    def get_questions(self, survey=None):
+    def get_questions(self, survey=None, verify=None):
         '''This method returns a DataFrame containing the survey questions and the Question IDs.
 
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
         '''
         warnings.warn('This method is being actively depricated. Please migrate your code over to the new V3 method "Responses().get_survey_questions".', DeprecationWarning, stacklevel=2)
-        df = self.get_responses(survey=survey)
+        df = self.get_responses(survey=survey, verify=verify)
         questions = pd.DataFrame(df[:1].T)
         questions.columns = ['Questions']
         return questions
 
     # Version 3 Code
-    def setup_request_v3(self, survey=None, payload=None):
+    def setup_request_v3(self, survey=None, payload=None, verify=None):
         ''' This method sets up the request and handles the setup of the request for the survey.'''
 
         assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
@@ -84,7 +86,7 @@ class Responses(Credentials):
         assert survey[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
 
         headers, url = self.header_setup(content_type=True, xm=False, path=f'surveys/{survey}/export-responses/')
-        request = r.request("POST", url, data=json.dumps(payload), headers=headers)
+        request = r.request("POST", url, data=json.dumps(payload), headers=headers, verify=verify)
         response = request.json()
         try:
             if response['meta']['httpStatus'] == '500 - Internal Server Error':
@@ -106,14 +108,14 @@ class Responses(Credentials):
             return progress_id, url, headers
         
     # Version 3 Code
-    def send_request_v3(self, survey=None, payload=None):
+    def send_request_v3(self, survey=None, payload=None, verify=None):
         '''This method sends the request, and sets up the download request.'''
         is_file = None
-        progress_id, url, headers = self.setup_request_v3(survey=survey, payload=payload)
+        progress_id, url, headers = self.setup_request_v3(survey=survey, payload=payload, verify=verify)
         progress_status = "in progress"
         while progress_status != "complete" and progress_status != "failed" and is_file is None:
             check_url = url + progress_id
-            check_request = r.request("GET", check_url, headers=headers)
+            check_request = r.request("GET", check_url, headers=headers, verify=verify)
             check_response = check_request.json()
             try:
                 is_file = check_response["result"]["fileId"]
@@ -141,7 +143,7 @@ class Responses(Credentials):
             return download_request
 
     # Version 3 Code
-    def get_survey_responses(self, survey=None, **kwargs):
+    def get_survey_responses(self, survey=None, verify=None, **kwargs):
         '''This function accepts the survey id, and returns the survey responses associated with that survey.
         :param useLabels: Instead of exporting the recode value for the answer choice, export the text of the answer choice. For more information on recode values, see Recode Values on the Qualtrics Support Page.
         :type useLabels: bool
@@ -202,25 +204,25 @@ class Responses(Credentials):
             elif key == 'timeZone':
                 assert isinstance(kwargs['timeZone'], str), 'Hey there, your "timeZone" parameter needs to be of type "str"!'
                 dynamic_payload.update({'timeZone': kwargs[(key)]})
-        download_request = self.send_request_v3(survey=survey, payload=dynamic_payload)
+        download_request = self.send_request_v3(survey=survey, payload=dynamic_payload, verify=verify)
         with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
             for s in survey_zip.infolist():
                 df = pd.read_csv(survey_zip.open(s.filename))
                 return df
 
     # Version 3 Code
-    def get_survey_questions(self, survey=None):
+    def get_survey_questions(self, survey=None, verify=None):
         '''This method returns a DataFrame containing the survey questions and the Question IDs.
 
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
         '''
-        df = self.get_survey_responses(survey=survey, limit=2)
+        df = self.get_survey_responses(survey=survey, limit=2, verify=verify)
         questions = pd.DataFrame(df[:1].T)
         questions.columns = ['Questions']
         return questions
 
-    def get_survey_response(self, survey=None, response=None, verbose=False): 
+    def get_survey_response(self, survey=None, response=None, verbose=False, verify=None): 
         ''' This method retrieves a single response from a given survey. '''
 
         assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
@@ -233,7 +235,7 @@ class Responses(Credentials):
         assert response[:2] == 'R_', 'Hey there! It looks like your response ID is incorrect. You can find the response ID on the Qualtrics site under your account settings. Please try again.'
 
         headers, url = self.header_setup(content_type=True, xm=False, path=f'/surveys/{survey}/responses/{response}')
-        request = r.request("GET", url, headers=headers)
+        request = r.request("GET", url, headers=headers, verify=verify)
         response = request.json()
         try:
             if response['meta']['httpStatus'] == '500 - Internal Server Error':
@@ -262,7 +264,7 @@ class Responses(Credentials):
         return
 
 
-    def create_survey_response(self, survey=None, dynamic_payload={}, verbose=False): 
+    def create_survey_response(self, survey=None, dynamic_payload={}, verbose=False, verify=None): 
         ''' This method creates a single response for a given survey. '''
 
         assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
@@ -288,7 +290,7 @@ class Responses(Credentials):
                 raise Qualtrics403Error('Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
         except (Qualtrics503Error, Qualtrics504Error) as e:
             # Recursive call to handle Internal Server Errors
-            return self.create_survey_response(self, survey=survey, dynamic_payload=dynamic_payload)
+            return self.create_survey_response(self, survey=survey, dynamic_payload=dynamic_payload, verify=verify)
         except (Qualtrics500Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
             # Handle Authorization/Bad Request Errors
             return print(e, response['meta'])

@@ -17,7 +17,7 @@ class Responses(Credentials):
     def __init__(self):
         return
 
-    def setup_request(self, file_format='csv', survey=None， verify=None):
+    def setup_request(self, file_format='csv', survey=None,s verify=None):
         ''' This method sets up the request and handles the setup of the request for the survey.'''
 
         assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
@@ -211,13 +211,13 @@ class Responses(Credentials):
                 return df
 
     # Version 3 Code
-    def get_survey_questions(self, survey=None, verify=None):
+    def get_survey_questions(self, survey=None, verify=None, **kwargs):
         '''This method returns a DataFrame containing the survey questions and the Question IDs.
 
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
         '''
-        df = self.get_survey_responses(survey=survey, limit=2, verify=verify)
+        df = self.get_survey_responses(survey=survey, limit=2, verify=verify, **kwargs)
         questions = pd.DataFrame(df[:1].T)
         questions.columns = ['Questions']
         return questions

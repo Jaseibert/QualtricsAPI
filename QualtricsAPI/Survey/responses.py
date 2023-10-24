@@ -167,9 +167,29 @@ class Responses(Credentials):
         :param survey: This is the id associated with a given survey.
         :return: a Pandas DataFrame
         '''
+
         dynamic_payload = {"format": 'csv'}
+        valid_keys = [
+            'useLabels', 
+            'includeLabelColumns', 
+            'exportResponsesInProgress', 
+            'limit', 
+            'seenUnansweredRecode', 
+            'multiselectSeenUnansweredRecode', 
+            'includeDisplayOrder', 
+            'startDate', 
+            'endDate', 
+            'timeZone', 
+            'breakoutSets'
+            'sortByLastModifiedDate',
+            'filterId',
+            'embeddedDataIds',
+            'questionIds',
+            'surveyMetadataIds'
+        ]
+        
         for key in list(kwargs.keys()):
-            assert key in ['useLabels', 'includeLabelColumns', 'exportResponsesInProgress', 'limit', 'seenUnansweredRecode', 'multiselectSeenUnansweredRecode', 'includeDisplayOrder', 'startDate', 'endDate', 'timeZone'], "Hey there! You can only pass in parameters with names in the list, ['useLabels', 'includeLabelColumns', 'exportResponsesInProgress', 'limit', 'seenUnansweredRecode', 'multiselectSeenUnansweredRecode', 'includeDisplayOrder', 'startDate', 'endDate', 'timeZone']"
+            assert key in valid_keys, "Hey there! You can only pass in parameters with names in the list, ['useLabels', 'includeLabelColumns', 'exportResponsesInProgress', 'limit', 'seenUnansweredRecode', 'multiselectSeenUnansweredRecode', 'includeDisplayOrder', 'startDate', 'endDate', 'timeZone']"
             if key == 'useLabels':
                 assert 'includeLabelColumns' not in list(kwargs.keys()), 'Hey there, you cannot pass both the "includeLabelColumns" and the "useLabels" parameters at the same time. Please pass just one and try again.'
                 assert isinstance(kwargs['useLabels'], bool), 'Hey there, your "useLabels" parameter needs to be of type "bool"!'
@@ -204,6 +224,27 @@ class Responses(Credentials):
             elif key == 'timeZone':
                 assert isinstance(kwargs['timeZone'], str), 'Hey there, your "timeZone" parameter needs to be of type "str"!'
                 dynamic_payload.update({'timeZone': kwargs[(key)]})
+            elif key == 'sortByLastModifiedDate':
+                assert isinstance(kwargs['sortByLastModifiedDate'], bool), 'Hey there, your "sortByLastModifiedDate" parameter needs to be of type "bool"!'
+                dynamic_payload.update({'sortByLastModifiedDate': kwargs[(key)]})
+            elif key == 'breakoutSets':
+                assert isinstance(kwargs['breakoutSets'], bool), 'Hey there, your "breakoutSets" parameter needs to be of type "bool"!'
+                dynamic_payload.update({'breakoutSets': kwargs[(key)]})
+            elif key == 'filterId':
+                assert isinstance(kwargs['filterId'], str), 'Hey there, your "filterId" parameter needs to be of type "str"!'
+                dynamic_payload.update({'filterId': kwargs[(key)]})
+            elif key == 'newlineReplacement':
+                assert isinstance(kwargs['newlineReplacement'], str), 'Hey there, your "newlineReplacement" parameter needs to be of type "str"!'
+                dynamic_payload.update({'newlineReplacement': kwargs[(key)]})
+            elif key == 'embeddedDataIds':
+                assert isinstance(kwargs['embeddedDataIds'], list), 'Hey there, your "embeddedDataIds" parameter needs to be of type "list"!'
+                dynamic_payload.update({'embeddedDataIds': kwargs[(key)]})
+            elif key == 'questionIds':
+                assert isinstance(kwargs['questionIds'], list), 'Hey there, your "questionIds" parameter needs to be of type "list"!'
+                dynamic_payload.update({'questionIds': kwargs[(key)]})
+            elif key == 'surveyMetadataIds':
+                assert isinstance(kwargs['surveyMetadataIds'], list), 'Hey there, your "surveyMetadataIds" parameter needs to be of type "list"!'
+                dynamic_payload.update({'surveyMetadataIds': kwargs[(key)]})
         download_request = self.send_request_v3(survey=survey, payload=dynamic_payload, verify=verify)
         with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
             for s in survey_zip.infolist():

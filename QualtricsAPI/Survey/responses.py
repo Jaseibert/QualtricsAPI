@@ -165,6 +165,19 @@ class Responses(Credentials):
         :type startDate: str
         :param timeZone: Timezone used to determine response date values. If this parameter is not provided, dates will be exported in UTC/GMT. See (https://api.qualtrics.com/instructions/docs/Instructions/dates-and-times.md) for the available timeZones.       :type timeZone: str
         :param survey: This is the id associated with a given survey.
+        :type survey: str
+        :param breakoutSets: If true, split multi-value fields into columns.
+        :type breakoutSets: bool
+        :param sortByLastModifiedDate: Sort responses by modified date.
+        :type sortByLastModifiedDate: bool
+        :param filterId: If you provide a filterId, the export will only return responses matching the corresponding filter.
+        :type filterId: str
+        :param embeddedDataIds: If provided, only export embedded data fields from the provided list of Embedded Data IDs.
+        :type embeddedDataIds: List[str]
+        :param questionIds: If provided, only export answers from the provided list of Question IDs
+        :type questionIds: List[str]
+        :param surveyMetadataIds: If provided, only export metadata fields from the provided list of Metadata IDs. This will remove metadata included in export by default. 
+        :type surveyMetadataIds: List[str]
         :return: a Pandas DataFrame
         '''
 
@@ -187,7 +200,7 @@ class Responses(Credentials):
             'questionIds',
             'surveyMetadataIds'
         ]
-        
+
         for key in list(kwargs.keys()):
             assert key in valid_keys, "Hey there! You can only pass in parameters with names in the list, ['useLabels', 'includeLabelColumns', 'exportResponsesInProgress', 'limit', 'seenUnansweredRecode', 'multiselectSeenUnansweredRecode', 'includeDisplayOrder', 'startDate', 'endDate', 'timeZone']"
             if key == 'useLabels':

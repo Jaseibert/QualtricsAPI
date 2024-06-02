@@ -354,3 +354,56 @@ class Responses(Credentials):
             else: 
               return response['result']
         return
+
+    def update_survey_response_embedded_data(self,survey=None,response_id=None,embedded_data={},reset_recorded_date=False,verbose=True):
+        ''' This method updates the embedded data on a single survey response.
+        It requires a survey ID, Response ID, and a dictionary of key value pairs for the header and value of the embedded data to be updated'''
+
+        assert survey != None, 'Hey There! The survey parameter cannot be None. You need to pass in a survey ID as a string into the survey parameter.'
+        assert isinstance(survey, str) == True, 'Hey There! The survey parameter must be of type string.'
+        assert len(survey) == 18, 'Hey there! It looks like your survey ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
+        assert survey[:3] == 'SV_', 'Hey there! It looks like your survey ID is incorrect. You can find the survey ID on the Qualtrics site under your account settings. Please try again.'
+        assert response_id != None, 'Hey There! The response_id parameter cannot be None. You need to pass in a response_id ID as a string into the response_id parameter.'
+        assert isinstance(response_id, str) == True, 'Hey There! The response_id parameter must be of type string.'
+        assert len(response_id) == 17, 'Hey there! It looks like your response_id ID is a the incorrect length. It needs to be 18 characters long. Please try again.'
+        assert response_id[:2] == 'R_', 'Hey there! It looks like your response_id ID is incorrect. You can find the response_id ID on the Qualtrics site under your survey response data & analysis page. Please try again.'
+        assert embedded_data != {}, 'Hey there! You are not passing any data to be updated. You must pass at least one key value pair in the embedded_data parameter'
+        assert self.validate_embedded_data(embedded_data=embedded_data), 'Hey there! Your embedded_data is not formatted correctly. all items must be key value pairs where both key and value are string type.'
+
+        headers, url = self.header_setup(content_type=True, xm=False, path=f'/responses/{response_id}')
+        payload = {'surveyId':survey,'resetRecordedDate':reset_recorded_date,'embeddedData':embedded_data}
+        request = r.put(url,json=payload,headers=headers)
+        response = request.json()
+
+        try:
+            if response['meta']['httpStatus'] == '500 - Internal Server Error':
+                raise Qualtrics500Error('500 - Internal Server Error')
+            elif response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':
+                raise Qualtrics503Error('503 - Temporary Internal Server Error')
+            elif response['meta']['httpStatus'] == '504 - Gateway Timeout':
+                raise Qualtrics504Error('504 - Gateway Timeout')
+            elif response['meta']['httpStatus'] == '400 - Bad Request':
+                raise Qualtrics400Error('Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
+            elif response['meta']['httpStatus'] == '401 - Unauthorized':
+                raise Qualtrics401Error('Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
+            elif response['meta']['httpStatus'] == '403 - Forbidden':
+                raise Qualtrics403Error('Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
+        except (Qualtrics503Error, Qualtrics504Error) as e:
+            # Recursive call to handle Internal Server Errors
+            return self.update_survey_response_embedded_data(self, survey=survey, response_id=response_id,embedded_data=embedded_data,reset_recorded_date=reset_recorded_date)
+        except (Qualtrics500Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
+            # Handle Authorization/Bad Request Errors
+            return print(e, response['meta'])
+        else:
+            return response['meta']
+
+    # This is a utility method to validate dictionary formatting for embedded data updates
+    def validate_embedded_data(self, embedded_data):
+        if not isinstance(embedded_data, dict):
+            return False
+
+        for key, value in embedded_data.items():
+            if not isinstance(key, str) or not isinstance(value, str):
+                return False
+
+        return True

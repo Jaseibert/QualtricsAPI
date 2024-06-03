@@ -58,7 +58,7 @@ class Distributions(Credentials):
         :type mailing_list: str
         :param survey: The Survey ID corresponding with the Survey that the distribution is to be sent to.
         :type survey: str
-        :param send_date: The date that the distribution is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
+        :param send_date: Format '%Y-%m-%dT%H:%M:%SZ': The date that the distribution is supposed to be sent on. Pass time.gmtime() for immediate distribution or use the set_send_date() method to format properly.
         :type send_date: str
         :param link_type: This parameter refers to the type of link that is to be sent within the distribution.
         :type link_type: str
@@ -126,7 +126,7 @@ class Distributions(Credentials):
         :type message: str
         :param distribution: The Distribution ID corresponding with the distribution that the reminder is to be attached to.
         :type distribution: str
-        :param send_date: The date that the reminder is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
+        :param send_date: Format '%Y-%m-%dT%H:%M:%SZ': The date that the reminder is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
         :type send_date: str
         :return: The "Reminder" Distribution ID. (str)
         '''
@@ -185,7 +185,7 @@ class Distributions(Credentials):
         :type message: str
         :param distribution: The Distribution ID corresponding with the distribution that the reminder is to be attached to.
         :type distribution: str
-        :param send_date: The date that the reminder is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
+        :param send_date: Format '%Y-%m-%dT%H:%M:%SZ': The date that the reminder is supposed to be sent on. Pass gmtime() for immediate distribution or use the set_send_date() method to format properly.
         :type send_date: str
         :return: The "Thank You" Distribution ID. (str)
         '''
@@ -196,7 +196,6 @@ class Distributions(Credentials):
         assert distribution[:4] == 'EMD_', 'Hey there! It looks like your distributionID is incorrect. You can find the distributionID by using the list_distributions method in this module. It will begin with "UMD_". Please try again.'
         assert message[:3] == 'MS_', 'Hey there! It looks like your MessageID is incorrect. You can find the MessageID by using the list messages method available in the Messages module of this Package. It will begin with "MS_". Please try again.'
         assert library[:3] == 'UR_' or library[:3] == 'GR_', 'Hey there! It looks like your Library ID is incorrect. You can find the Library ID on the Qualtrics site under your account settings. It will begin with "UR_" or "GR_". Please try again.'
-
 
         headers, base_url = self.header_setup(content_type=True, xm=False, path='distributions')
         url = f'{base_url}/{distribution}/thankyous'

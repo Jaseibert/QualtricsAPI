@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='QualtricsAPI',
-    version='0.6.1',
+    version='0.6.2',
     author='Jeremy A. Seibert',
     author_email='jeremy@seibert.industries',
     description="QualtricsAPI is a lightweight Python library for the Qualtrics Web API. ",
@@ -23,9 +23,9 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-          'pandas',
-          'numpy',
-          'requests', 
-          'python-dateutil'
-      ],
+        'pandas',
+        'numpy',
+        'requests',
+        'python-dateutil'
+    ],
 )

@@ -203,7 +203,7 @@ class Responses(Credentials):
         :type embeddedDataIds: List[str]
         :param questionIds: If provided, only export answers from the provided list of Question IDs
         :type questionIds: List[str]
-        :param surveyMetadataIds: If provided, only export metadata fields from the provided list of Metadata IDs. This will remove metadata included in export by default. 
+        :param surveyMetadataIds: If provided, only export metadata fields from the provided list of Metadata IDs. This will remove metadata included in export by default.
         :type surveyMetadataIds: List[str]
         :return: a Pandas DataFrame
         '''
@@ -472,7 +472,32 @@ class Responses(Credentials):
             return response['meta']
 
     def bulk_update_many_responses_from_dataframe(self, survey=None, df=None, update_cols=[], rid_col='ResponseId', chunk_size=5000, reset_recorded_date=False):
-        '''TODO: fill in this explaination'''
+        """
+        This method updates large volumes of survey responses based on the provided dataframe dataframe. It chunks the data and sends updates in batches to Qualtrics API.
+        Parameters:
+        - survey (str): The survey ID of the survey to be updated. Must be a string of length 18 starting with 'SV_'.
+        - df (pd.DataFrame): A pandas DataFrame containing the data for updating responses. Must include at least two columns and one row.
+        - update_cols (list): A list of column headers in the dataframe that are to be updated.
+        - rid_col (str): The column header containing the response ID values.
+        - chunk_size (int): The number of records to process in each batch (default 5000, max 10000).
+        - reset_recorded_date (bool): A flag indicating whether the response recorded date should be reset to the current date.
+        """
+        # Assertions to check for invalid inputs
+        assert isinstance(survey, str) and len(survey) == 18 and survey.startswith(
+            "SV_"), "Invalid survey ID. Must be a string of length 18 starting with 'SV_'."
+        assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
+        assert df.shape[1] >= 2 and df.shape[0] >= 1, "DataFrame must have at least two columns and one row."
+        assert isinstance(update_cols, list) and len(
+            update_cols) >= 1, "update_cols must be a list containing at least one string."
+        assert all(
+            col in df.columns for col in update_cols), "All columns in update_cols must exist in the DataFrame."
+        assert isinstance(
+            rid_col, str) and rid_col in df.columns, "rid_col must be a string and must exist as a header in the DataFrame."
+        assert isinstance(
+            chunk_size, int) and 0 < chunk_size <= 10000, "chunk_size must be an integer between 1 and 10000."
+        assert isinstance(reset_recorded_date,
+                          bool), "reset_recorded_date must be a boolean."
+
         headers, url = self.header_setup(
             content_type=True, xm=False, path=f'/surveys/{survey}/update-responses')
         chunks = self.__dataframe_chunks(df, chunk_size)
@@ -489,7 +514,11 @@ class Responses(Credentials):
                 running_total += len(updates)
                 request = r.post(url, json=payload, headers=headers)
                 response = request.json()
-                # print("response:", response)
+
+                exception_result = self.__handle_qualtrics_exceptions(response)
+                if exception_result:
+                    return print(exception_result)
+
                 progress_id = response['result']['progressId']
                 is_processing = True
                 while is_processing:
@@ -498,6 +527,13 @@ class Responses(Credentials):
                     progress_request = r.get(
                         check_progress_url, headers=headers)
                     progress_response = progress_request.json()
+                    progress_exception_result = self.__handle_qualtrics_exceptions(
+                        response=progress_response)
+                    if progress_exception_result:
+                        print("problem checking progress of bulk update:",
+                              progress_exception_result)
+                        time.sleep(3)
+                        continue
                     progress_status = progress_response['result']['status']
                     if progress_status == 'complete':
                         is_processing = False
@@ -533,6 +569,32 @@ class Responses(Credentials):
             update_object['embeddedData'][col] = row[col]
 
         return update_object
+
+    def __handle_qualtrics_exceptions(self, response):
+        """Private method to handle and raise custom exceptions based on Qualtrics API response."""
+        try:
+            if response['meta']['httpStatus'] == '500 - Internal Server Error':
+                raise Qualtrics500Error('500 - Internal Server Error')
+            elif response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':
+                raise Qualtrics503Error(
+                    '503 - Temporary Internal Server Error')
+            elif response['meta']['httpStatus'] == '504 - Gateway Timeout':
+                raise Qualtrics504Error('504 - Gateway Timeout')
+            elif response['meta']['httpStatus'] == '400 - Bad Request':
+                raise Qualtrics400Error(
+                    'Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
+            elif response['meta']['httpStatus'] == '401 - Unauthorized':
+                raise Qualtrics401Error(
+                    'Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
+            elif response['meta']['httpStatus'] == '403 - Forbidden':
+                raise Qualtrics403Error(
+                    'Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
+        except (Qualtrics503Error, Qualtrics504Error) as e:
+            # Potential strategy for retry logic for retryable internal errors
+            return None
+        except (Qualtrics500Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
+            return str(e), response['meta']
+        return None
 
     class __NpEncoder(json.JSONEncoder):
         def default(self, obj):

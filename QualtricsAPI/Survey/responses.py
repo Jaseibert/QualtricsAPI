@@ -366,7 +366,7 @@ class Responses(Credentials):
                     'Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
         except (Qualtrics503Error, Qualtrics504Error) as e:
             # Recursive call to handle Internal Server Errors
-            return self.get_survey_response(self, survey=survey, response=response, verbose=verbose)
+            return self.get_survey_response(survey=survey, response=response, verbose=verbose)
         except (Qualtrics500Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
             # Handle Authorization/Bad Request Errors
             return print(e)
@@ -409,7 +409,7 @@ class Responses(Credentials):
                     'Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
         except (Qualtrics503Error, Qualtrics504Error) as e:
             # Recursive call to handle Internal Server Errors
-            return self.create_survey_response(self, survey=survey, dynamic_payload=dynamic_payload, verify=verify)
+            return self.create_survey_response(survey=survey, dynamic_payload=dynamic_payload, verify=verify)
         except (Qualtrics500Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
             # Handle Authorization/Bad Request Errors
             return print(e, response['meta'])

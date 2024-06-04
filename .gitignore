@@ -8,4 +8,4 @@ dist/
 QualtricsAPI.egg-info
 setup.py
 pipfile.lock
-build/*
+build/

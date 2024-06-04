@@ -93,7 +93,9 @@ m.create_contact_in_list()
 ```
 ## Survey Module
 
-The `Responses()` module has two methods. Each of those methods can be called using the following methodology.
+### Fetch Response Data
+
+The `Responses()` module has two methods for retrieval of response data. Each of those methods can be called using the following methodology.
 
 ```python
 from QualtricsAPI.Survey import Responses
@@ -104,6 +106,26 @@ Responses().get_survey_responses(survey="<survey_id>")
 #Get Survey Questions (Updated)
 Responses().get_survey_questions(survey="<survey_id>")
 ```
+
+### Update Response Embedded Data
+
+The `Responses()` module has two methods for updating embedded data on survey responses. `update_survey_response_embedded_data` will update a single response from a dictonary of strings. `bulk_update_many_responses_from_dataframe` will update many responses at once from a pandas dataframe.
+
+```python
+from QualtricsAPI.Survey import Responses
+import pandas as pd
+
+r = Responses()
+
+# Update a single response from dictionary of strings
+new_data = {"my":"new","data":"dictionary"}
+r.update_survey_response_embedded_data(survey="<survey_id>", response_id="<response_id>", embedded_data=new_data)
+
+# Update many responses from dataframe
+my_df = pd.read_csv("path/to/my/file.csv")
+r.bulk_update_many_responses_from_dataframe(survey="<survey_id>", df=my_df,rid_col="<header of response ID column>", update_cols=['headers','of','columns','to be','updated'], chunk_size=100)
+```
+
 
 # Wrap-up
 

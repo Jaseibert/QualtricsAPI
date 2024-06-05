@@ -386,6 +386,66 @@ class ImportedDataProject(Credentials):
             self.idp_source_id = idp_id
 
         dynamic_payload = {"format": 'csv'}
+        valid_keys = [
+            'formatDecimalAsComma',
+            'limit',
+            'newlineReplacement',
+            'timeZone',
+            'useLabels',
+            'startDate',
+            'endDate',
+            'sortByLastModifiedDate',
+            'fields'
+        ]
+
+        for key in list(kwargs.keys()):
+            assert key in valid_keys, "Hey There! You can only send valid parameters: ['formatDecimalAsComma', 'limit', 'newlineReplacement', 'timeZone', 'useLabels', 'startDate', 'endDate', 'sortByLastModifiedDate', 'fields' ]"
+            if key == 'formatDecimalAsComma':
+                assert isinstance(
+                    kwargs['formatDecimalAsComma'], bool), "Hey there! formatDecimalAsComma must be a boolean"
+                dynamic_payload.update({'formatDecimalAsComma': kwargs[(key)]})
+            elif key == 'limit':
+                assert isinstance(
+                    kwargs[key], int), "Hey there! limit must be an integer"
+                assert kwargs[key] > 0, "Hey there! limit must be greater than zero"
+                dynamic_payload.update({'limit': kwargs[key]})
+
+            elif key == 'newlineReplacement':
+                assert isinstance(
+                    kwargs[key], str), "Hey there! newlineReplacement must be a string"
+                dynamic_payload.update({'newlineReplacement': kwargs[key]})
+
+            elif key == 'timeZone':
+                assert isinstance(
+                    kwargs[key], str), "Hey there! timeZone must be a string"
+                dynamic_payload.update({'timeZone': kwargs[key]})
+
+            elif key == 'useLabels':
+                assert isinstance(
+                    kwargs[key], bool), "Hey there! useLabels must be a boolean"
+                dynamic_payload.update({'useLabels': kwargs[key]})
+
+            elif key == 'startDate' or key == 'endDate':
+                import re
+                date_pattern = re.compile(
+                    r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z')
+                assert isinstance(
+                    kwargs[key], str), f"Hey there! {key} must be a string"
+                assert date_pattern.match(
+                    kwargs[key]), f"Hey there! {key} must be a date-string formatted 'YYYY-MM-DDThh:mm:ssZ'"
+                dynamic_payload.update({key: kwargs[key]})
+
+            elif key == 'sortByLastModifiedDate':
+                assert isinstance(
+                    kwargs[key], bool), "Hey there! sortByLastModifiedDate must be a boolean"
+                dynamic_payload.update({'sortByLastModifiedDate': kwargs[key]})
+
+            elif key == 'fields':
+                assert isinstance(
+                    kwargs[key], list), "Hey there! fields must be a list of strings"
+                assert all(isinstance(
+                    item, str) for item in kwargs[key]), "Hey there! all items in fields must be strings"
+                dynamic_payload.update({'fields': kwargs[key]})
 
         download_request = self.send_get_file_request(
             idp_id=idp_id, payload=dynamic_payload)

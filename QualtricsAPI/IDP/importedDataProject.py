@@ -2,6 +2,9 @@ import requests as r
 import pandas as pd
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.Exceptions import Qualtrics500Error, Qualtrics503Error, Qualtrics504Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error
+import zipfile
+import io
+import json
 
 
 class ImportedDataProject(Credentials):
@@ -288,6 +291,109 @@ class ImportedDataProject(Credentials):
             print(
                 f"Successfully added records to idp: {len(records)}")
             return response['meta']
+
+    def setup_get_file_request(self, idp_id=None, payload=None):
+        ''' This method makes the initial request and returns the progress id for the file download'''
+        assert idp_id != None or self.idp_source_id != None, 'Hey There! You need to set an ID when you instantiate the class, or pass one when you make this call.'
+
+        if idp_id == None:
+            idp_id = self.idp_source_id
+        elif self.idp_source_id == None:
+            self.idp_source_id = idp_id
+        # make the reqest
+        headers, url = self.header_setup(
+            content_type=True, accept=True, xm=False, path=f'imported-data-projects/{idp_id}/exports')
+        request = r.post(url, data=json.dumps(payload), headers=headers)
+        response = request.json()
+        print('job start response:', response)
+        try:
+            if response['meta']['httpStatus'] == '500 - Internal Server Error':
+                raise Qualtrics500Error('500 - Internal Server Error')
+            elif response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':
+                raise Qualtrics503Error(
+                    '503 - Temporary Internal Server Error')
+            elif response['meta']['httpStatus'] == '504 - Gateway Timeout':
+                raise Qualtrics504Error('504 - Gateway Timeout')
+            elif response['meta']['httpStatus'] == '400 - Bad Request':
+                raise Qualtrics400Error(
+                    'Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
+            elif response['meta']['httpStatus'] == '401 - Unauthorized':
+                raise Qualtrics401Error(
+                    'Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
+            elif response['meta']['httpStatus'] == '403 - Forbidden':
+                raise Qualtrics403Error(
+                    'Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
+        except (Qualtrics500Error, Qualtrics503Error, Qualtrics504Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
+            return print(e)
+        else:
+            print("START RESPONSE", response)
+            job_id = response['result']['jobId']
+            return job_id, url+"/"+job_id, headers
+
+    def send_get_file_request(self, idp_id=None, payload=None):
+        '''This method starts the request to download the IDP data'''
+        is_file = None
+        job_id, url, headers = self.setup_get_file_request(
+            idp_id=idp_id, payload=payload)
+        progress_status = "in progress"
+        print("jobid:", job_id)
+        print("url chekin", url)
+        while progress_status != "complete" and progress_status != "failed" and is_file is None:
+            check_request = r.get(url, headers=headers)
+            check_response = check_request.json()
+            print("check_response", check_response)
+            try:
+                is_file = check_response['result']['fileId']
+            except KeyError:
+                pass
+            progress_status = check_response['result']['status']
+        try:
+            if check_response['meta']['httpStatus'] == '500 - Internal Server Error':
+                raise Qualtrics500Error('500 - Internal Server Error')
+            elif check_response['meta']['httpStatus'] == '503 - Temporary Internal Server Error':
+                raise Qualtrics503Error(
+                    '503 - Temporary Internal Server Error')
+            elif check_response['meta']['httpStatus'] == '504 - Gateway Timeout':
+                raise Qualtrics504Error('504 - Gateway Timeout')
+            elif check_response['meta']['httpStatus'] == '400 - Bad Request':
+                raise Qualtrics400Error(
+                    'Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
+            elif check_response['meta']['httpStatus'] == '401 - Unauthorized':
+                raise Qualtrics401Error(
+                    'Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
+            elif check_response['meta']['httpStatus'] == '403 - Forbidden':
+                raise Qualtrics403Error(
+                    'Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
+        except (Qualtrics500Error, Qualtrics503Error, Qualtrics504Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
+            return print(e)
+        else:
+            download_headers, download_url = self.header_setup(
+                content_type=True, xm=False, accept=False, path=f"imported-data-projects/{idp_id}/exports/{is_file}/file")
+            download_headers['Accept'] = "application/octet-stream, application/json"
+            print("headers:", download_headers)
+            download_request = r.get(
+                download_url, headers=download_headers, stream=True)
+            print("download_request", download_request)
+            return download_request
+
+    def get_idp_data(self, idp_id=None, **kwargs):
+        '''This function takes in the IDP ID and returns a CSV of all of the data within the IDP'''
+        assert idp_id != None or self.idp_source_id != None, 'Hey There! You need to set an ID when you instantiate the class, or pass one when you make this call.'
+
+        if idp_id == None:
+            idp_id = self.idp_source_id
+        elif self.idp_source_id == None:
+            self.idp_source_id = idp_id
+
+        dynamic_payload = {"format": 'csv'}
+
+        download_request = self.send_get_file_request(
+            idp_id=idp_id, payload=dynamic_payload)
+
+        with zipfile.ZipFile(io.BytesIO(download_request.content)) as survey_zip:
+            for s in survey_zip.infolist():
+                df = pd.read_csv(survey_zip.open(s.filename))
+                return df
 
 ## private functions below here ##
 

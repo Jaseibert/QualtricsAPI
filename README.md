@@ -125,7 +125,44 @@ r.update_survey_response_embedded_data(survey="<survey_id>", response_id="<respo
 my_df = pd.read_csv("path/to/my/file.csv")
 r.bulk_update_many_responses_from_dataframe(survey="<survey_id>", df=my_df,rid_col="<header of response ID column>", update_cols=['headers','of','columns','to be','updated'], chunk_size=100)
 ```
+## Imported Data Project Module
 
+### Get IDP Data
+
+The `ImportedDataProject()` module can be used to retrieve data from imported data projects with the following usage.
+```python
+from QualtricsAPI.IDP import ImportedDataProject
+
+# Create an instance of our IDP project
+idp = ImportedDataProject(idp_source_id="<your idp source id>")
+
+meta, schema = idp.get_idp_schema()
+
+record = idp.get_single_record_from_idp(unique_field=<unique field value of record to be retrieved>)
+```
+
+### Create/Update/Delete IDP data
+
+The IDP module includes methods for creating/updating (it will upsert on the unique value) rows into an IDP as both single rows or up to 50 in bulk, as well as a method to delete individual records.
+```python
+# Add Columns to IDP
+new_columns = [{"name":"<new column name 1>","type":"<data type of new field>"}]
+column_add_result = idp.add_columns_to_idp(fields=new_cols)
+
+# Create a record from a dictionary
+new_record = {"<unique field>":"<value of record>"} 
+# keys must match IDP names, values must match type - fetch the schema to see valid inputs
+result = idp.add_single_record(record=new_record)
+
+# Create many records from list
+new_records = [{"<unique field>":"<value of record1>"},{"<unique field>":"<value of record2>"}]
+many_result = idp.add_many_records(records=new_records)
+
+# Delete row from IDP
+delete_result = idp.delete_record_from_idp(unique_field='<value of unique field for record to be removed>')
+# Value must match type as well
+```
+the `ImportedDataProject()` module can be imported without a project ID, and IDs can be passed at the time any method is called (`idp_id` is the parameter to set this from a function call). Passing a new id will update the class to this new id. 
 
 # Wrap-up
 

@@ -1,8 +1,11 @@
 import requests as r
 import pandas as pd
 from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
+from QualtricsAPI.Exceptions import Qualtrics500Error, Qualtrics503Error, Qualtrics504Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error
+
 
 class Distributions(Credentials):
     '''This is a child class to the credentials class and gathers information about  Qualtric's Distributions.'''
@@ -32,7 +35,8 @@ class Distributions(Credentials):
         :type seconds: int
         :return: The formatted DateTime. (str)
         '''
-        send_date = datetime.now() + timedelta(weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds)
+        send_date = datetime.now() + timedelta(weeks=weeks, days=days,
+                                               hours=hours, minutes=minutes, seconds=seconds)
         return date.strftime(send_date, '%Y-%m-%dT%H:%M:%SZ')
 
     def create_distribution(self, subject, reply_email, from_email, from_name, mailing_list, library, survey, message, send_date, link_type='Individual'):
@@ -66,15 +70,19 @@ class Distributions(Credentials):
         '''
 
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
-        assert len(library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
-        assert len(survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
-        assert len(message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.'
         assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'
         assert message[:3] == 'MS_', 'Hey there! It looks like your MessageID is incorrect. You can find the MessageID by using the list messages method available in the Messages module of this Package. It will begin with "MS_". Please try again.'
         assert library[:3] == 'UR_' or library[:3] == 'GR_', 'Hey there! It looks like your Library ID is incorrect. You can find the Library ID on the Qualtrics site under your account settings. It will begin with "UR_" or "GR_". Please try again.'
 
-        headers, url = self.header_setup(content_type=True, xm=False, path='distributions')
+        headers, url = self.header_setup(
+            content_type=True, xm=False, path='distributions')
         data = {
             'header': {
                 'fromEmail': from_email,
@@ -91,8 +99,8 @@ class Distributions(Credentials):
             },
             'sendDate': send_date,
             'message': {
-                    'libraryId': library,
-                    'messageId': message
+                'libraryId': library,
+                'messageId': message
             }
         }
 
@@ -102,7 +110,8 @@ class Distributions(Credentials):
             distribution_id = response['result']['id']
             return distribution_id
         except:
-            print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
 
     def create_reminder(self, subject, reply_email, from_email, from_name, library, message, distribution, send_date):
@@ -132,14 +141,16 @@ class Distributions(Credentials):
         '''
 
         assert len(distribution) == 19, 'Hey, the parameter for "distribution" that was passed is the wrong length. It should have 19 characters.'
-        assert len(library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
-        assert len(message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
         assert distribution[:4] == 'EMD_', 'Hey there! It looks like your distributionID is incorrect. You can find the distributionID by using the list_distributions method in this module. It will begin with "UMD_". Please try again.'
         assert message[:3] == 'MS_', 'Hey there! It looks like your MessageID is incorrect. You can find the MessageID by using the list messages method available in the Messages module of this Package. It will begin with "MS_". Please try again.'
         assert library[:3] == 'UR_' or library[:3] == 'GR_', 'Hey there! It looks like your Library ID is incorrect. You can find the Library ID on the Qualtrics site under your account settings. It will begin with "UR_" or "GR_". Please try again.'
 
-
-        headers, base_url = self.header_setup(content_type=True, xm=False, path='distributions')
+        headers, base_url = self.header_setup(
+            content_type=True, xm=False, path='distributions')
         url = f'{base_url}/{distribution}/reminders'
         data = {
             'header': {
@@ -150,8 +161,8 @@ class Distributions(Credentials):
             },
             'sendDate': send_date,
             'message': {
-                    'libraryId': library,
-                    'messageId': message
+                'libraryId': library,
+                'messageId': message
             }
         }
 
@@ -161,7 +172,8 @@ class Distributions(Credentials):
             reminder_id = response['result']
             return reminder_id
         except:
-            print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
 
     def create_thank_you(self, subject, reply_email, from_email, from_name, library, message, distribution, send_date):
@@ -191,14 +203,16 @@ class Distributions(Credentials):
         '''
 
         assert len(distribution) == 19, 'Hey, the parameter for "distribution" that was passed is the wrong length. It should have 19 characters.'
-        assert len(library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
-        assert len(message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
         assert distribution[:4] == 'EMD_', 'Hey there! It looks like your distributionID is incorrect. You can find the distributionID by using the list_distributions method in this module. It will begin with "UMD_". Please try again.'
         assert message[:3] == 'MS_', 'Hey there! It looks like your MessageID is incorrect. You can find the MessageID by using the list messages method available in the Messages module of this Package. It will begin with "MS_". Please try again.'
         assert library[:3] == 'UR_' or library[:3] == 'GR_', 'Hey there! It looks like your Library ID is incorrect. You can find the Library ID on the Qualtrics site under your account settings. It will begin with "UR_" or "GR_". Please try again.'
 
-
-        headers, base_url = self.header_setup(content_type=True, xm=False, path='distributions')
+        headers, base_url = self.header_setup(
+            content_type=True, xm=False, path='distributions')
         url = f'{base_url}/{distribution}/thankyous'
         data = {
             'header': {
@@ -209,8 +223,8 @@ class Distributions(Credentials):
             },
             'sendDate': send_date,
             'message': {
-                    'libraryId': library,
-                    'messageId': message
+                'libraryId': library,
+                'messageId': message
             }
         }
         request = r.post(url, json=data, headers=headers)
@@ -219,7 +233,8 @@ class Distributions(Credentials):
             thanks_id = response['result']
             return thanks_id
         except:
-            print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
 
     def list_distributions(self, survey):
@@ -234,16 +249,18 @@ class Distributions(Credentials):
         '''
 
         assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'
-        assert len(survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
 
         headers, base_url = self.header_setup(xm=False, path='distributions')
         url = f'{base_url}?surveyId={survey}'
         columns = ['id', 'parentDistributionId', 'ownerId', 'organizationId', 'requestStatus', 'requestType',
-                    'sendDate', 'createdDate', 'modifiedDate', 'headers', 'fromEmail', 'replyToEmail', 'fromName',
-                     'subject', 'recipients', 'mailingListId', 'contactId', 'sampleId', 'message', 'messageId',
-                     'messageText', 'surveyLink', 'surveyId', 'expirationDate', 'linkType', 'stats', 'sent', 'failed',
-                     'started', 'bounced', 'opened', 'skipped', 'finished', 'complaints', 'blocked', 'mailing_list_library_id', 'message_library_id']
+                   'sendDate', 'createdDate', 'modifiedDate', 'headers', 'fromEmail', 'replyToEmail', 'fromName',
+                   'subject', 'recipients', 'mailingListId', 'contactId', 'sampleId', 'message', 'messageId',
+                   'messageText', 'surveyLink', 'surveyId', 'expirationDate', 'linkType', 'stats', 'sent', 'failed',
+                   'started', 'bounced', 'opened', 'skipped', 'finished', 'complaints', 'blocked', 'mailing_list_library_id', 'message_library_id']
         master = pd.DataFrame(columns=columns)
+
         def extract_distributions(url=url, master=master):
             request = r.get(url, headers=headers)
             response = request.json()
@@ -252,24 +269,28 @@ class Distributions(Credentials):
                 dists = Parser().json_parser(response=response, keys=keys, arr=False)
                 dist_df = pd.DataFrame(dists).transpose()
                 dist_df.columns = keys
-                library_ids = Parser().json_parser(response=response, keys=['libraryId'], arr=False)
-                dist_df['mailing_list_library_id'] = library_ids[0][:len(dist_df)]
+                library_ids = Parser().json_parser(
+                    response=response, keys=['libraryId'], arr=False)
+                dist_df['mailing_list_library_id'] = library_ids[0][:len(
+                    dist_df)]
                 dist_df['message_library_id'] = library_ids[0][len(dist_df):]
-                master = pd.concat([master, dist_df], sort=False).reset_index(drop=True)
+                master = pd.concat([master, dist_df],
+                                   sort=False).reset_index(drop=True)
                 next_page = response['result']['nextPage']
                 return master, next_page
             else:
                 print(response['meta'])
-                master, next_page = extract_distributions(url=url, master=master)
+                master, next_page = extract_distributions(
+                    url=url, master=master)
 
         master, next_page = extract_distributions()
         if next_page == None:
             return master
         else:
             while next_page != None:
-                master, next_page = extract_distributions(url=next_page, master=master)
+                master, next_page = extract_distributions(
+                    url=next_page, master=master)
             return master
-                
 
     def get_distribution(self, survey, distribution):
         ''' This method gives users the ability to get a specific distribution corresponding with a given survey. Given that
@@ -285,7 +306,8 @@ class Distributions(Credentials):
         '''
 
         assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'
-        assert len(survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
         assert len(distribution) == 19, 'Hey, the parameter for "distribution" that was passed is the wrong length. It should have 19 characters.'
         assert distribution[:4] == 'EMD_', 'Hey there! It looks like your distributionID is incorrect. You can find the distributionID by using the list_distributions method in this module. It will begin with "UMD_". Please try again.'
 
@@ -296,19 +318,21 @@ class Distributions(Credentials):
             response = request.json()
             keys = ['id', 'parentDistributionId', 'ownerId', 'organizationId', 'requestStatus', 'requestType',
                     'sendDate', 'createdDate', 'modifiedDate', 'headers', 'fromEmail', 'replyToEmail', 'fromName',
-                     'subject', 'recipients', 'mailingListId', 'contactId', 'sampleId', 'message', 'messageId',
-                     'messageText', 'surveyLink', 'surveyId', 'expirationDate', 'linkType', 'stats', 'sent', 'failed',
-                     'started', 'bounced', 'opened', 'skipped', 'finished', 'complaints', 'blocked']
+                    'subject', 'recipients', 'mailingListId', 'contactId', 'sampleId', 'message', 'messageId',
+                    'messageText', 'surveyLink', 'surveyId', 'expirationDate', 'linkType', 'stats', 'sent', 'failed',
+                    'started', 'bounced', 'opened', 'skipped', 'finished', 'complaints', 'blocked']
             dists = Parser().json_parser(response=response, keys=keys, arr=False)
             dist_df = pd.DataFrame(dists)
             dist_df.index = keys
-            library_ids = Parser().json_parser(response=response, keys=['libraryId'], arr=False)
-            lib = pd.DataFrame(library_ids[0], index=['mailing_list_library_id', 'message_library_id'])
+            library_ids = Parser().json_parser(
+                response=response, keys=['libraryId'], arr=False)
+            lib = pd.DataFrame(library_ids[0], index=[
+                               'mailing_list_library_id', 'message_library_id'])
             dist_df = dist_df.append(lib)
             return dist_df
         except:
-            print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
-
+            print(
+                f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
 
     def create_sms_distribution(self, dist_name, mailing_list, library, survey, message, send_date, parentDistributionId=None, method='Invite'):
         '''This method gives users the ability to create a SMS distribution for a given mailing list and survey. In order to use this method you
@@ -334,15 +358,19 @@ class Distributions(Credentials):
         '''
 
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
-        assert len(library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
-        assert len(survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
-        assert len(message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            library) == 18, 'Hey, the parameter for "library" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
+        assert len(
+            message) == 18, 'Hey, the parameter for "message" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.'
         assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'
         assert message[:3] == 'MS_', 'Hey there! It looks like your MessageID is incorrect. You can find the MessageID by using the list messages method available in the Messages module of this Package. It will begin with "MS_". Please try again.'
         assert library[:3] == 'UR_' or library[:3] == 'GR_', 'Hey there! It looks like your Library ID is incorrect. You can find the Library ID on the Qualtrics site under your account settings. It will begin with "UR_" or "GR_". Please try again.'
 
-        headers, url = self.header_setup(content_type=True, xm=False, path='distributions/sms')
+        headers, url = self.header_setup(
+            content_type=True, xm=False, path='distributions/sms')
         data = {
             'sendDate': send_date,
             'surveyId': survey,
@@ -352,13 +380,13 @@ class Distributions(Credentials):
             },
             'name': dist_name,
             'message': {
-                    'libraryId': library,
-                    'messageId': message
+                'libraryId': library,
+                'messageId': message
             }
         }
 
-        if parentDistributionId != None: 
-           data['parentDistributionId'] = parentDistributionId
+        if parentDistributionId != None:
+            data['parentDistributionId'] = parentDistributionId
 
         request = r.post(url, json=data, headers=headers)
         response = request.json()
@@ -366,5 +394,115 @@ class Distributions(Credentials):
             distribution_id = response['result']['id']
             return distribution_id
         except:
-            print(f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
+
+    def generate_individual_survey_link(self, survey=None, mailing_list=None, contact=None, embedded_data=None, transactional_data=None, expiration=1):
+        '''This function takes in a single contact and a survey and returns a unique link for that contact to take that survey
+
+        '''
+        # Create contact in mailing list
+        create_contact_headers, create_contact_url = self.header_setup(
+            content_type=True, xm=True, path=f"mailinglists/{mailing_list}/contacts")
+        if embedded_data != None:
+            contact['embeddedData'] = embedded_data
+        create_contact_request = r.post(
+            create_contact_url, json=contact, headers=create_contact_headers)
+        create_contact_response = create_contact_request.json()
+        cc_result = self._handle_response(create_contact_response)
+        contact_id = cc_result['id']
+        print("Contact Created in mailing list.", contact_id)
+        # Create Transaction
+        create_tx_headers, create_tx_url = self.header_setup(
+            content_type=True, xm=True, path=f'transactions')
+        date_time_now = datetime.now().strftime('%Y-%m-%d %I:%M:%S')
+        tx_payload = {
+            "single_link_transaction": {
+                "contactId": contact_id,
+                "mailingListId": mailing_list,
+                "transactionDate": date_time_now,
+                "data": transactional_data
+            }
+        }
+        create_tx_request = r.post(
+            create_tx_url, headers=create_tx_headers, json=tx_payload)
+        create_tx_response = create_tx_request.json()
+        create_tx_data = self._handle_response(create_tx_response)
+        transaction_id = create_tx_data['createdTransactions']['single_link_transaction']['id']
+        print("Created Transaction.", transaction_id)
+        # Create Transaction Batch
+        create_tx_batch_headers, create_tx_batch_url = self.header_setup(
+            content_type=True, xm=True, path=f'transactionbatches')
+        create_tx_batch_payload = {
+            "transactionIds": [transaction_id],
+            "creationDate": datetime.now().strftime('%Y-%m-%dT%I:%M:%SZ')
+        }
+        create_tx_batch_request = r.post(
+            create_tx_batch_url, json=create_tx_batch_payload, headers=create_tx_batch_headers)
+        create_tx_batch_response = create_tx_batch_request.json()
+        create_tx_batch_data = self._handle_response(create_tx_batch_response)
+        tx_batch_id = create_tx_batch_data['id']
+        print("Created Transaction Batch:", tx_batch_id)
+        # Generate Distribution Links for TX batch
+        gen_dist_headers, gen_dist_url = self.header_setup(
+            content_type=True, xm=False, accept=False, path=f'distributions')
+        gen_dist_payload = {
+            "surveyId": survey,
+            "linkType": "Individual",
+            "description": "distribution "+datetime.now().strftime('%Y-%m-%d %I:%M:%S'),
+            "action": "CreateTransactionBatchdistribution",
+            "transactionBatchId": tx_batch_id,
+            "expirationDate": (datetime.now() + relativedelta(months=+expiration)).strftime('%Y-%m-%d %I:%M:%S'),
+            "mailingListId": mailing_list
+        }
+        gen_dist_request = r.post(
+            gen_dist_url, json=gen_dist_payload, headers=gen_dist_headers)
+        gen_dist_response = gen_dist_request.json()
+        gen_dist_data = self._handle_response(gen_dist_response)
+        distribution_id = gen_dist_data['id']
+        print("Created distribution:", distribution_id)
+        # Fetch Distribution links
+        fetch_link_headers, fetch_link_url = self.header_setup(
+            content_type=True, xm=False, accept=False, path=f'distributions/{distribution_id}/links?surveyId={survey}')
+        fetch_link_request = r.get(fetch_link_url, headers=fetch_link_headers)
+        fetch_link_response = fetch_link_request.json()
+        fetch_link_data = self._handle_response(fetch_link_response)
+        link = fetch_link_data['elements'][0]['link']
+        print("Link Created.", link)
+        return link
+
+    def _handle_response(self, response: dict):
+        try:
+            http_status = response['meta']['httpStatus']
+
+            if http_status == '500 - Internal Server Error':
+                raise Qualtrics500Error('500 - Internal Server Error')
+            elif http_status == '503 - Temporary Internal Server Error':
+                raise Qualtrics503Error(
+                    '503 - Temporary Internal Server Error')
+            elif http_status == '504 - Gateway Timeout':
+                raise Qualtrics504Error('504 - Gateway Timeout')
+            elif http_status == '400 - Bad Request':
+                raise Qualtrics400Error(
+                    'Qualtrics Error\n(Http Error: 400 - Bad Request): There was something invalid about the request.')
+            elif http_status == '401 - Unauthorized':
+                raise Qualtrics401Error(
+                    'Qualtrics Error\n(Http Error: 401 - Unauthorized): The Qualtrics API user could not be authenticated or does not have authorization to access the requested resource.')
+            elif http_status == '403 - Forbidden':
+                raise Qualtrics403Error(
+                    'Qualtrics Error\n(Http Error: 403 - Forbidden): The Qualtrics API user was authenticated and made a valid request, but is not authorized to access this requested resource.')
+
+        except (Qualtrics503Error, Qualtrics504Error):
+            # Recursive call to handle Internal Server Errors can be placed here
+            # Example: return self.get_survey_response(response=response)
+            pass  # Placeholder for recursive call logic
+        except (Qualtrics500Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error) as e:
+            # Handle Authorization/Bad Request Errors
+            print(e)
+        else:
+            # Return the successful response result
+            if 'result' in response:
+                return response['result']
+            else:
+                return response['meta']

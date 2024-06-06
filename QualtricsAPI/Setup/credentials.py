@@ -44,7 +44,7 @@ class Credentials(object):
         if xm:
             assert os.environ['directory_id'], 'Hey there! This endpoint is only accessible for XM Directory Users . If you have access to the XM Directory, then be sure to include your directory_id when you use the qualtrics_api_credentials() method. '
             path = 'directories/{0}/'.format(
-                os.environ['directory_id']) if xm else path
+                os.environ['directory_id'])+path if xm else path
 
         header = {"x-api-token": os.environ['token']}
         base_url = f"https://{os.environ['data_center']}.qualtrics.com/API/v3/{path}"

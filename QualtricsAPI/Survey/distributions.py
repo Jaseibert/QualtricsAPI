@@ -471,10 +471,42 @@ class Distributions(Credentials):
         return link_elements[0]['link']
 
     def generate_links_from_dataframe(self, survey=None, mailing_list=None, df=None, embedded_fields=[], transactional_fields=[], expiration=1):
-        '''This method takes in a pandas dataframe and generates links for the contacts in the dataframe
+        '''This method takes in a pandas dataframe and generates links for the contacts in the dataframe.
 
+        :param survey: Survey ID 
+        :type survey: str (18 characters long, starts with "SV_")
+        :param mailing_list: Mailing list ID
+        :type mailing_list: str (18 characters long, starts with "CG_")
+        :param df: DataFrame containing contact information with at least 1 row of data. 
+                   Must contain at least one of the following columns: 'firstName', 'lastName', 'email', 'extRef', or 'language'.
+        :type df: pd.DataFrame
+        :param embedded_fields: List of strings where each string is a column name in df that should be embedded.
+        :type embedded_fields: list of str
+        :param transactional_fields: List of strings where each string is a column name in df that should be included as transactional fields.
+        :type transactional_fields: list of str
+        :param expiration: Expiration time in days.
+        :type expiration: int (must be greater or equal to 1)
         '''
+
         # Validate inputs
+        assert isinstance(survey, str) and len(survey) == 18 and survey.startswith(
+            "SV_"), "Survey must be a string of 18 characters starting with 'SV_'"
+        assert isinstance(mailing_list, str) and len(mailing_list) == 18 and mailing_list.startswith(
+            "CG_"), "Mailing list must be a string of 18 characters starting with 'CG_'"
+        assert isinstance(df, pd.DataFrame) and len(
+            df) > 0, "df must be a pandas DataFrame with at least 1 row"
+        assert {'firstName', 'lastName', 'email', 'extRef', 'language'}.intersection(
+            df.columns), "df must contain at least one of the following columns: 'firstName', 'lastName', 'email', 'extRef', or 'language'"
+        assert isinstance(embedded_fields, list) and all(isinstance(field, str)
+                                                         for field in embedded_fields), "Embedded fields must be a list of strings"
+        assert all(
+            field in df.columns for field in embedded_fields), f"All embedded fields must match columns in df. Provided: {embedded_fields}"
+        assert isinstance(transactional_fields, list) and all(isinstance(field, str)
+                                                              for field in transactional_fields), "Transactional fields must be a list of strings"
+        assert all(
+            field in df.columns for field in transactional_fields), f"All transactional fields must match columns in df. Provided: {transactional_fields}"
+        assert isinstance(
+            expiration, int) and expiration >= 1, "Expiration must be an integer greater or equal to 1"
 
         # Create TX Batch (empty)
         tx_batch_id = self.create_transaction_batch([])
@@ -667,8 +699,7 @@ class Distributions(Credentials):
         transaction_data = {}
         for field in transaction_data_columns:
             if field in row:
-                if row[field] != '':
-                    transaction_data[field] = row[field]
+                transaction_data[field] = row[field]
         contact["transactionData"] = transaction_data
         contact['unsubscribed'] = False
 

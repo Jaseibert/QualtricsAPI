@@ -5,6 +5,7 @@ from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
 from QualtricsAPI.Exceptions import Qualtrics500Error
 
+
 class MailingList(Credentials):
     ''' This class contains methods that give users the ability to work with their users Mailing list's and
     their users Mailing Lists contact data within the XMDirectory.'''
@@ -22,7 +23,8 @@ class MailingList(Credentials):
         :return: tuple containing the Mailing List's and the Mailing List's new id.
         '''
         assert name != None, 'Hey there! The name parameter cannot be None. You need to pass in a new Mailing List name as a string into the name parameter.'
-        assert isinstance(name, str) == True, 'Hey there! The name parameter must be of type string.'
+        assert isinstance(
+            name, str) == True, 'Hey there! The name parameter must be of type string.'
 
         headers, base_url = self.header_setup(content_type=True, xm=True)
         url = f"{base_url}/mailinglists"
@@ -30,10 +32,12 @@ class MailingList(Credentials):
         request = r.post(url, json=data, headers=headers)
         response = request.json()
         try:
-            list_id = Parser().json_parser(response=response, keys=['id'], arr=False)[0][0]
+            list_id = Parser().json_parser(
+                response=response, keys=['id'], arr=False)[0][0]
             return name, list_id
         except:
-            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def list_lists(self, page_size=100):
         '''This method lists all the mailing lists in the directory for the specified user token. You won't typically need to adjust
@@ -49,25 +53,32 @@ class MailingList(Credentials):
         headers, base_url = self.header_setup(xm=True)
         url = base_url + f"/mailinglists/?pageSize={page_size}"
         try:
-          def get_page(mailing_lists=mailing_lists, url=url):
-            ''' This method is a nested method that extracts a single page of mailing lists. '''
-            request = r.get(url, headers=headers)
-            response = request.json()
-            keys = ['mailingListId', 'name', 'ownerId', 'lastModifiedDate', 'creationDate','contactCount', 'nextPage']
-            lists = Parser().json_parser(response=response, keys=keys, arr=False)
-            single_page = pd.DataFrame(lists).transpose()
-            single_page.columns = keys
-            single_page['creationDate'] = pd.to_datetime(single_page['creationDate'], unit='ms')
-            single_page['lastModifiedDate'] = pd.to_datetime(single_page['lastModifiedDate'], unit='ms')
-            mailing_lists = pd.concat([mailing_lists, single_page]).reset_index(drop=True)
-            next_page = str(response['result']['nextPage'])
-            return mailing_lists, next_page, response
-          mailing_lists, next_page, response = get_page(mailing_lists=mailing_lists, url=url)
-          while next_page != 'None':
-            mailing_lists, next_page, response = get_page(mailing_lists=mailing_lists, url=next_page)
-          return mailing_lists
+            def get_page(mailing_lists=mailing_lists, url=url):
+                ''' This method is a nested method that extracts a single page of mailing lists. '''
+                request = r.get(url, headers=headers)
+                response = request.json()
+                keys = ['mailingListId', 'name', 'ownerId', 'lastModifiedDate',
+                        'creationDate', 'contactCount', 'nextPage']
+                lists = Parser().json_parser(response=response, keys=keys, arr=False)
+                single_page = pd.DataFrame(lists).transpose()
+                single_page.columns = keys
+                single_page['creationDate'] = pd.to_datetime(
+                    single_page['creationDate'], unit='ms')
+                single_page['lastModifiedDate'] = pd.to_datetime(
+                    single_page['lastModifiedDate'], unit='ms')
+                mailing_lists = pd.concat(
+                    [mailing_lists, single_page]).reset_index(drop=True)
+                next_page = str(response['result']['nextPage'])
+                return mailing_lists, next_page, response
+            mailing_lists, next_page, response = get_page(
+                mailing_lists=mailing_lists, url=url)
+            while next_page != 'None':
+                mailing_lists, next_page, response = get_page(
+                    mailing_lists=mailing_lists, url=next_page)
+            return mailing_lists
         except:
-          print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def get_list(self, mailing_list=None):
         '''This function gets the list specfied by the mailing list param and returns the list members.
@@ -77,7 +88,8 @@ class MailingList(Credentials):
         :return: A Pandas DataFrame
         '''
         assert mailing_list != None, 'Hey there! The mailing_list parameter cannot be None. You need to pass in a Mailing List ID as a string into the mailing_list parameter.'
-        assert isinstance(mailing_list, str) == True, 'Hey there! The mailing_list parameter must be of type string.'
+        assert isinstance(
+            mailing_list, str) == True, 'Hey there! The mailing_list parameter must be of type string.'
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.'
 
@@ -87,19 +99,21 @@ class MailingList(Credentials):
         response = request.json()
         try:
             list_info = {
-                        "mailingListId": response['result']['mailingListId'],
-                        "name": response['result']['name'],
-                        "ownerId": response['result']['ownerId'],
-                        "lastModifiedDate": response['result']['lastModifiedDate'],
-                        "creationDate": response['result']['creationDate'],
-                        "contactCount": response['result']['contactCount']
+                "mailingListId": response['result']['mailingListId'],
+                "name": response['result']['name'],
+                "ownerId": response['result']['ownerId'],
+                "lastModifiedDate": response['result']['lastModifiedDate'],
+                "creationDate": response['result']['creationDate'],
+                "contactCount": response['result']['contactCount']
             }
             df = pd.DataFrame.from_dict(list_info, orient='index').transpose()
             df['creationDate'] = pd.to_datetime(df['creationDate'], unit='ms')
-            df['lastModifiedDate'] = pd.to_datetime(df['lastModifiedDate'], unit='ms')
+            df['lastModifiedDate'] = pd.to_datetime(
+                df['lastModifiedDate'], unit='ms')
             return df
         except:
-            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def rename_list(self, mailing_list=None, name=None):
         '''This method takes an existing mailing list name and updates it to reflect the name defined in the name parameter.
@@ -111,9 +125,11 @@ class MailingList(Credentials):
         :return: A string indicating the success or failure of the method call.
         '''
         assert mailing_list != None, 'Hey there! The mailing_list parameter cannot be None. You need to pass in a Mailing List ID as a string into the mailing_list parameter.'
-        assert isinstance(mailing_list, str) == True, 'Hey there! The mailing_list parameter must be of type string.'
+        assert isinstance(
+            mailing_list, str) == True, 'Hey there! The mailing_list parameter must be of type string.'
         assert name != None, 'Hey there! The name parameter cannot be None. You need to pass in a new Mailing List name as a string into the name parameter.'
-        assert isinstance(name, str) == True, 'Hey there! The name parameter must be of type string.'
+        assert isinstance(
+            name, str) == True, 'Hey there! The name parameter must be of type string.'
         assert len(mailing_list) == 18, 'Hey there! The parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
@@ -124,9 +140,11 @@ class MailingList(Credentials):
         response = request.json()
         try:
             if response['meta']['httpStatus'] == '200 - OK':
-                print(f'Your mailing list "{mailing_list}" has been renamed to {name} in the XM Directory.')
+                print(
+                    f'Your mailing list "{mailing_list}" has been renamed to {name} in the XM Directory.')
         except:
-            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
         return
 
     def delete_list(self, mailing_list=None):
@@ -138,7 +156,8 @@ class MailingList(Credentials):
         '''
 
         assert mailing_list != None, 'Hey, the mailing_list parameter cannot be None. You need to pass in a Mailing List ID as a string into the mailing_list parameter.'
-        assert isinstance(mailing_list, str) == True, 'Hey there, the mailing_list parameter must be of type string.'
+        assert isinstance(
+            mailing_list, str) == True, 'Hey there, the mailing_list parameter must be of type string.'
         assert len(mailing_list) == 18, 'Hey there! The parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
 
@@ -149,9 +168,11 @@ class MailingList(Credentials):
         response = request.json()
         try:
             if response['meta']['httpStatus'] == '200 - OK':
-                print(f'Your mailing list "{mailing_list}" has been deleted from the XM Directory.')
+                print(
+                    f'Your mailing list "{mailing_list}" has been deleted from the XM Directory.')
         except:
-            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
         return
 
     def list_contacts(self, mailing_list=None, page_size=100):
@@ -166,28 +187,34 @@ class MailingList(Credentials):
         assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
         assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. Please try again.'
         assert page_size != 0, 'Hey there! You need to have a page size greater than 1'
- 
+
         contact_list = pd.DataFrame()
         headers, base_url = self.header_setup(xm=True)
-        url = base_url + f"/mailinglists/{mailing_list}/contacts?pageSize={page_size}"
+        url = base_url + \
+            f"/mailinglists/{mailing_list}/contacts?pageSize={page_size}"
         try:
-          def get_page(mailing_list=mailing_list, contact_list=contact_list, url=url):
-            request = r.get(url, headers=headers)
-            response = request.json()
-            keys = ['contactId','firstName','lastName','email','phone','extRef','language','unsubscribed']
-            contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
-            single_page = pd.DataFrame(contact_lists).transpose()
-            single_page.columns = keys
-            single_page['mailing_list'] = mailing_list
-            contact_list = pd.concat([contact_list, single_page]).reset_index(drop=True)
-            next_page = str(response['result']['nextPage'])
-            return contact_list, next_page, response
-          contact_list, next_page, response = get_page(mailing_list=mailing_list, contact_list=contact_list, url=url)
-          while next_page != 'None':
-            contact_list, next_page, response = get_page(mailing_list=mailing_list, contact_list=contact_list, url=next_page)
-          return contact_list
+            def get_page(mailing_list=mailing_list, contact_list=contact_list, url=url):
+                request = r.get(url, headers=headers)
+                response = request.json()
+                keys = ['contactId', 'firstName', 'lastName', 'email',
+                        'phone', 'extRef', 'language', 'unsubscribed']
+                contact_lists = Parser().json_parser(response=response, keys=keys, arr=False)
+                single_page = pd.DataFrame(contact_lists).transpose()
+                single_page.columns = keys
+                single_page['mailing_list'] = mailing_list
+                contact_list = pd.concat(
+                    [contact_list, single_page]).reset_index(drop=True)
+                next_page = str(response['result']['nextPage'])
+                return contact_list, next_page, response
+            contact_list, next_page, response = get_page(
+                mailing_list=mailing_list, contact_list=contact_list, url=url)
+            while next_page != 'None':
+                contact_list, next_page, response = get_page(
+                    mailing_list=mailing_list, contact_list=contact_list, url=next_page)
+            return contact_list
         except:
-          print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
 
     def create_contact_in_list(self, mailing_list=None, **kwargs):
         '''This method creates contacts in the specified mailing list. It is important to remember here that whenever you create a contact in
@@ -203,7 +230,7 @@ class MailingList(Credentials):
         :param email: The new contact's email.
         :type email: str
         :param phone: The new contact's phone number.
-        :tyoe phone: str
+        :type phone: str
         :param external_ref: The new contact's external reference.
         :type external_ref: str
         :param unsubscribed: This parameter denotes whether the new contact is unsubscribed from surveys (Default: False).
@@ -219,7 +246,8 @@ class MailingList(Credentials):
 
         dynamic_payload = {}
         for key in list(kwargs.keys()):
-            assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata', 'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
+            assert key in ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata',
+                           'phone'], "Hey there! You can only pass in parameters with names in the list, ['first_name', 'last_name', 'email', 'unsubscribed', 'language', 'external_ref', 'metadata']"
             if key == 'first_name':
                 dynamic_payload.update({'firstName': kwargs[str(key)]})
             elif key == 'last_name':
@@ -237,7 +265,8 @@ class MailingList(Credentials):
             elif key == 'phone':
                 dynamic_payload.update({'phone': kwargs[str(key)]})
             elif key == 'metadata':
-                assert isinstance(kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
+                assert isinstance(
+                    kwargs['metadata'], dict), 'Hey there, your metadata parameter needs to be of type "dict"!'
                 dynamic_payload.update({'embeddedData': kwargs[str(key)]})
 
         headers, base_url = self.header_setup(content_type=True, xm=True)
@@ -254,14 +283,15 @@ class MailingList(Credentials):
                 request = r.post(url, json=dynamic_payload, headers=headers)
                 response = request.json()
                 if response['meta']['httpStatus'] == '500 - Internal Server Error':
-                    attempt+=1
+                    attempt += 1
                     t.sleep(0.25)
                     continue
                 elif response['meta']['httpStatus'] == '200 - OK':
                     return response['result']['id'], response['result']['contactLookupId']
             return print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
         except Exception:
-            print(f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
+            print(
+                f"ServerError: {response['meta']['httpStatus']}\nError Code: {response['meta']['error']['errorCode']}\nError Message: {response['meta']['error']['errorMessage']}")
         else:
             contact_list_id = response['result']['contactLookupId']
             return contact_id, contact_list_id

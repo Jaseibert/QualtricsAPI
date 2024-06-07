@@ -91,6 +91,60 @@ m.list_contacts()
 #Creates contacts in a Mailing List
 m.create_contact_in_list()
 ```
+
+## Distributions Module
+
+The `Distributions()` module has methods for creating distributions, reminders, thank you's, SMS distributions, and generating links.
+
+### Distributions
+Distributions can be created and fetched with the following methods.
+```python
+from Qualtrics.Survey import Distributions
+
+# Create a distribution client
+distribution_client = Distributions()
+
+# List Distributions for Survey
+distribution_list = distribution_client.list_distributions(survey="<Your Survey ID>")
+
+# Create Distribution for Survey
+distribution_id = distribution_client.create_distribution(subject="<Email Subject String>", reply_email="<Reply to Email>", from_email="<From Email>",from_name="<From Name>", mailing_list="<Mailing List ID>", library="<Library ID where messages are located>", survey="<Survey ID>", message="<Message ID>", send_date="<DateString of when to send>", link_type="<defaults to individual>")
+
+# Create Reminder for Distribution
+reminder_distribution_id = distribution_client.create_reminder(subject="<Email Subject String>", reply_email="<Reply to Email>", from_email="<From Email>",from_name="<From Name>", mailing_list="<Mailing List ID>", library="<Library ID where messages are located>", message="<Message ID>", distribution="<Distribution ID>", send_date="<DateString of when to send>")
+
+# Create Thank-You for Distribution
+thank_you_distribution_id = distribution_client.create_thank_you(subject="<Email Subject String>", reply_email="<Reply to Email>", from_email="<From Email>",from_name="<From Name>", mailing_list="<Mailing List ID>", library="<Library ID where messages are located>", message="<Message ID>", distribution="<Distribution ID>", send_date="<DateString of when to send>")
+```
+
+### Link Generation
+
+Some users do not wish to send the surveys from Qualtrics, but rather want to generate individual links tied to contacts which will open the survey for that user. The `Distributions()` module contains a method for doing this for a single contact, and for doing it from a dataframe for many contacts (max 10,000 at a time).
+```python
+# Generate Survey Link for single contact
+contact_data = { # Sample contact dictionary
+    "firstName": 'firstName',
+    "lastName": 'lastName',
+    "email": 'email@mail.com',
+    "phone": '999-555-9999',
+    "extRef": 'myexref',
+    "unsubscribed": False
+}
+embedded_data = {"my_key":"my_value"} # Sample Embedded Data object
+transactional_data = {"my_key":"my_value"} # Sample Transactional Data object
+
+my_link = distribution_client.generate_individual_survey_link(survey="<Survey ID>", mailing_list="<Mailing List ID>", contact=contact_data, embedded_data=embeddedData, transactional_data=transactionalData, expiration=2) # Where expiration is number of months before link expires (must be >= 1)
+
+import pandas as pd
+# Generate dataframe of links from input dataframe
+df = pd.read_csv("path/to/my.csv",na_filter=False) # empty fields being nan will cause error
+embedded_data_cols = ['headers','of','embedded fields']
+transactional_data_cols ['headers','of','transactional fields']
+
+links_df = distribution_client.generate_links_from_dataframe(survey="<Survey ID>", mailing_list="<Mailing List ID>", df=df, embedded_fields=embedded_data_cols, transactional_fields=transactional_data_cols, expiration=3)
+links_df.to_csv("links_table.csv")
+```
+
 ## Survey Module
 
 ### Fetch Response Data

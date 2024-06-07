@@ -399,8 +399,17 @@ class Distributions(Credentials):
                 f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
 
-    def create_transaction_batch(self, transaction_ids=[]):
+    def create_transaction_batch(self, transaction_ids=None):
+        '''Creates a transaction batch
+
+        :param transaction_ids: List of transaction ids to be added to the batch (can be empty)        
+        '''
+        assert transaction_ids is None or (isinstance(transaction_ids, list) and all(isinstance(
+            id, str) for id in transaction_ids)), "transaction_ids must be a list of strings or None"
+
         # Create Transaction Batch
+        if transaction_ids == None:
+            transaction_ids = []
         create_tx_batch_headers, create_tx_batch_url = self.header_setup(
             content_type=True, xm=True, path=f'transactionbatches')
         create_tx_batch_payload = {
@@ -415,9 +424,36 @@ class Distributions(Credentials):
         return tx_batch_id
 
     def generate_individual_survey_link(self, survey=None, mailing_list=None, contact=None, embedded_data=None, transactional_data=None, expiration=1):
-        '''This function takes in a single contact and a survey and returns a unique link for that contact to take that survey
+        '''This function takes in a single contact and a survey and returns a unique link for that contact to take that survey.
 
+        :param survey: Survey ID
+        :type survey: str (18 characters long, starts with "SV_")
+        :param mailing_list: Mailing list ID
+        :type mailing_list: str (18 characters long, starts with "CG_")
+        :param contact: Contact ID
+        :type contact: str (19 characters long, starts with "CID_")
+        :param embedded_data: Dictionary containing embedded data
+        :type embedded_data: dict (keys and values must be strings)
+        :param transactional_data: Dictionary containing transactional data
+        :type transactional_data: dict (keys and values must be strings)
+        :param expiration: Expiration time in months
+        :type expiration: int (must be greater or equal to 1)
         '''
+
+        # Validate inputs
+        assert isinstance(survey, str) and len(survey) == 18 and survey.startswith(
+            "SV_"), "Survey must be a string of 18 characters starting with 'SV_'"
+        assert isinstance(mailing_list, str) and len(mailing_list) == 18 and mailing_list.startswith(
+            "CG_"), "Mailing list must be a string of 18 characters starting with 'CG_'"
+        assert isinstance(contact, str) and len(contact) == 19 and contact.startswith(
+            "CID_"), "Contact must be a string of 19 characters starting with 'CID_'"
+        assert embedded_data is None or (isinstance(embedded_data, dict) and all(isinstance(k, str) and isinstance(
+            v, str) for k, v in embedded_data.items())), "Embedded data must be a dictionary with string keys and values"
+        assert transactional_data is None or (isinstance(transactional_data, dict) and all(isinstance(k, str) and isinstance(
+            v, str) for k, v in transactional_data.items())), "Transactional data must be a dictionary with string keys and values"
+        assert isinstance(
+            expiration, int) and expiration >= 1, "Expiration must be an integer greater or equal to 1"
+
         if embedded_data == None:
             embedded_data = {}
         if transactional_data == None:
@@ -563,9 +599,27 @@ class Distributions(Credentials):
         return links_df
 
     def generate_links_from_tx_batch(self, survey=None, mailing_list=None, tx_batch_id=None, expiration=2):
-        '''This method takes in a survey and transaction batch and generates links for all contacts in that batch
+        '''This method takes in a survey and transaction batch and generates links for all contacts in that batch.
 
+        :param survey: Survey ID
+        :type survey: str (18 characters long, starts with "SV_")
+        :param mailing_list: Mailing list ID
+        :type mailing_list: str (18 characters long, starts with "CG_")
+        :param tx_batch_id: Transaction batch ID
+        :type tx_batch_id: str (18 characters long, starts with "BT_")
+        :param expiration: Expiration time in months
+        :type expiration: int (must be greater or equal to 1)
         '''
+
+        # Validate inputs
+        assert isinstance(survey, str) and len(survey) == 18 and survey.startswith(
+            "SV_"), "Survey must be a string of 18 characters starting with 'SV_'"
+        assert isinstance(mailing_list, str) and len(mailing_list) == 18 and mailing_list.startswith(
+            "CG_"), "Mailing list must be a string of 18 characters starting with 'CG_'"
+        assert isinstance(tx_batch_id, str) and len(tx_batch_id) == 18 and tx_batch_id.startswith(
+            "BT_"), "Transaction batch ID must be a string of 18 characters starting with 'BT_'"
+        assert isinstance(
+            expiration, int) and expiration >= 1, "Expiration must be an integer greater or equal to 1"
         # Generate Distribution Links for TX batch
         gen_dist_headers, gen_dist_url = self.header_setup(
             content_type=True, xm=False, accept=False, path=f'distributions')

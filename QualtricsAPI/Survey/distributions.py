@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from QualtricsAPI.Setup import Credentials
 from QualtricsAPI.JSON import Parser
 from QualtricsAPI.Exceptions import Qualtrics500Error, Qualtrics503Error, Qualtrics504Error, Qualtrics400Error, Qualtrics401Error, Qualtrics403Error
+from time import sleep
 
 
 class Distributions(Credentials):
@@ -398,10 +399,41 @@ class Distributions(Credentials):
                 f"\nServerError: QualtricsAPI Error Code: {response['meta']['error']['errorCode']}\nQualtricsAPI Error Message: {response['meta']['error']['errorMessage']}")
         return
 
+    def create_transaction_batch(self, transaction_ids=[]):
+        # Create Transaction Batch
+        create_tx_batch_headers, create_tx_batch_url = self.header_setup(
+            content_type=True, xm=True, path=f'transactionbatches')
+        create_tx_batch_payload = {
+            "transactionIds": transaction_ids,
+            "creationDate": datetime.now().strftime('%Y-%m-%dT%I:%M:%SZ')
+        }
+        create_tx_batch_request = r.post(
+            create_tx_batch_url, json=create_tx_batch_payload, headers=create_tx_batch_headers)
+        create_tx_batch_response = create_tx_batch_request.json()
+        create_tx_batch_data = self._handle_response(create_tx_batch_response)
+        tx_batch_id = create_tx_batch_data['id']
+        return tx_batch_id
+
     def generate_individual_survey_link(self, survey=None, mailing_list=None, contact=None, embedded_data=None, transactional_data=None, expiration=1):
         '''This function takes in a single contact and a survey and returns a unique link for that contact to take that survey
 
         '''
+        if embedded_data == None:
+            embedded_data = {}
+        if transactional_data == None:
+            transactional_data = {}
+
+        assert len(
+            survey) == 18, 'Hey, the parameter for "survey" that was passed is the wrong length. It should have 18 characters.'
+        assert survey[:3] == 'SV_', 'Hey there! It looks like your SurveyID is incorrect. You can find the SurveyID on the Qualtrics site under your account settings. It will begin with "SV_". Please try again.'
+        assert len(mailing_list) == 18, 'Hey, the parameter for "mailing_list" that was passed is the wrong length. It should have 18 characters.'
+        assert mailing_list[:3] == 'CG_', 'Hey there! It looks like your Mailing List ID is incorrect. You can find the Mailing List ID on the Qualtrics site under your account settings. It will begin with "CG_". Please try again.'
+        self._validate_contact_data(contact)
+        self._validate_embedded_data(embedded_data)
+        self._validate_embedded_data(transactional_data)
+        assert isinstance(expiration, int), "Expiration must be an integer."
+        assert expiration > 0, "Expiration must be greater than 0."
+
         # Create contact in mailing list
         create_contact_headers, create_contact_url = self.header_setup(
             content_type=True, xm=True, path=f"mailinglists/{mailing_list}/contacts")
@@ -432,18 +464,76 @@ class Distributions(Credentials):
         transaction_id = create_tx_data['createdTransactions']['single_link_transaction']['id']
         print("Created Transaction.", transaction_id)
         # Create Transaction Batch
-        create_tx_batch_headers, create_tx_batch_url = self.header_setup(
-            content_type=True, xm=True, path=f'transactionbatches')
-        create_tx_batch_payload = {
-            "transactionIds": [transaction_id],
-            "creationDate": datetime.now().strftime('%Y-%m-%dT%I:%M:%SZ')
-        }
-        create_tx_batch_request = r.post(
-            create_tx_batch_url, json=create_tx_batch_payload, headers=create_tx_batch_headers)
-        create_tx_batch_response = create_tx_batch_request.json()
-        create_tx_batch_data = self._handle_response(create_tx_batch_response)
-        tx_batch_id = create_tx_batch_data['id']
+        tx_batch_id = self.create_transaction_batch([transaction_id])
         print("Created Transaction Batch:", tx_batch_id)
+        link_elements = self.generate_links_from_tx_batch(
+            survey, mailing_list, tx_batch_id, expiration)
+        return link_elements[0]['link']
+
+    def generate_links_from_dataframe(self, survey=None, mailing_list=None, df=None, embedded_fields=[], transactional_fields=[], expiration=1):
+        '''This method takes in a pandas dataframe and generates links for the contacts in the dataframe
+
+        '''
+        # Validate inputs
+
+        # Create TX Batch (empty)
+        tx_batch_id = self.create_transaction_batch([])
+        # Loop through the dataframe and accumulate the contacts in a list
+        contacts = []
+        for idx, row in df.iterrows():
+            contact = self._series_to_contact_object(
+                row, embedded_fields, transactional_fields)
+            # print(contact)
+            contacts.append(contact)
+        print("number of contacts:", len(contacts))
+        contact_import_payload = {
+            "transactionMeta": {
+                "batchId": tx_batch_id
+            },
+            "contacts": contacts
+        }
+        if len(transactional_fields) > 0:
+            contact_import_payload['transactionMeta']['fields'] = transactional_fields
+        contact_headers, contact_url = self.header_setup(
+            content_type=True, accept=True, xm=True, path=f'mailinglists/{mailing_list}/transactioncontacts')
+        contact_request = r.post(
+            contact_url, headers=contact_headers, json=contact_import_payload)
+        contact_response = contact_request.json()
+        contact_result = self._handle_response(contact_response)
+        tracking_url = contact_result['tracking']['url']
+        import_id = contact_result['id']
+        # print("Tracking URL:", tracking_url)
+        print("import ID:", import_id)
+        processing_contacts = True
+        last_console_update = ""
+        while processing_contacts:
+            processing_request = r.get(tracking_url, headers=contact_headers)
+            processing_response = processing_request.json()
+            processing_result = self._handle_response(processing_response)
+            msg = "Processing contacts: "+str(
+                processing_result['percentComplete'])+"% complete"
+            if last_console_update != msg:
+                print(msg)
+                last_console_update = msg
+            if processing_result['percentComplete'] >= 100:
+                print("added", processing_result['contacts']['count']['added'])
+                print(
+                    "updated", processing_result['contacts']['count']['updated'])
+                print(
+                    "failed", processing_result['contacts']['count']['failed'])
+                processing_contacts = False
+            sleep(1.5)
+        # Generate links
+        links = self.generate_links_from_tx_batch(
+            survey=survey, mailing_list=mailing_list, tx_batch_id=tx_batch_id, expiration=expiration)
+        links_df = pd.DataFrame(links)
+        links_df.set_index('contactId', inplace=True)
+        return links_df
+
+    def generate_links_from_tx_batch(self, survey=None, mailing_list=None, tx_batch_id=None, expiration=2):
+        '''This method takes in a survey and transaction batch and generates links for all contacts in that batch
+
+        '''
         # Generate Distribution Links for TX batch
         gen_dist_headers, gen_dist_url = self.header_setup(
             content_type=True, xm=False, accept=False, path=f'distributions')
@@ -468,9 +558,12 @@ class Distributions(Credentials):
         fetch_link_request = r.get(fetch_link_url, headers=fetch_link_headers)
         fetch_link_response = fetch_link_request.json()
         fetch_link_data = self._handle_response(fetch_link_response)
-        link = fetch_link_data['elements'][0]['link']
-        print("Link Created.", link)
-        return link
+        # print(fetch_link_data['elements'][0])
+        elements = fetch_link_data['elements']
+        # print("Links Created.", elements)
+        return elements
+
+    ## Private utility methods below here ##
 
     def _handle_response(self, response: dict):
         try:
@@ -506,3 +599,77 @@ class Distributions(Credentials):
                 return response['result']
             else:
                 return response['meta']
+
+    def _validate_contact_data(self, contact_data):
+        # Ensure payload is a dictionary
+        assert isinstance(contact_data, dict), "Payload must be a dictionary."
+
+        # Ensure payload is not empty
+        assert contact_data, "Payload must have at least one field."
+
+        valid_fields = {"firstName", "lastName",
+                        "email", "phone", "extRef", "unsubscribed"}
+        for key, value in contact_data.items():
+            # Ensure each field is a valid field
+            assert key in valid_fields, f"Invalid field '{key}' in payload."
+
+            # Ensure 'unsubscribed' is a boolean if it exists
+            if key == "unsubscribed":
+                assert isinstance(
+                    value, bool) or value is None, "Field 'unsubscribed' must be a boolean."
+            else:
+                # Ensure all other fields are strings or null
+                assert isinstance(
+                    value, str) or value is None, f"Field '{key}' must be a string or null."
+
+        # Ensure there is at least one non-null field
+        assert any(value is not None for value in contact_data.values()
+                   ), "Payload must have at least one non-null field."
+
+        return True
+
+    def _validate_embedded_data(self, embedded_data):
+        # Ensure payload is a dictionary
+        assert isinstance(embedded_data, dict), "Payload must be a dictionary."
+
+        if embedded_data:
+            for key, value in embedded_data.items():
+                # Ensure all keys are strings
+                assert isinstance(key, str), f"Key '{key}' must be a string."
+
+                # Ensure all values are either strings or numbers
+                assert isinstance(
+                    value, (str, int, float)), f"Value '{value}' for key '{key}' must be a string or a number."
+
+        return True
+
+    def _series_to_contact_object(self, row, embedded_data_columns, transaction_data_columns):
+        # Initialize the contact object with requisite keys.
+        contact = {}
+
+        # Root fields for the contact object
+        root_fields = ['firstName', 'lastName', 'email', 'extRef', 'language']
+
+        # Update the contact object with values from the row for root fields
+        for field in root_fields:
+            if field in row:
+                contact[field] = row[field]
+
+        # Add 'embeddedData' field
+        embedded_data = {}
+        for field in embedded_data_columns:
+            if field in row:
+                if row[field] != '':
+                    embedded_data[field] = row[field]
+        contact["embeddedData"] = embedded_data
+
+        # Add 'transactionData' field
+        transaction_data = {}
+        for field in transaction_data_columns:
+            if field in row:
+                if row[field] != '':
+                    transaction_data[field] = row[field]
+        contact["transactionData"] = transaction_data
+        contact['unsubscribed'] = False
+
+        return contact
